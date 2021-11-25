@@ -22,4 +22,9 @@ public class Day%Day% extends Day {
     public int getDay() {
         return %Day%;
     }
+
+    @Override
+    public boolean isTest() {
+        return false;
+    }
 }
