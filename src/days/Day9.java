@@ -26,7 +26,7 @@ public class Day9 extends Day {
     public void part1() {
         PrimitiveIterator.OfInt nextMarbles = IntStream.range(0, last + 1).iterator();
         Marble current = new Marble(nextMarbles.next());
-        int[] scores = new int[players];
+        long[] scores = new long[players];
 
         game: while (true) {
             for (int i = 0; i < players; i++) {
@@ -51,8 +51,8 @@ public class Day9 extends Day {
             }
         }
 
-        int max = Integer.MIN_VALUE;
-        for (int score : scores) {
+        long max = Integer.MIN_VALUE;
+        for (long score : scores) {
             max = Math.max(score, max);
         }
         System.out.println(max);
@@ -60,7 +60,8 @@ public class Day9 extends Day {
 
     @Override
     public void part2() {
-
+        last *= 100;
+        part1();
     }
 
     @Override
