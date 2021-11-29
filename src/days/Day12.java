@@ -3,16 +3,22 @@ package days;
 import setup.Day;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Day12 extends Day {
-    private String state;
     private Map<String, String> rules;
+    private Map<Integer, String> state;
 
     @Override
     public void processInput() {
         List<String> split = List.of(input.trim().split("\n"));
-        state = split.get(0).trim().replaceFirst("[^.#]+", "");
+
+        state = new HashMap<>();
+        char[] chars = split.get(0).trim().replaceAll("[^.#]", "").toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            state.put(i, String.valueOf(chars[i]));
+        }
 
         rules = new HashMap<>();
 
@@ -24,25 +30,30 @@ public class Day12 extends Day {
 
     @Override
     public void part1() {
-        List<String> pastStates = new ArrayList<>();
+//        System.out.println(IntStream.rangeClosed(Collections.min(state.entrySet(), Map.Entry.comparingByKey()).getKey(), Collections.max(state.entrySet(), Map.Entry.comparingByKey()).getKey())
+//                .mapToObj(i -> state.getOrDefault(i, ".")).collect(Collectors.joining()));
 
-         for (int n = 0; n < 20; n ++){
-             pastStates.add(state);
-//             System.out.println(state);
-             state = "....." + state + ".....";
 
-            StringBuilder newState = new StringBuilder();
-            List<String> substrings = new ArrayList<>();
 
-            IntStream.range(0, state.length() - 4).mapToObj(i -> state.substring(i, i + 5)).forEachOrdered(substrings::add);
+        for (int n = 0; n < 20; n++) {
+            Map<Integer, String> oldState = state;
+            state = new HashMap<>();
+            int minPlant = oldState.entrySet().stream().filter(x -> x.getValue().equals("#")).mapToInt(Map.Entry::getKey).min().getAsInt();
+            int maxPlant = oldState.entrySet().stream().filter(x -> x.getValue().equals("#")).mapToInt(Map.Entry::getKey).max().getAsInt();
 
-            for (String s : substrings) {
-                newState.append(rules.getOrDefault(s, "."));
-            }
-            state = newState.toString().replaceAll("^\\.+|\\.+$", "");
+            minPlant -= 4;
+            maxPlant += 4;
+            IntStream.rangeClosed(minPlant, maxPlant).forEach(i -> {
+                String collect = IntStream.range(i, i + 5).mapToObj(x -> oldState.getOrDefault(x, ".")).collect(Collectors.joining());
+                state.put(i, rules.getOrDefault(collect, "."));
+            });
+//            System.out.println(IntStream.rangeClosed(Collections.min(state.entrySet(), Map.Entry.comparingByKey()).getKey(), Collections.max(state.entrySet(), Map.Entry.comparingByKey()).getKey())
+//                    .mapToObj(i -> state.getOrDefault(i, ".")).collect(Collectors.joining()));
         }
-        pastStates.add(state);
-        System.out.println(String.join("", pastStates).split("#", -1).length - 1);
+
+        System.out.println(state);
+        System.out.println(state.entrySet().stream().filter(e -> Objects.equals(e.getValue(), "#")).mapToInt(Map.Entry::getKey).sum());
+
     }
 
     @Override
