@@ -2,7 +2,6 @@ package days;
 
 import setup.Day;
 
-import java.util.Arrays;
 import java.util.PrimitiveIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,8 +9,8 @@ import java.util.stream.IntStream;
 
 public class Day9 extends Day {
 
-    int players;
-    int last;
+    private int players;
+    private int last;
 
     @Override
     public void processInput() {
@@ -28,7 +27,8 @@ public class Day9 extends Day {
         Marble current = new Marble(nextMarbles.next());
         long[] scores = new long[players];
 
-        game: while (true) {
+        game:
+        while (true) {
             for (int i = 0; i < players; i++) {
                 if (nextMarbles.hasNext()) {
                     Marble next = new Marble(nextMarbles.next());
@@ -74,7 +74,7 @@ public class Day9 extends Day {
         return false;
     }
 
-    static class Marble {
+    private static class Marble {
         public final int value;
 
         Marble clockwise = this;

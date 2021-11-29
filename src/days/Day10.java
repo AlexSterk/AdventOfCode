@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 public class Day10 extends Day {
 
-    List<Point> points;
-    int seconds = 0;
+    private List<Point> points;
+    private int seconds = 0;
 
     @Override
     public void processInput() {

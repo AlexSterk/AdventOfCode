@@ -2,21 +2,29 @@ package days;
 
 import setup.Day;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Day1 extends Day {
-    List<Operation> operations;
+    private List<Operation> operations;
+
+    private static Operation stringToOperation(String s) {
+        Operator o = s.charAt(0) == '+' ? Operator.ADDITION : Operator.SUBTRACTION;
+        int n = Integer.parseInt(s.substring(1).trim());
+        return new Operation(o, n);
+    }
+
+    public static void main(String[] args) {
+        Day1 day1 = new Day1();
+        day1.part1();
+        day1.part2();
+    }
 
     @Override
     public void processInput() {
         operations = Arrays.stream(input.trim().split("\n")).map(Day1::stringToOperation).collect(Collectors.toList());
-    }
-
-    public static Operation stringToOperation(String s) {
-        Operator o = s.charAt(0) == '+' ? Operator.ADDITION : Operator.SUBTRACTION;
-        int n = Integer.parseInt(s.substring(1).trim());
-        return new Operation(o, n);
     }
 
     @Override
@@ -38,7 +46,7 @@ public class Day1 extends Day {
         while (!freqs.contains(freq)) {
             freqs.add(freq);
             freq = operations.get(i).execute(freq);
-            i = (i+1) % operations.size();
+            i = (i + 1) % operations.size();
         }
         System.out.println(freq);
     }
@@ -48,26 +56,24 @@ public class Day1 extends Day {
         return 1;
     }
 
-    public static void main(String[] args) {
-        Day1 day1 = new Day1();
-        day1.part1();
-        day1.part2();
+    private enum Operator {
+        ADDITION,
+        SUBTRACTION;
+
+        int execute(int previous, int n) {
+            if (this == ADDITION) return previous + n;
+            else if (this == SUBTRACTION) return previous - n;
+            return -1;
+        }
     }
+
+    private static record Operation(Operator operator, int number) {
+        int execute(int previous) {
+            return operator.execute(previous, number);
+        }
+    }
+
 }
 
-enum Operator {
-    ADDITION,
-    SUBTRACTION;
 
-    int execute(int previous, int n) {
-        if (this == ADDITION) return previous + n;
-        else if (this == SUBTRACTION) return previous - n;
-        return -1;
-    }
-}
 
-record Operation(Operator operator, int number) {
-    int execute(int previous) {
-        return operator.execute(previous, number);
-    }
-}

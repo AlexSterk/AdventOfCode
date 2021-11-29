@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 public class Day5 extends Day {
 
-    public static final List<String> ALPHABET = IntStream.rangeClosed('a', 'z').boxed().map(Character::toString).collect(Collectors.toList());
+    private static final List<String> ALPHABET = IntStream.rangeClosed('a', 'z').boxed().map(Character::toString).collect(Collectors.toList());
 
     @Override
     public void processInput() {

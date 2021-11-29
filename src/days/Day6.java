@@ -6,10 +6,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day6 extends Day {
-    static List<Character> ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+    private static final List<Character> ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().mapToObj(c -> (char) c).collect(Collectors.toList());
 
-    public int maxX, maxY;
-    public List<Point> points;
+    private int maxX, maxY;
+    private List<Point> points;
 
     @Override
     public void processInput() {
@@ -43,7 +43,8 @@ public class Day6 extends Day {
                 Map.Entry<Integer, List<Point>> min = Collections.min(dist.entrySet(), Map.Entry.comparingByKey());
                 if (min.getValue().size() == 1) {
                     Point e = min.getValue().get(0);
-                    if (points.size() <= ALPHABET.size()) System.out.print(min.getKey() == 0 ? ALPHABET.get(points.indexOf(e)) : Character.toLowerCase(ALPHABET.get(points.indexOf(e))));
+                    if (points.size() <= ALPHABET.size())
+                        System.out.print(min.getKey() == 0 ? ALPHABET.get(points.indexOf(e)) : Character.toLowerCase(ALPHABET.get(points.indexOf(e))));
                     areas.merge(e, 1, Integer::sum);
                     if (x == 0 || x == maxX + 1 || y == 0 || y == maxY + 1) inf.add(e);
                 } else if (points.size() <= ALPHABET.size()) System.out.print(".");
@@ -78,7 +79,7 @@ public class Day6 extends Day {
         return false;
     }
 
-    static record Point(int x, int y) {
+    private static record Point(int x, int y) {
         public Point(String x, String y) {
             this(Integer.parseInt(x), Integer.parseInt(y));
         }

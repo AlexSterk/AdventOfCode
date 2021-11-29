@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 public class Day2 extends Day {
     List<String> ids;
 
+    public static void main(String[] args) {
+        Day2 day2 = new Day2();
+        day2.part1();
+        day2.part2();
+    }
+
     @Override
     public void processInput() {
         ids = Arrays.asList(input.split("\n"));
@@ -31,13 +37,14 @@ public class Day2 extends Day {
             if (map.containsValue(3)) count3s++;
         }
 
-        System.out.println(count2s*count3s);
+        System.out.println(count2s * count3s);
     }
 
     @Override
     public void part2() {
         for (String id : ids) {
-            l: for (String id2 : ids) {
+            l:
+            for (String id2 : ids) {
                 if (id.equals(id2)) continue;
 
                 int diffs = 0;
@@ -58,11 +65,5 @@ public class Day2 extends Day {
     @Override
     public int getDay() {
         return 2;
-    }
-
-    public static void main(String[] args) {
-        Day2 day2 = new Day2();
-        day2.part1();
-        day2.part2();
     }
 }

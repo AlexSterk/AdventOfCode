@@ -23,7 +23,7 @@ public class Day4 extends Day {
     @Override
     public void part1() {
         minutes = new HashMap<>();
-        
+
         int onDuty = -1;
         Date startsSleep = null;
 
@@ -38,12 +38,12 @@ public class Day4 extends Day {
                 int start = startsSleep.getMinutes();
                 int end = record.timestamp().getMinutes();
                 int finalOnDuty = onDuty;
-                
-                IntStream.range(start, end).forEach(i -> minutes.computeIfAbsent(finalOnDuty, x -> new HashMap<>()).merge(i, 1, Integer::sum) );
+
+                IntStream.range(start, end).forEach(i -> minutes.computeIfAbsent(finalOnDuty, x -> new HashMap<>()).merge(i, 1, Integer::sum));
                 startsSleep = null;
             }
         }
-        
+
         int longestSleeper = minutes.entrySet().stream().max(Comparator.comparing(e -> e.getValue().values().stream().mapToInt(i -> i).sum())).get().getKey();
         int minute = minutes.get(longestSleeper).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 
@@ -53,8 +53,8 @@ public class Day4 extends Day {
     @Override
     public void part2() {
         Map<Integer, Map<Integer, Integer>> inverted = new HashMap<>();
-        
-        minutes.forEach((k,v) -> v.forEach((m, c) -> inverted.computeIfAbsent(m, i -> new HashMap<>()).put(k,c)));
+
+        minutes.forEach((k, v) -> v.forEach((m, c) -> inverted.computeIfAbsent(m, i -> new HashMap<>()).put(k, c)));
 
         int mostFrequentMinute = inverted.entrySet().stream().max(Comparator.comparing(e -> Collections.max(e.getValue().values()))).get().getKey();
         int guard = inverted.get(mostFrequentMinute).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
@@ -65,45 +65,47 @@ public class Day4 extends Day {
     public int getDay() {
         return 4;
     }
-}
 
-sealed interface Log {
-    
-}
-
-record StartsShift(int guard) implements Log {}
-
-enum Action implements Log {
-    SLEEPS,
-    WAKES
-}
-
-record Record(Date timestamp, Log log) {
-    static final Pattern ENTRY_PATTERN = Pattern.compile("\\[(.+)\\] (.+)");
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    
-    static Record stringToRecord(String s) {
-        var m = ENTRY_PATTERN.matcher(s.trim());
-        m.matches();
-
-        Date timestamp = null;
-        try {
-            timestamp = DATE_FORMAT.parse(m.group(1));
-        } catch (ParseException e) {
-           throw new RuntimeException();
-        }
-        Log log = switch (m.group(2)) {
-            case "wakes up" -> Action.WAKES;
-            case "falls asleep" -> Action.SLEEPS;
-           default -> {
-               var ma = Pattern.compile("\\d+").matcher(m.group(2));
-               ma.find();
-               yield new StartsShift(Integer.parseInt(ma.group()));
-           }
-        };
-        
-        return new Record(timestamp, log);
+    private enum Action implements Log {
+        SLEEPS,
+        WAKES
     }
+
+    private static sealed interface Log {
+
+    }
+
+    static private record StartsShift(int guard) implements Log {
+    }
+
+    private static record Record(Date timestamp, Log log) {
+        static final Pattern ENTRY_PATTERN = Pattern.compile("\\[(.+)\\] (.+)");
+        static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        static Record stringToRecord(String s) {
+            var m = ENTRY_PATTERN.matcher(s.trim());
+            m.matches();
+
+            Date timestamp = null;
+            try {
+                timestamp = DATE_FORMAT.parse(m.group(1));
+            } catch (ParseException e) {
+                throw new RuntimeException();
+            }
+            Log log = switch (m.group(2)) {
+                case "wakes up" -> Action.WAKES;
+                case "falls asleep" -> Action.SLEEPS;
+                default -> {
+                    var ma = Pattern.compile("\\d+").matcher(m.group(2));
+                    ma.find();
+                    yield new StartsShift(Integer.parseInt(ma.group()));
+                }
+            };
+
+            return new Record(timestamp, log);
+        }
+    }
+
 }
 
 

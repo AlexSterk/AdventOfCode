@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class Day8 extends Day {
 
-    static class Node {
+    private static class Node {
         List<Integer> metadata = new ArrayList<>();
         List<Node> children = new ArrayList<>();
 

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Day3 extends Day {
-    Map<Integer, Rectangle> rectangles;
+    private Map<Integer, Rectangle> rectangles;
 
     @Override
     public void processInput() {
@@ -20,7 +20,7 @@ public class Day3 extends Day {
         int maxWidth = rectangles.values().stream().map(r -> r.width() + r.x()).max(Comparator.comparingInt(i -> i)).get();
         int maxHeight = rectangles.values().stream().map(r -> r.height() + r.y()).max(Comparator.comparingInt(i -> i)).get();
 
-        int[][] fabric = new int[maxWidth+1][maxHeight+1];
+        int[][] fabric = new int[maxWidth + 1][maxHeight + 1];
 
         for (Rectangle r : rectangles.values()) {
             for (int i = r.x(); i < r.x() + r.width(); i++) {
@@ -67,18 +67,19 @@ public class Day3 extends Day {
     public int getDay() {
         return 3;
     }
-}
 
-record Rectangle(int id, int x, int y, int width, int height) {
-    Rectangle(String id, String x, String y, String width, String height) {
-        this(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(width), Integer.parseInt(height));
+    static private record Rectangle(int id, int x, int y, int width, int height) {
+        static final Pattern PATTERN = Pattern.compile("#(\\d+) @ (\\d+),(\\d+): (\\d+)x(\\d+)");
+
+        Rectangle(String id, String x, String y, String width, String height) {
+            this(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(width), Integer.parseInt(height));
+        }
+
+        static Rectangle stringToRectangle(String s) {
+            Matcher matcher = PATTERN.matcher(s.trim());
+            matcher.matches();
+            return new Rectangle(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+        }
     }
 
-    static final Pattern PATTERN = Pattern.compile("#(\\d+) @ (\\d+),(\\d+): (\\d+)x(\\d+)");
-
-    static Rectangle stringToRectangle(String s) {
-        Matcher matcher = PATTERN.matcher(s.trim());
-        matcher.matches();
-        return new Rectangle(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
-    }
 }

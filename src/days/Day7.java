@@ -3,11 +3,9 @@ package days;
 import setup.Day;
 
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Day7 extends Day {
-    Map<String, Set<String>> requires;
+    private Map<String, Set<String>> requires;
 
     @Override
     public void processInput() {
