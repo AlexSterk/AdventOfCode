@@ -1,0 +1,99 @@
+package days;
+
+import setup.Day;
+
+import java.util.Arrays;
+import java.util.PrimitiveIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+
+public class Day9 extends Day {
+
+    int players;
+    int last;
+
+    @Override
+    public void processInput() {
+        Pattern p = Pattern.compile("\\D*(\\d+)\\D+(\\d+)\\D*");
+        Matcher m = p.matcher(input);
+        m.matches();
+        players = Integer.parseInt(m.group(1));
+        last = Integer.parseInt(m.group(2));
+    }
+
+    @Override
+    public void part1() {
+        PrimitiveIterator.OfInt nextMarbles = IntStream.range(0, last + 1).iterator();
+        Marble current = new Marble(nextMarbles.next());
+        int[] scores = new int[players];
+
+        game: while (true) {
+            for (int i = 0; i < players; i++) {
+                if (nextMarbles.hasNext()) {
+                    Marble next = new Marble(nextMarbles.next());
+                    if (next.value % 23 == 0) {
+                        scores[i] += next.value;
+                        Marble toRemove = current;
+                        for (int j = 0; j < 7; j++) {
+                            toRemove = toRemove.counterClockwise;
+                        }
+                        current = toRemove.clockwise;
+                        scores[i] += toRemove.value;
+                        toRemove.removeThis();
+                    } else {
+                        next.insertThisAfter(current.clockwise);
+                        current = next;
+                    }
+                } else {
+                    break game;
+                }
+            }
+        }
+
+        int max = Integer.MIN_VALUE;
+        for (int score : scores) {
+            max = Math.max(score, max);
+        }
+        System.out.println(max);
+    }
+
+    @Override
+    public void part2() {
+
+    }
+
+    @Override
+    public int getDay() {
+        return 9;
+    }
+
+    @Override
+    public boolean isTest() {
+        return false;
+    }
+
+    static class Marble {
+        public final int value;
+
+        Marble clockwise = this;
+        Marble counterClockwise = this;
+
+        Marble(int value) {
+            this.value = value;
+        }
+
+        void insertThisAfter(Marble marbleToInsertAfter) {
+            Marble oldClockwise = marbleToInsertAfter.clockwise;
+            marbleToInsertAfter.clockwise = this;
+            this.counterClockwise = marbleToInsertAfter;
+            this.clockwise = oldClockwise;
+            oldClockwise.counterClockwise = this;
+        }
+
+        void removeThis() {
+            counterClockwise.clockwise = clockwise;
+            clockwise.counterClockwise = counterClockwise;
+        }
+    }
+}
