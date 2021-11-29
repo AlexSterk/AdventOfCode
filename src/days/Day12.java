@@ -30,10 +30,6 @@ public class Day12 extends Day {
 
     @Override
     public void part1() {
-//        System.out.println(IntStream.rangeClosed(Collections.min(state.entrySet(), Map.Entry.comparingByKey()).getKey(), Collections.max(state.entrySet(), Map.Entry.comparingByKey()).getKey())
-//                .mapToObj(i -> state.getOrDefault(i, ".")).collect(Collectors.joining()));
-
-
 
         for (int n = 0; n < 20; n++) {
             Map<Integer, String> oldState = state;
@@ -41,17 +37,15 @@ public class Day12 extends Day {
             int minPlant = oldState.entrySet().stream().filter(x -> x.getValue().equals("#")).mapToInt(Map.Entry::getKey).min().getAsInt();
             int maxPlant = oldState.entrySet().stream().filter(x -> x.getValue().equals("#")).mapToInt(Map.Entry::getKey).max().getAsInt();
 
-            minPlant -= 4;
-            maxPlant += 4;
+            minPlant -= 2;
+            maxPlant += 2;
             IntStream.rangeClosed(minPlant, maxPlant).forEach(i -> {
-                String collect = IntStream.range(i, i + 5).mapToObj(x -> oldState.getOrDefault(x, ".")).collect(Collectors.joining());
+                String collect = IntStream.rangeClosed(i - 2, i + 2).mapToObj(x -> oldState.getOrDefault(x, ".")).collect(Collectors.joining());
                 state.put(i, rules.getOrDefault(collect, "."));
             });
-//            System.out.println(IntStream.rangeClosed(Collections.min(state.entrySet(), Map.Entry.comparingByKey()).getKey(), Collections.max(state.entrySet(), Map.Entry.comparingByKey()).getKey())
-//                    .mapToObj(i -> state.getOrDefault(i, ".")).collect(Collectors.joining()));
         }
 
-        System.out.println(state);
+//        System.out.println(state);
         System.out.println(state.entrySet().stream().filter(e -> Objects.equals(e.getValue(), "#")).mapToInt(Map.Entry::getKey).sum());
 
     }
@@ -68,6 +62,6 @@ public class Day12 extends Day {
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 }
