@@ -9,13 +9,13 @@ public class Day%Day% extends Day {
     }
 
     @Override
-    public void part1() {
-
+    public Object part1() {
+        return null;
     }
 
     @Override
-    public void part2() {
-
+    public Object part2() {
+        return null;
     }
 
     @Override
