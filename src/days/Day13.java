@@ -2,10 +2,8 @@ package days;
 
 import setup.Day;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Day13 extends Day {
 
@@ -47,23 +45,37 @@ public class Day13 extends Day {
 
     @Override
     public void part1() {
-        while (true) {
-            Map<Pair, Cart> taken = new HashMap<>();
-            for (Cart cart : carts) {
+        boolean crash = false;
+        while (!crash) {
+            Collections.sort(carts);
+            for (Cart cart : new ArrayList<>(carts)) {
                 cart.move();
-                Pair pos = new Pair(cart.x, cart.y);
-                if (taken.containsKey(pos)) {
-                    System.out.println(pos);
-                    return;
+                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).collect(Collectors.toList());
+                if (!crashes.isEmpty()) {
+                    System.out.println(cart.x + "," + cart.y);
+                    carts.removeAll(crashes);
+                    carts.remove(cart);
+                    crash = true;
                 }
-                taken.put(pos, cart);
             }
         }
     }
 
     @Override
     public void part2() {
-
+        while (carts.size() > 1) {
+            Collections.sort(carts);
+            for (Cart cart : new ArrayList<>(carts)) {
+                cart.move();
+                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).collect(Collectors.toList());
+                if (!crashes.isEmpty()) {
+                    carts.removeAll(crashes);
+                    carts.remove(cart);
+                }
+            }
+        }
+        Cart cart = carts.get(0);
+        System.out.println(cart.x + "," + cart.y);
     }
 
     @Override
@@ -80,7 +92,7 @@ public class Day13 extends Day {
 
     }
 
-    private static class Cart {
+    private static class Cart implements Comparable<Cart> {
         private final char[][] grid;
         private int x, y;
         private int vx, vy;
@@ -92,6 +104,10 @@ public class Day13 extends Day {
             this.vx = vx;
             this.vy = vy;
             this.grid = grid;
+        }
+
+        public boolean checkCrash(Cart o) {
+            return x == o.x && y == o.y;
         }
 
         public void move() {
@@ -127,6 +143,12 @@ public class Day13 extends Day {
                 }
                 case ' ' -> throw new RuntimeException();
             }
+        }
+
+        @Override
+        public int compareTo(Cart o) {
+            final int compare = Integer.compare(y, o.y);
+            return compare == 0 ? Integer.compare(x, o.x) : compare;
         }
     }
 }
