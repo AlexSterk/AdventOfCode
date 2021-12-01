@@ -40,12 +40,18 @@ public class Day15 extends Day {
     public void part1() {
 //        System.out.println(Arrays.stream(grid.grid).flatMap(Arrays::stream).filter(t -> t.type == TileType.EMPTY).count());
 
+        int rounds = simulateFight();
+        int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
+        System.out.println("Rounds: " + rounds);
+        System.out.println("Remaining HP: " + hp);
+        System.out.println("Result: " + (rounds * hp));
+    }
+
+    private int simulateFight() {
         int rounds = 0;
         Map<UnitType, List<Unit>> units = grid.units.stream().collect(Collectors.groupingBy(u -> u.type));
         o:
         while (true) {
-            System.out.println(grid);
-            System.out.println();
             Collections.sort(grid.units);
             for (Unit unit : grid.units) {
 //                System.out.println(unit);
@@ -57,17 +63,25 @@ public class Day15 extends Day {
             }
             rounds++;
         }
-        System.out.println(grid);
-        System.out.println();
-        int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
-        System.out.println("Rounds: " + rounds);
-        System.out.println("Remaining HP: " + hp);
-        System.out.println("Result: " + (rounds * hp));
+        return rounds;
     }
 
     @Override
     public void part2() {
-
+        int elfPower = 4;
+        int rounds;
+        do {
+            System.out.println("Trying " + elfPower);
+            processInput();
+            int finalElfPower = elfPower;
+            grid.units.stream().filter(u -> u.type == UnitType.ELF).forEach(u -> u.attack = finalElfPower);
+            rounds = simulateFight();
+            elfPower++;
+        } while (!grid.units.stream().filter(u -> u.type == UnitType.ELF).allMatch(Unit::alive));
+        int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
+        System.out.println("Rounds: " + rounds);
+        System.out.println("Remaining HP: " + hp);
+        System.out.println("Result: " + (rounds * hp));
     }
 
     @Override
