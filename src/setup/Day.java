@@ -77,14 +77,14 @@ public abstract class Day {
 
         day.processInput();
         Instant now = Instant.now();
-        System.out.println("Solution to part 1: " + day.part1());
+        Object part1 = day.part1();
         Duration partOneTime = Duration.between(now, Instant.now());
-        System.out.format("Solving part 1 took %02d.%04d seconds", partOneTime.getSeconds(), partOneTime.toMillis());
+        System.out.format("Soluttion to part 1: %s (%02d.%04ds)%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());
 
         if (day.resetForPartTwo()) day.processInput();
         now = Instant.now();
-        System.out.println("Solution to part 2: " + day.part2());
+        Object part2 = day.part2();
         Duration partTwoTime = Duration.between(now, Instant.now());
-        System.out.format("Solving part 2 took %02d.%04d seconds", partTwoTime.getSeconds(), partTwoTime.toMillis());
+        System.out.format("Soluttion to part 1: %s (%02d.%04ds)%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
     }
 }
