@@ -2,6 +2,7 @@ package days;
 
 import setup.Day;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,12 +11,11 @@ import java.util.stream.Collectors;
 public class Day16 extends Day {
 
     private static final Pattern BEFORE_AFTER_LIST = Pattern.compile("\\[(.+)]");
-    int[] registers;
-    List<Sample> samples;
+    private List<Sample> samples;
+    private List<List<Integer>> program;
 
     @Override
     public void processInput() {
-        registers = new int[4];
         String[] parts = input.split("\n\n\n\n");
 
         String[] samples = parts[0].split("\n\n");
@@ -32,6 +32,10 @@ public class Day16 extends Day {
                     Arrays.stream(lines[1].split(" ")).map(Integer::parseInt).toList()
             ));
         }
+        program = Arrays.stream(parts[1].split("\n"))
+                .map(s ->
+                        Arrays.stream(s.split(" ")).map(Integer::parseInt).toList()
+                ).toList();
     }
 
     @Override
@@ -67,6 +71,22 @@ public class Day16 extends Day {
             potentialOpcodes.remove(opcode);
         }
 
+        List<Instruction> program = new ArrayList<>();
+        for (List<Integer> line : this.program) {
+            Instruction newInstance = null;
+            try {
+                newInstance = opcodes.get(line.get(0))
+                        .getDeclaredConstructor(int.class, int.class, int.class)
+                        .newInstance(line.get(1), line.get(2), line.get(3));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            program.add(newInstance);
+        }
+        final int[] registers = new int[4];
+        program.forEach(i -> Instruction.execute(i, registers));
+        System.out.println(registers[0]);
     }
 
     @Override
