@@ -2,15 +2,14 @@ package days;
 
 import setup.Day;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Day16 extends Day {
 
-    private static Pattern BEFORE_AFTER_LIST = Pattern.compile("\\[(.+)]");
+    private static final Pattern BEFORE_AFTER_LIST = Pattern.compile("\\[(.+)]");
     int[] registers;
     List<Sample> samples;
 
@@ -38,7 +37,8 @@ public class Day16 extends Day {
     @Override
     public void part1() {
         System.out.println(samples.stream()
-                .mapToInt(Sample::tryAllInstructions)
+                .map(Sample::tryAllInstructions)
+                .mapToInt(List::size)
                 .filter(i -> i >= 3)
                 .count()
         );
@@ -46,6 +46,26 @@ public class Day16 extends Day {
 
     @Override
     public void part2() {
+        Map<Integer, Set<Class<? extends Instruction>>> potentialOpcodes = samples.stream()
+                .collect(Collectors.toMap(
+                                s -> s.op.get(0),
+                                s -> s.tryAllInstructions().stream().map(Instruction::getClass).collect(Collectors.toSet()),
+                                (l1, l2) -> {
+                                    l1.retainAll(l2);
+                                    return l1;
+                                }
+                        )
+                );
+
+        Map<Integer, Class<? extends Instruction>> opcodes = new HashMap<>();
+        while (!potentialOpcodes.isEmpty()) {
+            var sureOpcode = potentialOpcodes.entrySet().stream().filter(e -> e.getValue().size() == 1).findFirst().get();
+            Class<? extends Instruction> ins = sureOpcode.getValue().iterator().next();
+            Integer opcode = sureOpcode.getKey();
+            opcodes.put(opcode, ins);
+            potentialOpcodes.forEach((o, s) -> s.remove(ins));
+            potentialOpcodes.remove(opcode);
+        }
 
     }
 
@@ -112,16 +132,16 @@ public class Day16 extends Day {
     }
 
     private record Sample(List<Integer> before, List<Integer> after, List<Integer> op) {
-        public int tryAllInstructions() {
-            int count = 0;
+        public List<Instruction> tryAllInstructions() {
+            List<Instruction> valid = new ArrayList<>();
             List<Instruction> allInstructions = Instruction.getAllInstructions(op.get(1), op.get(2), op.get(3));
             for (Instruction instruction : allInstructions) {
                 int[] registers = before.stream().mapToInt(x -> x).toArray();
                 Instruction.execute(instruction, registers);
                 List<Integer> output = Arrays.stream(registers).boxed().toList();
-                if (output.equals(after)) count++;
+                if (output.equals(after)) valid.add(instruction);
             }
-            return count;
+            return valid;
         }
     }
 
