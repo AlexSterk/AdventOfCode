@@ -36,12 +36,7 @@ public class Day1 extends Day {
     public Object part2() {
         int increases = 0;
 
-        System.out.println(measurements.subList(0, 3));
-        System.out.println(measurements.subList(measurements.size() - 3, measurements.size()));
-
         List<List<Integer>> windows = IntStream.rangeClosed(0, measurements.size() - 3).mapToObj(i -> measurements.subList(i, i + 3)).collect(Collectors.toList());
-        System.out.println(windows.get(0));
-        System.out.println(windows.get(windows.size() - 1));
         for (int i = 1; i < windows.size(); i++) {
             if (sum(windows.get(i)) > sum(windows.get(i-1))) increases++;
         }
