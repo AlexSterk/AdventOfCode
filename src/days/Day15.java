@@ -119,14 +119,7 @@ public class Day15 extends Day {
         }
     }
 
-    private static final class Grid {
-        public final Tile[][] grid;
-        public final List<Unit> units;
-
-        public Grid(Tile[][] grid, List<Unit> units) {
-            this.grid = grid;
-            this.units = units;
-        }
+    private record Grid(Tile[][] grid, List<Unit> units) {
 
         public List<Tile> adjacent(Position pos) {
             List<Tile> res = new ArrayList<>();
@@ -293,15 +286,6 @@ public class Day15 extends Day {
                 standingOn = moveTo;
                 turn(false);
             }
-//            if (minPath.isPresent()) {
-//                var moveTo = reachable.stream()
-//                        .filter(p -> p.size() == minPath.getAsInt())
-//                        .map(p -> p.get(p.size() - 1))
-//                        .min(Comparator.comparing(p -> p.get(p.size() - 1).position))
-//                        .get();
-//                standingOn = moveTo.get(0);
-//                turn(false);
-//            }
         }
 
         @Override
