@@ -38,7 +38,7 @@ public class Day15 extends Day {
 
     @Override
     public void part1() {
-        System.out.println(Arrays.stream(grid.grid).flatMap(Arrays::stream).filter(t -> t.type == TileType.EMPTY).count());
+//        System.out.println(Arrays.stream(grid.grid).flatMap(Arrays::stream).filter(t -> t.type == TileType.EMPTY).count());
 
         int rounds = 0;
         Map<UnitType, List<Unit>> units = grid.units.stream().collect(Collectors.groupingBy(u -> u.type));
@@ -48,7 +48,7 @@ public class Day15 extends Day {
             System.out.println();
             Collections.sort(grid.units);
             for (Unit unit : grid.units) {
-                System.out.println(unit);
+//                System.out.println(unit);
                 if (units.values().stream().anyMatch(us -> us.stream().noneMatch(Unit::alive))) {
                     break o;
                 }
@@ -57,6 +57,8 @@ public class Day15 extends Day {
             }
             rounds++;
         }
+        System.out.println(grid);
+        System.out.println();
         int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
         System.out.println("Rounds: " + rounds);
         System.out.println("Remaining HP: " + hp);
@@ -129,7 +131,7 @@ public class Day15 extends Day {
 
         public List<Tile> getPath(Tile start, Tile end) {
             Map<Tile, Integer> dist = new HashMap<>();
-            Map<Tile, List<Tile>> prevs = new HashMap<>();
+            Map<Tile, Tile> prev = new HashMap<>();
 
             dist.put(start, 0);
 
@@ -141,36 +143,31 @@ public class Day15 extends Day {
                     .forEach(t -> {
                         if (t != start) {
                             dist.put(t, Integer.MAX_VALUE);
-                            prevs.put(t, new ArrayList<>());
+                            prev.put(t, null);
                         } else Q.add(t);
-//                        Q.add(t);
                     });
 
             while (!Q.isEmpty()) {
                 Tile u = Q.poll();
-                System.out.println(u);
                 for (Tile v : u.adjacent()) {
                     if (v.type == TileType.WALL || occupying(v).isPresent()) continue;
                     int alt = dist.get(u) + 1;
                     if (alt < dist.get(v)) {
                         dist.put(v, alt);
-                        prevs.get(v).clear();
-                        prevs.get(v).add(u);
-                        Q.add(v);
-                    } else if (alt == dist.get(v)) {
-                        prevs.get(v).add(u);
+                        prev.put(v, u);
                         Q.add(v);
                     }
                 }
             }
-            List<Tile> path = new ArrayList<>();
-            Optional<Tile> cur = Optional.of(end);
-            while (cur.get() != start) {
-                path.add(cur.get());
-                cur = prevs.get(cur.get()).stream().min(Comparator.comparing(Tile::position));
-                if (cur.isEmpty()) return null;
-            }
 
+            List<Tile> path = new ArrayList<>();
+            Tile cur = end;
+            while (cur != start) {
+                path.add(cur);
+                cur = prev.get(cur);
+                if (cur == null) return null;
+            }
+            path.add(start);
             Collections.reverse(path);
             return path;
         }
@@ -256,19 +253,41 @@ public class Day15 extends Day {
 
             if (inRange.isEmpty()) return;
 
-            var reachable = inRange.stream()
+            Map<Tile, Integer> reachable = inRange.stream()
                     .map(t -> grid.getPath(standingOn, t))
                     .filter(Objects::nonNull)
-                    .toList();
-            var minPath = reachable.stream().mapToInt(List::size).min();
-            if (minPath.isPresent()) {
-                var moveTo = reachable.stream()
-                        .filter(p -> p.size() == minPath.getAsInt())
-                        .min(Comparator.comparing(p -> p.get(p.size() - 1).position))
-                        .get();
-                standingOn = moveTo.get(0);
+                    .collect(Collectors.toMap(p -> p.get(p.size() - 1), List::size, Integer::min));
+            if (!reachable.isEmpty())  {
+                var min = Collections.min(reachable.values());
+                var nearest = reachable.entrySet().stream()
+                        .filter(e -> e.getValue().equals(min))
+                        .map(Map.Entry::getKey)
+                        .toList();
+                var targetTile = Collections.min(nearest, Comparator.comparing(Tile::position));
+                var validPaths = standingOn.adjacent().stream()
+                        .filter(t -> t.type == TileType.EMPTY && grid.occupying(t).isEmpty())
+                        .map(t -> grid.getPath(t, targetTile))
+                        .filter(Objects::nonNull)
+                        .toList();
+                var shortestValidDistance = validPaths.stream()
+                        .mapToInt(List::size)
+                        .min().getAsInt();
+                var moveTo = validPaths.stream()
+                        .filter(p -> p.size() == shortestValidDistance)
+                        .map(p -> p.get(0))
+                        .min(Comparator.comparing(Tile::position)).get();
+                standingOn = moveTo;
                 turn(false);
             }
+//            if (minPath.isPresent()) {
+//                var moveTo = reachable.stream()
+//                        .filter(p -> p.size() == minPath.getAsInt())
+//                        .map(p -> p.get(p.size() - 1))
+//                        .min(Comparator.comparing(p -> p.get(p.size() - 1).position))
+//                        .get();
+//                standingOn = moveTo.get(0);
+//                turn(false);
+//            }
         }
 
         @Override
