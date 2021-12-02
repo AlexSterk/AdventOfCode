@@ -73,7 +73,7 @@ public class Day16 extends Day {
 
         List<Instruction> program = new ArrayList<>();
         for (List<Integer> line : this.program) {
-            Instruction newInstance = null;
+            Instruction newInstance;
             try {
                 newInstance = opcodes.get(line.get(0))
                         .getDeclaredConstructor(int.class, int.class, int.class)
