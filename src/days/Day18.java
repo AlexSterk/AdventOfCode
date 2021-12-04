@@ -3,13 +3,32 @@ package days;
 import setup.Day;
 import util.Grid;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day18 extends Day {
     private Grid<Acre> grid;
+
+    private static int getResourceValue(Grid<Acre> grid) {
+        int woods, lumberyards;
+        woods = (int) grid.getAll().stream().filter(t -> t.data() == Acre.TREE).count();
+        lumberyards = (int) grid.getAll().stream().filter(t -> t.data() == Acre.LUMBERYARD).count();
+        return woods * lumberyards;
+    }
+
+    private static Grid<Acre> runRound(Grid<Acre> grid) {
+        Grid<Acre> newState = grid.copy();
+        grid.getAll().forEach(t -> {
+            Set<Grid.Tile<Acre>> adjacent = grid.getAdjacent(t, false);
+            Map<Acre, Integer> surrounding = Arrays.stream(Acre.values()).collect(Collectors.toMap(a -> a, a -> (int) adjacent.stream().filter(x -> x.data() == a).count()));
+            newState.set(t, switch (t.data()) {
+                case GROUND -> surrounding.get(Acre.TREE) >= 3 ? Acre.TREE : Acre.GROUND;
+                case TREE -> surrounding.get(Acre.LUMBERYARD) >= 3 ? Acre.LUMBERYARD : Acre.TREE;
+                case LUMBERYARD -> surrounding.get(Acre.LUMBERYARD) >= 1 && surrounding.get(Acre.TREE) >= 1 ? Acre.LUMBERYARD : Acre.GROUND;
+            });
+        });
+        return newState;
+    }
 
     @Override
     public void processInput() {
@@ -31,28 +50,25 @@ public class Day18 extends Day {
     @Override
     public void part1() {
         for (int round = 0; round < 10; round++) {
-            Grid<Acre> newState = grid.copy();
-            grid.getAll().forEach(t -> {
-                Set<Grid.Tile<Acre>> adjacent = grid.getAdjacent(t, false);
-                Map<Acre, Integer> surrounding = Arrays.stream(Acre.values()).collect(Collectors.toMap(a -> a, a -> (int) adjacent.stream().filter(x -> x.data() == a).count()));
-                newState.set(t, switch (t.data()) {
-                    case GROUND -> surrounding.get(Acre.TREE) >= 3 ? Acre.TREE : Acre.GROUND;
-                    case TREE -> surrounding.get(Acre.LUMBERYARD) >= 3 ? Acre.LUMBERYARD : Acre.TREE;
-                    case LUMBERYARD -> surrounding.get(Acre.LUMBERYARD) >= 1 && surrounding.get(Acre.TREE) >= 1 ? Acre.LUMBERYARD : Acre.GROUND;
-                });
-            });
-            grid = newState;
+            grid = runRound(grid);
         }
-        int woods, lumberyards;
-        woods = (int) grid.getAll().stream().filter(t -> t.data() == Acre.TREE).count();
-        lumberyards = (int) grid.getAll().stream().filter(t -> t.data() == Acre.LUMBERYARD).count();
-
-        System.out.println(woods * lumberyards);
+        int resourceValue = getResourceValue(grid);
+        System.out.println(resourceValue);
     }
 
     @Override
     public void part2() {
-
+        processInput();
+        List<Grid<Acre>> previous = new ArrayList<>();
+        while (!previous.contains(grid)) {
+            previous.add(grid);
+            grid = runRound(grid);
+        }
+        int firstOccurence = previous.indexOf(grid);
+        int cycle = previous.size() - firstOccurence;
+        int a = (1000000000 - firstOccurence) % cycle;
+        int b = firstOccurence + a;
+        System.out.println(getResourceValue(previous.get(b)));
     }
 
     @Override

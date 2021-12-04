@@ -17,6 +17,19 @@ public class Grid<T> {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grid<?> grid1 = (Grid<?>) o;
+        return grid.equals(grid1.grid);
+    }
+
+    @Override
+    public int hashCode() {
+        return grid.hashCode();
+    }
+
     public void set(int x, int y, T data) {
         grid.get(y).set(x, new Tile<>(x, y, data, this));
     }
@@ -91,6 +104,19 @@ public class Grid<T> {
                     ", y=" + y +
                     ", data=" + data +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Tile<?> tile = (Tile<?>) o;
+            return x == tile.x && y == tile.y && Objects.equals(data, tile.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, data);
         }
     }
 }
