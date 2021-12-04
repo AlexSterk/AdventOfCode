@@ -3,6 +3,7 @@ package days;
 import setup.Day;
 import util.Grid;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,22 +36,14 @@ public class Day4 extends Day {
     @Override
     public Object part1() {
         for (Integer number : numbers) {
-            System.out.println(number + "\n");
-            boards.forEach(x -> System.out.println(x + "\n"));
-            System.out.println("=================\n");
             for (Grid<BingoNumber> board : boards) {
                 Optional<Grid.Tile<BingoNumber>> first = board.getAll().stream().filter(t -> t.data().number.equals(number)).findFirst();
                 first.ifPresent(t -> board.set(t, new BingoNumber(number, true)));
-            }
-            Optional<List<Grid.Tile<BingoNumber>>> winningBoard = boards.stream()
-                    .flatMap(b -> Stream.concat(b.getRows().stream(), b.getColumns().stream()))
-                    .filter(r -> r.stream().allMatch(t -> t.data().marked))
-                    .findFirst();
-            if (winningBoard.isPresent()) {
-                var board = winningBoard.get().get(0).grid();
-                System.out.println(board);
-                int unmarkedSum = board.getAll().stream().filter(t -> !t.data().marked()).mapToInt(t -> t.data().number).sum();
-                return unmarkedSum * number;
+                if (winningBoard(board)) {
+                    System.out.println(board);
+                    int unmarkedSum = board.getAll().stream().filter(t -> !t.data().marked()).mapToInt(t -> t.data().number).sum();
+                    return unmarkedSum * number;
+                }
             }
         }
         throw new RuntimeException("No winning board found");
@@ -63,31 +56,30 @@ public class Day4 extends Day {
 
     @Override
     public Object part2() {
+        List<Grid<BingoNumber>> winningBoards = new ArrayList<>();
+
         for (Integer number : numbers) {
-            System.out.println(number + "\n");
-            boards.forEach(x -> System.out.println(x + "\n"));
-            System.out.println("=================\n");
             for (Grid<BingoNumber> board : boards) {
                 Optional<Grid.Tile<BingoNumber>> first = board.getAll().stream().filter(t -> t.data().number.equals(number)).findFirst();
                 first.ifPresent(t -> board.set(t, new BingoNumber(number, true)));
+                if (winningBoard(board) && !winningBoards.contains(board)) {
+                    winningBoards.add(board);
+                }
             }
-            Optional<List<Grid.Tile<BingoNumber>>> winningBoard = boards.stream()
-                    .flatMap(b -> Stream.concat(b.getRows().stream(), b.getColumns().stream()))
-                    .filter(r -> r.stream().allMatch(t -> t.data().marked))
-                    .findFirst();
-            if (winningBoard.isPresent()) {
-                var board = winningBoard.get().get(0).grid();
-                System.out.println(board);
-                int unmarkedSum = board.getAll().stream().filter(t -> !t.data().marked()).mapToInt(t -> t.data().number).sum();
+            if (winningBoards.size() == boards.size()) {
+                var lastWinning = winningBoards.get(winningBoards.size() - 1);
+                System.out.println(lastWinning);
+                int unmarkedSum = lastWinning.getAll().stream().filter(t -> !t.data().marked()).mapToInt(t -> t.data().number).sum();
                 return unmarkedSum * number;
             }
         }
-        throw new RuntimeException("No winning board found");
+        throw new RuntimeException("Not every board wins");
     }
 
-//    private boolean winningBoard(Grid<BingoNumber> board) {
-//
-//    }
+    private static boolean winningBoard(Grid<BingoNumber> board) {
+        return Stream.concat(board.getRows().stream(), board.getColumns().stream())
+                .anyMatch(r -> r.stream().allMatch(t -> t.data().marked));
+    }
 
     @Override
     public int getDay() {
