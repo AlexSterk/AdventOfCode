@@ -1,9 +1,6 @@
 package util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Grid<T> {
@@ -36,6 +33,34 @@ public class Grid<T> {
         return grid.stream().flatMap(Collection::stream).toList();
     }
 
+    public Grid<T> copy() {
+        Grid<T> g = new Grid<>(width, height);
+        getAll().forEach(t -> g.set(t, t.data));
+        return g;
+    }
+
+    public Set<Tile<T>> getAdjacent(Tile<T> tile, boolean strict) {
+        Set<Tile<T>> set = new HashSet<>();
+        set.add(tile.up());
+        set.add(tile.down());
+        set.add(tile.left());
+        set.add(tile.right());
+        if (!strict) {
+            Tile<T> left = tile.left();
+            if (left != null) {
+                set.add(left.up());
+                set.add(left.down());
+            }
+            Tile<T> right = tile.right();
+            if (right != null) {
+                set.add(right.up());
+                set.add(right.down());
+            }
+        }
+        set.remove(null);
+        return set;
+    }
+
     @Override
     public String toString() {
         return grid.stream().map(l -> l.stream().map(t -> t.data.toString()).collect(Collectors.joining())).collect(Collectors.joining("\n"));
@@ -44,19 +69,19 @@ public class Grid<T> {
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
 
         public Tile<T> up() {
-            return grid.getTile(x, y - 1);
+            return y - 1 >= 0 ? grid.getTile(x, y - 1) : null;
         }
 
         public Tile<T> down() {
-            return grid.getTile(x, y + 1);
+            return y + 1 < grid.height ? grid.getTile(x, y + 1) : null;
         }
 
         public Tile<T> left() {
-            return grid.getTile(x - 1, y);
+            return x - 1 >= 0 ? grid.getTile(x - 1, y) : null;
         }
 
         public Tile<T> right() {
-            return grid.getTile(x + 1, y);
+            return x + 1 < grid.width ? grid.getTile(x + 1, y) : null;
         }
 
         @Override
