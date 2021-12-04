@@ -1,9 +1,6 @@
 package util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -21,6 +18,19 @@ public class Grid<T> {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grid<?> grid1 = (Grid<?>) o;
+        return grid.equals(grid1.grid);
+    }
+
+    @Override
+    public int hashCode() {
+        return grid.hashCode();
+    }
+
     public void set(int x, int y, T data) {
         grid.get(y).set(x, new Tile<>(x, y, data, this));
     }
@@ -35,6 +45,34 @@ public class Grid<T> {
 
     public List<Tile<T>> getAll() {
         return grid.stream().flatMap(Collection::stream).toList();
+    }
+
+    public Grid<T> copy() {
+        Grid<T> g = new Grid<>(width, height);
+        getAll().forEach(t -> g.set(t, t.data));
+        return g;
+    }
+
+    public Set<Tile<T>> getAdjacent(Tile<T> tile, boolean includeDiagonals) {
+        Set<Tile<T>> set = new HashSet<>();
+        set.add(tile.up());
+        set.add(tile.down());
+        set.add(tile.left());
+        set.add(tile.right());
+        if (includeDiagonals) {
+            Tile<T> left = tile.left();
+            if (left != null) {
+                set.add(left.up());
+                set.add(left.down());
+            }
+            Tile<T> right = tile.right();
+            if (right != null) {
+                set.add(right.up());
+                set.add(right.down());
+            }
+        }
+        set.remove(null);
+        return set;
     }
 
     public List<Tile<T>> getRow(int y) {
@@ -63,19 +101,19 @@ public class Grid<T> {
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
 
         public Tile<T> up() {
-            return grid.getTile(x, y - 1);
+            return y - 1 >= 0 ? grid.getTile(x, y - 1) : null;
         }
 
         public Tile<T> down() {
-            return grid.getTile(x, y + 1);
+            return y + 1 < grid.height ? grid.getTile(x, y + 1) : null;
         }
 
         public Tile<T> left() {
-            return grid.getTile(x - 1, y);
+            return x - 1 >= 0 ? grid.getTile(x - 1, y) : null;
         }
 
         public Tile<T> right() {
-            return grid.getTile(x + 1, y);
+            return x + 1 < grid.width ? grid.getTile(x + 1, y) : null;
         }
 
         @Override
@@ -85,6 +123,19 @@ public class Grid<T> {
                     ", y=" + y +
                     ", data=" + data +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Tile<?> tile = (Tile<?>) o;
+            return x == tile.x && y == tile.y && Objects.equals(data, tile.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, data);
         }
     }
 }
