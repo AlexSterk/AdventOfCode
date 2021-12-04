@@ -1,5 +1,6 @@
 package setup;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -35,12 +36,16 @@ public class Download {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest req = HttpRequest.newBuilder(uri).GET().header("cookie", String.format("session=%s", sessionToken)).build();
 
-        Path file = Paths.get(String.format("data/day%d/input.txt", day));
-        file.toFile().getParentFile().mkdirs();
-        httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file));
+        File file = Paths.get(String.format("data/day%d/input.txt", day)).toFile();
+        file.getParentFile().mkdirs();
+        httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
 
         System.out.print("Link to puzzle: ");
         System.out.printf("https://adventofcode.com/%s/day/%d%n", year, day);
+
+        File testFile = new File(file.getParent(), "test.txt");
+        testFile.createNewFile();
+
     }
 
     private static int getDay() {

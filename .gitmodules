@@ -1,0 +1,4 @@
+[submodule "util"]
+	path = src/util
+	url = ./
+	branch = util/master
