@@ -44,8 +44,8 @@ public class Day3 extends Day {
 
     @Override
     public Object part2() {
-        int oxygen = 0;
-        int co2 = 0;
+        int oxygen;
+        int co2;
 
         Set<String> oxygenSet = new HashSet<>(Set.of(numbers));
         Set<String> co2Set = new HashSet<>(Set.of(numbers));
