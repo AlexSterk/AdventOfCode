@@ -11,19 +11,13 @@ import java.util.stream.Collectors;
 public class Day2 extends Day {
     List<String> ids;
 
-    public static void main(String[] args) {
-        Day2 day2 = new Day2();
-        day2.part1();
-        day2.part2();
-    }
-
     @Override
     public void processInput() {
         ids = Arrays.asList(input.split("\n"));
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         int count2s = 0;
         int count3s = 0;
 
@@ -37,11 +31,11 @@ public class Day2 extends Day {
             if (map.containsValue(3)) count3s++;
         }
 
-        System.out.println(count2s * count3s);
+        return count2s * count3s;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         for (String id : ids) {
             l:
             for (String id2 : ids) {
@@ -56,10 +50,10 @@ public class Day2 extends Day {
                     if (diffs > 1) continue l;
                 }
 
-                System.out.println(common.stream().map(Object::toString).collect(Collectors.joining()));
-                return;
+                return common.stream().map(Object::toString).collect(Collectors.joining());
             }
         }
+        throw new RuntimeException("idk");
     }
 
     @Override

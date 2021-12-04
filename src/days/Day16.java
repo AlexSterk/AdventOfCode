@@ -39,17 +39,16 @@ public class Day16 extends Day {
     }
 
     @Override
-    public void part1() {
-        System.out.println(samples.stream()
+    public Object part1() {
+        return samples.stream()
                 .map(Sample::tryAllInstructions)
                 .mapToInt(List::size)
                 .filter(i -> i >= 3)
-                .count()
-        );
+                .count();
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         Map<Integer, Set<Class<? extends Instruction>>> potentialOpcodes = samples.stream()
                 .collect(Collectors.toMap(
                                 s -> s.op.get(0),
@@ -86,7 +85,7 @@ public class Day16 extends Day {
         }
         final int[] registers = new int[4];
         program.forEach(i -> Instruction.execute(i, registers));
-        System.out.println(registers[0]);
+        return registers[0];
     }
 
     @Override

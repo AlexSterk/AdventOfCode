@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day6 extends Day {
-    private static final List<Character> ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+    private static final List<Character> ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().mapToObj(c -> (char) c).toList();
 
     private int maxX, maxY;
     private List<Point> points;
@@ -23,7 +23,7 @@ public class Day6 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         if (points.size() <= ALPHABET.size())
             for (int i = 0; i < points.size(); i++) System.out.printf("%s: %c\n", points.get(i), ALPHABET.get(i));
 
@@ -53,11 +53,11 @@ public class Day6 extends Day {
         }
 
         areas.keySet().removeIf(inf::contains);
-        System.out.println(Collections.max(areas.entrySet(), Map.Entry.comparingByValue()));
+        return Collections.max(areas.entrySet(), Map.Entry.comparingByValue()).getValue();
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         List<Point> locations = new ArrayList<>();
         for (int y = 0; y < maxY + 2; y++) {
             for (int x = 0; x < maxX + 2; x++) {
@@ -66,7 +66,7 @@ public class Day6 extends Day {
                 if (sum < 10000) locations.add(p);
             }
         }
-        System.out.println(locations.size());
+        return locations.size();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class Day6 extends Day {
         return false;
     }
 
-    private static record Point(int x, int y) {
+    private record Point(int x, int y) {
         public Point(String x, String y) {
             this(Integer.parseInt(x), Integer.parseInt(y));
         }

@@ -26,7 +26,7 @@ public class Day8 extends Day {
         }
     }
 
-    static record NodeResult(Node node, int offset) {
+    record NodeResult(Node node, int offset) {
 
     }
 
@@ -58,13 +58,13 @@ public class Day8 extends Day {
     }
 
     @Override
-    public void part1() {
-        System.out.println(root.partOneMetadataSum());
+    public Object part1() {
+        return root.partOneMetadataSum();
     }
 
     @Override
-    public void part2() {
-        System.out.println(root.partTwoMetadataSum());
+    public Object part2() {
+        return root.partTwoMetadataSum();
     }
 
     @Override

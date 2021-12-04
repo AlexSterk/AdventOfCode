@@ -16,28 +16,22 @@ public class Day1 extends Day {
         return new Operation(o, n);
     }
 
-    public static void main(String[] args) {
-        Day1 day1 = new Day1();
-        day1.part1();
-        day1.part2();
-    }
-
     @Override
     public void processInput() {
         operations = Arrays.stream(input.trim().split("\n")).map(Day1::stringToOperation).collect(Collectors.toList());
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         int freq = 0;
         for (Operation operation : operations) {
             freq = operation.execute(freq);
         }
-        System.out.println(freq);
+        return freq;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         int freq = 0;
         List<Integer> freqs = new ArrayList<>();
 
@@ -48,7 +42,7 @@ public class Day1 extends Day {
             freq = operations.get(i).execute(freq);
             i = (i + 1) % operations.size();
         }
-        System.out.println(freq);
+        return freq;
     }
 
     @Override
@@ -67,7 +61,7 @@ public class Day1 extends Day {
         }
     }
 
-    private static record Operation(Operator operator, int number) {
+    private record Operation(Operator operator, int number) {
         int execute(int previous) {
             return operator.execute(previous, number);
         }

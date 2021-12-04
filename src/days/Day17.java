@@ -59,8 +59,7 @@ public class Day17 extends Day {
     }
 
     @Override
-    public void part1() {
-        int n = 0;
+    public Object part1() {
 
         Grid.Tile<Material> down = ground.getTile(500 - xOffset, 0).down();
         if (down.data() != Material.SAND)
@@ -157,12 +156,12 @@ public class Day17 extends Day {
             System.out.println(spreading);
         } while (!spreading.isEmpty());
         System.out.println(ground);
-        System.out.println(ground.getAll().stream().filter(t -> t.data() == Material.WATER_FLOWING || t.data() == Material.WATER_STILL).count());
+        return ground.getAll().stream().filter(t -> t.data() == Material.WATER_FLOWING || t.data() == Material.WATER_STILL).count();
     }
 
     @Override
-    public void part2() {
-        System.out.println(ground.getAll().stream().filter(t -> t.data() == Material.WATER_STILL).count());
+    public Object part2() {
+        return ground.getAll().stream().filter(t -> t.data() == Material.WATER_STILL).count();
     }
 
     @Override

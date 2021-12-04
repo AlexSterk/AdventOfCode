@@ -17,29 +17,29 @@ public class Day14 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         while (recipes.length() < numRecipes + 10) {
             createRecipes();
         }
-        System.out.println(recipes.substring(numRecipes, numRecipes + 10));
+        return recipes.substring(numRecipes, numRecipes + 10);
     }
 
     private void createRecipes() {
         int sum = Character.getNumericValue(recipes.charAt(elves[0])) + Character.getNumericValue(recipes.charAt(elves[1]));
         recipes.append(sum);
         for (int i = 0; i < elves.length; i++) {
-            Integer currentRecipeIndex = elves[i];
-            Integer currentRecipeScore = Character.getNumericValue(recipes.charAt(currentRecipeIndex));
+            int currentRecipeIndex = elves[i];
+            int currentRecipeScore = Character.getNumericValue(recipes.charAt(currentRecipeIndex));
             elves[i] = (currentRecipeIndex + 1 + currentRecipeScore) % recipes.length();
         }
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         for (int i = 0; i < 30_000_000; i++) {
             createRecipes();
         }
-        System.out.println(recipes.indexOf(numRecipes.toString()));
+        return recipes.indexOf(numRecipes.toString());
     }
 
     @Override

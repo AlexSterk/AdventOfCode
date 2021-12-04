@@ -5,12 +5,11 @@ import setup.Day;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Day5 extends Day {
 
-    private static final List<String> ALPHABET = IntStream.rangeClosed('a', 'z').boxed().map(Character::toString).collect(Collectors.toList());
+    private static final List<String> ALPHABET = IntStream.rangeClosed('a', 'z').boxed().map(Character::toString).toList();
 
     @Override
     public void processInput() {
@@ -18,12 +17,12 @@ public class Day5 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         String polymer = input.trim();
 
         polymer = react(polymer);
 
-        System.out.println(polymer.length());
+        return polymer.length();
     }
 
     private static String react(String polymer) {
@@ -39,7 +38,7 @@ public class Day5 extends Day {
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         List<Integer> sizes = new ArrayList<>();
         
         String polymer = input.trim();
@@ -49,7 +48,7 @@ public class Day5 extends Day {
             test = react(test);
             sizes.add(test.length());
         }
-        System.out.println(Collections.min(sizes));
+        return Collections.min(sizes);
     }
 
     @Override

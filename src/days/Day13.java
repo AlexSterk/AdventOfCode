@@ -7,13 +7,12 @@ import java.util.stream.Collectors;
 
 public class Day13 extends Day {
 
-    private char[][] grid;
     private List<Cart> carts;
 
     @Override
     public void processInput() {
         final String[] lines = input.split("\n");
-        grid = new char[lines.length][];
+        char[][] grid = new char[lines.length][];
         for (int y = 0; y < lines.length; y++) {
             grid[y] = lines[y].toCharArray();
         }
@@ -44,30 +43,29 @@ public class Day13 extends Day {
     }
 
     @Override
-    public void part1() {
-        boolean crash = false;
-        while (!crash) {
+    public Object part1() {
+        while (true) {
             Collections.sort(carts);
             for (Cart cart : new ArrayList<>(carts)) {
                 cart.move();
-                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).collect(Collectors.toList());
+                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).toList();
                 if (!crashes.isEmpty()) {
-                    System.out.println(cart.x + "," + cart.y);
+                    System.out.println();
                     carts.removeAll(crashes);
                     carts.remove(cart);
-                    crash = true;
+                    return cart.x + "," + cart.y;
                 }
             }
         }
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         while (carts.size() > 1) {
             Collections.sort(carts);
             for (Cart cart : new ArrayList<>(carts)) {
                 cart.move();
-                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).collect(Collectors.toList());
+                List<Cart> crashes = carts.stream().filter(c -> c != cart).filter(cart::checkCrash).toList();
                 if (!crashes.isEmpty()) {
                     carts.removeAll(crashes);
                     carts.remove(cart);
@@ -75,7 +73,7 @@ public class Day13 extends Day {
             }
         }
         Cart cart = carts.get(0);
-        System.out.println(cart.x + "," + cart.y);
+        return cart.x + "," + cart.y;
     }
 
     @Override
@@ -86,10 +84,6 @@ public class Day13 extends Day {
     @Override
     public boolean isTest() {
         return false;
-    }
-
-    private static record Pair(int x, int y) {
-
     }
 
     private static class Cart implements Comparable<Cart> {

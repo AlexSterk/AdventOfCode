@@ -19,7 +19,7 @@ public class Day18 extends Day {
     private static Grid<Acre> runRound(Grid<Acre> grid) {
         Grid<Acre> newState = grid.copy();
         grid.getAll().forEach(t -> {
-            Set<Grid.Tile<Acre>> adjacent = grid.getAdjacent(t, false);
+            Set<Grid.Tile<Acre>> adjacent = grid.getAdjacent(t, true);
             Map<Acre, Integer> surrounding = Arrays.stream(Acre.values()).collect(Collectors.toMap(a -> a, a -> (int) adjacent.stream().filter(x -> x.data() == a).count()));
             newState.set(t, switch (t.data()) {
                 case GROUND -> surrounding.get(Acre.TREE) >= 3 ? Acre.TREE : Acre.GROUND;
@@ -48,16 +48,15 @@ public class Day18 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         for (int round = 0; round < 10; round++) {
             grid = runRound(grid);
         }
-        int resourceValue = getResourceValue(grid);
-        System.out.println(resourceValue);
+        return getResourceValue(grid);
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         processInput();
         List<Grid<Acre>> previous = new ArrayList<>();
         while (!previous.contains(grid)) {
@@ -68,7 +67,7 @@ public class Day18 extends Day {
         int cycle = previous.size() - firstOccurence;
         int a = (1000000000 - firstOccurence) % cycle;
         int b = firstOccurence + a;
-        System.out.println(getResourceValue(previous.get(b)));
+        return getResourceValue(previous.get(b));
     }
 
     @Override

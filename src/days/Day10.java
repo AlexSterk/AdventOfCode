@@ -26,22 +26,6 @@ public class Day10 extends Day {
                 )).collect(Collectors.toList());
     }
 
-    void makeGrid(int oldHeight, Set<Position> oldPositions) {
-        Set<Position> positions = points.stream().map(p -> p.pos).collect(Collectors.toSet());
-
-        int minY = Collections.min(positions, compareY).y;
-        int maxY = Collections.max(positions, compareY).y;
-
-        int height = maxY - minY;
-
-        if (oldHeight < height) {
-            printGrid(oldPositions);
-        } else {
-            points.forEach(Point::move);
-            makeGrid(height, positions);
-        }
-    }
-
     void printGrid(Set<Position> positions) {
         int minX = Collections.min(positions, compareX).x;
         int minY = Collections.min(positions, compareY).y;
@@ -57,7 +41,7 @@ public class Day10 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         int oldHeight = Integer.MAX_VALUE;
         Set<Position> oldPositions = null;
 
@@ -77,11 +61,12 @@ public class Day10 extends Day {
                 seconds++;
             }
         }
+        return null;
     }
 
     @Override
-    public void part2() {
-        System.out.println(seconds - 1);
+    public Object part2() {
+        return seconds - 1;
     }
 
     @Override
@@ -114,7 +99,7 @@ public class Day10 extends Day {
         }
     }
 
-    private static record Position(int x, int y)  {}
+    private record Position(int x, int y)  {}
 
     private static final Comparator<Position> compareX = Comparator.comparingInt(o -> o.x);
     private static final Comparator<Position> compareY = Comparator.comparingInt(o -> o.y);

@@ -30,7 +30,7 @@ public class Day11 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         powerLevels = new HashMap<>();
 
         for (int x = 1; x < 301; x++) {
@@ -58,11 +58,11 @@ public class Day11 extends Day {
             }
         }
 
-        System.out.println(squarePower.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey());
+        return squarePower.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         Map<Triple, Long> squarePowerLevels = new HashMap<>();
         powerLevels.forEach((k, v) -> squarePowerLevels.put(new Triple(k.x, k.y, 1), Long.valueOf(v)));
 
@@ -90,10 +90,7 @@ public class Day11 extends Day {
             }
         }
 
-        Map.Entry<Triple, Long> tripleLongEntry = squarePowerLevels.entrySet().stream().max(Map.Entry.comparingByValue()).get();
-        System.out.println(tripleLongEntry.getKey());
-        System.out.println(tripleLongEntry.getValue());
-
+        return squarePowerLevels.entrySet().stream().max(Map.Entry.comparingByValue()).get();
     }
 
     @Override
@@ -106,9 +103,9 @@ public class Day11 extends Day {
         return false;
     }
 
-    private static record Pair(int x, int y) {
+    private record Pair(int x, int y) {
     }
 
-    private static record Triple(int x, int y, int size) {
+    private record Triple(int x, int y, int size) {
     }
 }

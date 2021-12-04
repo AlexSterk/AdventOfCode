@@ -21,7 +21,7 @@ public class Day4 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         minutes = new HashMap<>();
 
         int onDuty = -1;
@@ -47,18 +47,18 @@ public class Day4 extends Day {
         int longestSleeper = minutes.entrySet().stream().max(Comparator.comparing(e -> e.getValue().values().stream().mapToInt(i -> i).sum())).get().getKey();
         int minute = minutes.get(longestSleeper).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 
-        System.out.println(longestSleeper * minute);
+        return longestSleeper * minute;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         Map<Integer, Map<Integer, Integer>> inverted = new HashMap<>();
 
         minutes.forEach((k, v) -> v.forEach((m, c) -> inverted.computeIfAbsent(m, i -> new HashMap<>()).put(k, c)));
 
         int mostFrequentMinute = inverted.entrySet().stream().max(Comparator.comparing(e -> Collections.max(e.getValue().values()))).get().getKey();
         int guard = inverted.get(mostFrequentMinute).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
-        System.out.println(mostFrequentMinute * guard);
+        return mostFrequentMinute * guard;
     }
 
     @Override
@@ -71,22 +71,22 @@ public class Day4 extends Day {
         WAKES
     }
 
-    private static sealed interface Log {
+    private sealed interface Log {
 
     }
 
-    static private record StartsShift(int guard) implements Log {
+    private record StartsShift(int guard) implements Log {
     }
 
-    private static record Record(Date timestamp, Log log) {
-        static final Pattern ENTRY_PATTERN = Pattern.compile("\\[(.+)\\] (.+)");
+    private record Record(Date timestamp, Log log) {
+        static final Pattern ENTRY_PATTERN = Pattern.compile("\\[(.+)] (.+)");
         static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         static Record stringToRecord(String s) {
             var m = ENTRY_PATTERN.matcher(s.trim());
             m.matches();
 
-            Date timestamp = null;
+            Date timestamp;
             try {
                 timestamp = DATE_FORMAT.parse(m.group(1));
             } catch (ParseException e) {

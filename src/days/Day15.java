@@ -37,14 +37,14 @@ public class Day15 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
 //        System.out.println(Arrays.stream(grid.grid).flatMap(Arrays::stream).filter(t -> t.type == TileType.EMPTY).count());
 
         int rounds = simulateFight();
         int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
         System.out.println("Rounds: " + rounds);
         System.out.println("Remaining HP: " + hp);
-        System.out.println("Result: " + (rounds * hp));
+        return rounds * hp;
     }
 
     private int simulateFight() {
@@ -67,7 +67,7 @@ public class Day15 extends Day {
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         int elfPower = 4;
         int rounds;
         do {
@@ -81,7 +81,7 @@ public class Day15 extends Day {
         int hp = grid.units.stream().filter(Unit::alive).mapToInt(u -> u.hp).sum();
         System.out.println("Rounds: " + rounds);
         System.out.println("Remaining HP: " + hp);
-        System.out.println("Result: " + (rounds * hp));
+        return rounds * hp;
     }
 
     @Override
@@ -279,11 +279,10 @@ public class Day15 extends Day {
                 var shortestValidDistance = validPaths.stream()
                         .mapToInt(List::size)
                         .min().getAsInt();
-                var moveTo = validPaths.stream()
+                standingOn = validPaths.stream()
                         .filter(p -> p.size() == shortestValidDistance)
                         .map(p -> p.get(0))
                         .min(Comparator.comparing(Tile::position)).get();
-                standingOn = moveTo;
                 turn(false);
             }
         }

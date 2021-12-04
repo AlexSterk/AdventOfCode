@@ -21,7 +21,7 @@ public class Day7 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
 //        System.out.println(requires);
         List<String> completed = new ArrayList<>();
 
@@ -32,12 +32,16 @@ public class Day7 extends Day {
             requires.forEach((k, s) -> s.remove(todo));
         }
 
-        System.out.println(String.join("", completed));
+        return String.join("", completed);
     }
 
     @Override
-    public void part2() {
-        processInput();
+    public boolean resetForPartTwo() {
+        return true;
+    }
+
+    @Override
+    public Object part2() {
         List<String> completed = new ArrayList<>();
         int WORKERS = 5;
         int EXTRA_TIME = 60;
@@ -72,6 +76,7 @@ public class Day7 extends Day {
             System.out.println(String.join("", completed));
             totalSeconds += 1;
         }
+        return totalSeconds - 2;
     }
 
     @Override

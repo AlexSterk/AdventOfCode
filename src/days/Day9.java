@@ -22,7 +22,7 @@ public class Day9 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         PrimitiveIterator.OfInt nextMarbles = IntStream.range(0, last + 1).iterator();
         Marble current = new Marble(nextMarbles.next());
         long[] scores = new long[players];
@@ -55,13 +55,13 @@ public class Day9 extends Day {
         for (long score : scores) {
             max = Math.max(score, max);
         }
-        System.out.println(max);
+        return max;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         last *= 100;
-        part1();
+        return part1();
     }
 
     @Override

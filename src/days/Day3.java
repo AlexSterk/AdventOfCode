@@ -16,7 +16,7 @@ public class Day3 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         int maxWidth = rectangles.values().stream().map(r -> r.width() + r.x()).max(Comparator.comparingInt(i -> i)).get();
         int maxHeight = rectangles.values().stream().map(r -> r.height() + r.y()).max(Comparator.comparingInt(i -> i)).get();
 
@@ -38,11 +38,11 @@ public class Day3 extends Day {
             }
         }
 
-        System.out.println(c);
+        return c;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         Map<Integer, Map<Integer, Set<Integer>>> grid = new HashMap<>();
 
         HashSet<Integer> noOverlap = new HashSet<>(rectangles.keySet());
@@ -60,7 +60,7 @@ public class Day3 extends Day {
             }
         }
 
-        System.out.println(noOverlap);
+        return noOverlap.iterator().next();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class Day3 extends Day {
         return 3;
     }
 
-    static private record Rectangle(int id, int x, int y, int width, int height) {
+    private record Rectangle(int id, int x, int y, int width, int height) {
         static final Pattern PATTERN = Pattern.compile("#(\\d+) @ (\\d+),(\\d+): (\\d+)x(\\d+)");
 
         Rectangle(String id, String x, String y, String width, String height) {
