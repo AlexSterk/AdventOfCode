@@ -66,6 +66,14 @@ public abstract class Day {
         return false;
     }
 
+    public String partOneSolution() {
+        return null;
+    }
+
+    public String partTwoSolution() {
+        return null;
+    }
+
     /**
      * Main method to dynamically run each problem class.
      */
