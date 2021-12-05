@@ -71,4 +71,13 @@ public class Day5 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "5585";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "17193";
+    }
 }

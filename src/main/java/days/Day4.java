@@ -91,6 +91,16 @@ public class Day4 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "11536";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "1284";
+    }
+
     private record BingoNumber(Integer number, boolean marked) {
         public BingoNumber(Integer number) {
             this(number, false);
