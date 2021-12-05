@@ -24,6 +24,11 @@ public record Line(Point a, Point b) {
         );
     }
 
+    private static IntStream revRange(int from, int to) {
+        return IntStream.rangeClosed(from, to)
+                .map(i -> to - i + from);
+    }
+
     public static Line toLine(String s) {
         Matcher m = LINE_PATTERN.matcher(s);
         return m.matches() ? new Line(
@@ -42,11 +47,35 @@ public record Line(Point a, Point b) {
         return a.a().equals(b.a());
     }
 
+    private boolean reverseX() {
+        return a.x() > b.x();
+    }
+
+    private boolean reverseY() {
+        return a.y() > b.y();
+    }
+
     public List<Point> expand() {
         List<Point> points = new ArrayList<>();
 
-        PrimitiveIterator.OfInt xs = Spliterators.iterator((vertical() ? IntStream.generate(a::x) : IntStream.rangeClosed(Math.min(a.x(), b.x()), Math.max(a.x(), b.x()))).spliterator());
-        PrimitiveIterator.OfInt ys = Spliterators.iterator((horizontal() ? IntStream.generate(a::y) : IntStream.rangeClosed(Math.min(a.y(), b.y()), Math.max(a.y(), b.y()))).spliterator());
+        PrimitiveIterator.OfInt xs;
+        if (vertical()) {
+            xs = Spliterators.iterator(IntStream.generate(a::x).spliterator());
+        } else if (reverseX()) {
+            xs = Spliterators.iterator(revRange(b.x(), a.x()).spliterator());
+        }
+        else {
+            xs = Spliterators.iterator(IntStream.rangeClosed(a.x(), b.x()).spliterator());
+        }
+        PrimitiveIterator.OfInt ys;
+        if (horizontal()) {
+            ys = Spliterators.iterator(IntStream.generate(a::y).spliterator());
+        } else if (reverseY()) {
+            ys = Spliterators.iterator(revRange(b.y(), a.y()).spliterator());
+        }
+        else {
+            ys = Spliterators.iterator(IntStream.rangeClosed(a.y(), b.y()).spliterator());
+        }
 
         while (xs.hasNext() && ys.hasNext()) {
             points.add(new Point(xs.nextInt(), ys.nextInt()));
