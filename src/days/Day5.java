@@ -1,41 +1,64 @@
 package days;
 
 import setup.Day;
+import util.Grid;
 import util.Line;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 public class Day5 extends Day {
     private List<Line> lines;
+    private Grid<Integer> board;
 
     @Override
     public void processInput() {
         String[] lines = input.split("\n");
         this.lines = Arrays.stream(lines).map(Line::toLine).toList();
+
+        List<Line.Point> points = this.lines.stream()
+                .flatMap(l -> Stream.of(l.a(), l.b()))
+                .toList();
+
+        var maxX = Collections.max(points, Comparator.comparing(Line.Point::x)).x() + 1;
+        var maxY = Collections.max(points, Comparator.comparing(Line.Point::y)).y() + 1;
+
+        board = new Grid<>(maxX, maxY);
+        for (int x = 0; x < maxX; x++) {
+            for (int y = 0; y < maxY; y++) {
+                board.set(x, y, 0);
+            }
+        }
     }
 
     @Override
     public Object part1() {
-        Set<Line.Point> overlap = new HashSet<>();
-        for (int i = 0; i < lines.size(); i++) {
-            Line lineA = lines.get(i);
-            if (!lineA.horizontal() && !lineA.vertical()) continue;
-            for (int j = i + 1; j < lines.size(); j++) {
-                Line lineB = lines.get(j);
-                if (!lineB.horizontal() && !lineB.vertical()) continue;
-                overlap.addAll(lineA.overlap(lineB));
-            }
-        }
-
-        return overlap.size();
+        lines.stream()
+                .filter(l -> l.horizontal() || l.vertical())
+                .map(Line::expand)
+//                .peek(System.out::println)
+                .forEach(ps -> ps.forEach(p -> board.set(p.x(), p.y(), board.getTile(p.x(), p.y()).data() + 1)));
+//        System.out.println(board);
+        return board.getAll().stream().filter(t -> t.data() >= 2).count();
     }
 
     @Override
     public Object part2() {
-        return null;
+        lines.stream()
+//                .sorted(Comparator.comparingInt(o -> Math.min(o.a().y(), o.b().y())))
+                .map(Line::expand)
+//                .peek(System.out::println)
+                .forEach(ps -> ps.forEach(p -> board.set(p.x(), p.y(), board.getTile(p.x(), p.y()).data() + 1)));
+//        System.out.println(board);
+        return board.getAll().stream().filter(t -> t.data() >= 2).count();
+    }
+
+    @Override
+    public boolean resetForPartTwo() {
+        return true;
     }
 
     @Override
