@@ -1,5 +1,3 @@
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,6 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class RegressionTest {
 
@@ -29,16 +31,20 @@ public class RegressionTest {
     }
 
     public static Stream<Arguments> daysToTest() {
-        return days.stream().map(Arguments::of);
+        return Stream.concat(
+                days.stream().map(Arguments::of),
+                Stream.of(Arguments.of(""))
+        );
     }
 
     @ParameterizedTest
     @MethodSource("daysToTest")
     public void testPartOne(String d) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        assumeFalse(d.isEmpty());
         Day day = getDay(d);
-        Assumptions.assumeTrue(day.partOneSolution() != null);
+        assumeTrue(day.partOneSolution() != null);
         day.processInput();
-        Assertions.assertEquals(day.partOneSolution(), day.part1().toString());
+        assertEquals(day.partOneSolution(), day.part1().toString());
     }
 
     private Day getDay(String d) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -91,10 +97,11 @@ public class RegressionTest {
     @ParameterizedTest
     @MethodSource("daysToTest")
     public void testPartTwo(String d) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        assumeFalse(d.isEmpty());
         Day day = getDay(d);
-        Assumptions.assumeTrue(day.partTwoSolution() != null);
+        assumeTrue(day.partTwoSolution() != null);
         day.processInput();
         if (!day.resetForPartTwo()) day.part1();
-        Assertions.assertEquals(day.partTwoSolution(), day.part2().toString());
+        assertEquals(day.partTwoSolution(), day.part2().toString());
     }
 }
