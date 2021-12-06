@@ -98,7 +98,7 @@ public class Day16 extends Day {
         return false;
     }
 
-    private sealed interface Instruction {
+    sealed interface Instruction {
         static List<Instruction> getAllInstructions(int a, int b, int c) {
             List<Instruction> res = new ArrayList<>();
 
@@ -164,51 +164,51 @@ public class Day16 extends Day {
         }
     }
 
-    private record Addr(int A, int B, int C) implements Instruction {
+    record Addr(int A, int B, int C) implements Instruction {
     }
 
-    private record Addi(int A, int B, int C) implements Instruction {
+    record Addi(int A, int B, int C) implements Instruction {
     }
 
-    private record Mulr(int A, int B, int C) implements Instruction {
+    record Mulr(int A, int B, int C) implements Instruction {
     }
 
-    private record Muli(int A, int B, int C) implements Instruction {
+    record Muli(int A, int B, int C) implements Instruction {
     }
 
-    private record Banr(int A, int B, int C) implements Instruction {
+    record Banr(int A, int B, int C) implements Instruction {
     }
 
-    private record Bani(int A, int B, int C) implements Instruction {
+    record Bani(int A, int B, int C) implements Instruction {
     }
 
-    private record Borr(int A, int B, int C) implements Instruction {
+    record Borr(int A, int B, int C) implements Instruction {
     }
 
-    private record Bori(int A, int B, int C) implements Instruction {
+    record Bori(int A, int B, int C) implements Instruction {
     }
 
-    private record Setr(int A, int B, int C) implements Instruction {
+    record Setr(int A, int B, int C) implements Instruction {
     }
 
-    private record Seti(int A, int B, int C) implements Instruction {
+    record Seti(int A, int B, int C) implements Instruction {
     }
 
-    private record Gtir(int A, int B, int C) implements Instruction {
+    record Gtir(int A, int B, int C) implements Instruction {
     }
 
-    private record Gtri(int A, int B, int C) implements Instruction {
+    record Gtri(int A, int B, int C) implements Instruction {
     }
 
-    private record Gtrr(int A, int B, int C) implements Instruction {
+    record Gtrr(int A, int B, int C) implements Instruction {
     }
 
-    private record Eqir(int A, int B, int C) implements Instruction {
+    record Eqir(int A, int B, int C) implements Instruction {
     }
 
-    private record Eqri(int A, int B, int C) implements Instruction {
+    record Eqri(int A, int B, int C) implements Instruction {
     }
 
-    private record Eqrr(int A, int B, int C) implements Instruction {
+    record Eqrr(int A, int B, int C) implements Instruction {
     }
 }
