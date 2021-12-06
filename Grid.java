@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@SuppressWarnings("unused")
 public class Grid<T> {
 
     private final List<List<Tile<T>>> grid;
@@ -80,6 +81,16 @@ public class Grid<T> {
                 .filter(t -> t.x >= xStart && t.x <= xEnd && t.y >= yStart && t.y <= yEnd)
                 .forEach(t -> sub.set(t.x - xStart, t.y - yStart, t.data));
         return sub;
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public Grid<T> subgridNoNull() {
+        int minX = getAll().stream().filter(Objects::nonNull).min(Comparator.comparing(Tile::x)).get().x();
+        int maxX = getAll().stream().filter(Objects::nonNull).max(Comparator.comparing(Tile::x)).get().x();
+        int minY = getAll().stream().filter(Objects::nonNull).min(Comparator.comparing(Tile::y)).get().y();
+        int maxY = getAll().stream().filter(Objects::nonNull).max(Comparator.comparing(Tile::y)).get().y();
+
+        return subgrid(minX, maxX, minY, maxY);
     }
 
     public Set<Tile<T>> getAdjacent(Tile<T> tile, boolean includeDiagonals) {
