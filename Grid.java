@@ -1,6 +1,7 @@
 package util;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -8,6 +9,7 @@ public class Grid<T> {
 
     private final List<List<Tile<T>>> grid;
     public final int width, height;
+    private Supplier<T> empty;
 
     public Grid(int w, int h) {
         this.width = w;
@@ -15,6 +17,19 @@ public class Grid<T> {
         this.grid = new ArrayList<>(h);
         for (int y = 0; y < h; y++) {
             this.grid.add(new ArrayList<>(Collections.nCopies(w, null)));
+        }
+    }
+
+    public Grid(int w, int h, Supplier<T> empty) {
+        this(w, h);
+        this.empty = empty;
+    }
+
+    public void init(Supplier<T> data, boolean overwrite) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (_getTile(x,y) == null || overwrite) set(x, y, data.get());
+            }
         }
     }
 
@@ -40,6 +55,11 @@ public class Grid<T> {
     }
 
     public Tile<T> getTile(int x, int y) {
+        Tile<T> tTile = _getTile(x, y);
+        return tTile == null && empty != null ? new Tile<>(x, y, empty.get(), this) : tTile;
+    }
+
+    private Tile<T> _getTile(int x, int y) {
         return grid.get(y).get(x);
     }
 
@@ -48,9 +68,18 @@ public class Grid<T> {
     }
 
     public Grid<T> copy() {
-        Grid<T> g = new Grid<>(width, height);
+        Grid<T> g = new Grid<>(width, height, empty);
         getAll().forEach(t -> g.set(t, t.data));
         return g;
+    }
+
+    public Grid<T> subgrid(int xStart, int xEnd, int yStart, int yEnd) {
+        Grid<T> sub = new Grid<>(xEnd - xStart + 1, yEnd - yStart + 1, empty);
+        getAll().stream()
+                .filter(Objects::nonNull)
+                .filter(t -> t.x >= xStart && t.x <= xEnd && t.y >= yStart && t.y <= yEnd)
+                .forEach(t -> sub.set(t.x - xStart, t.y - yStart, t.data));
+        return sub;
     }
 
     public Set<Tile<T>> getAdjacent(Tile<T> tile, boolean includeDiagonals) {
@@ -95,7 +124,18 @@ public class Grid<T> {
 
     @Override
     public String toString() {
-        return grid.stream().map(l -> l.stream().map(t -> t.data.toString()).collect(Collectors.joining())).collect(Collectors.joining("\n"));
+        return grid.stream()
+                .map(l -> l.stream().map(t -> t == null ? " " : t.data.toString()).collect(Collectors.joining()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    public String toString(Map<Tile<T>, String> custom) {
+        return grid.stream()
+                .map(l -> l.stream().map(t -> {
+                    if (custom.containsKey(t)) return custom.get(t);
+                    return t == null ? " " : t.data.toString();
+                }).collect(Collectors.joining()))
+                .collect(Collectors.joining("\n"));
     }
 
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
