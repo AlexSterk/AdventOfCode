@@ -21,9 +21,9 @@ public class Download {
     }
 
     private static void createTemplate(int day) throws IOException {
-        Path classFilePath = Paths.get(String.format("src/days/Day%d.java", day));
+        Path classFilePath = Paths.get(String.format("src/main/java/days/Day%d.java", day));
         if (!Files.exists(classFilePath)) {
-            String template = Files.readString(Path.of("src/setup/Day.txt")).replaceAll("%Day%", String.valueOf(day));
+            String template = Files.readString(Path.of("src/main/java/setup/Day.txt")).replaceAll("%Day%", String.valueOf(day));
             Files.writeString(classFilePath, template);
             System.out.printf("Generated class file at: %s", classFilePath.toAbsolutePath());
         } else {
