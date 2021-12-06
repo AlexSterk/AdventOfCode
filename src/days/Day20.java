@@ -31,6 +31,7 @@ public class Day20 extends Day {
         startPosition = map.getTile(width - 1, height - 1);
     }
 
+    @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
     @Override
     public Object part1() {
         Tile<MapData> position = startPosition;
