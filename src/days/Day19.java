@@ -3,7 +3,6 @@ package days;
 import days.Day16.*;
 import setup.Day;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,25 +14,7 @@ public class Day19 extends Day {
     public void processInput() {
         String[] lines = input.split("\n");
         String ipDirective = lines[0];
-        instructions = Arrays.stream(lines).skip(1).map(s -> s.split(" ")).map(a -> switch (a[0]) {
-            case "addr" -> new Addr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "addi" -> new Addi(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "mulr" -> new Mulr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "muli" -> new Muli(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "banr" -> new Banr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "bani" -> new Bani(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "borr" -> new Borr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "bori" -> new Bori(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "setr" -> new Setr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "seti" -> new Seti(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "gtir" -> new Gtir(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "gtri" -> new Gtri(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "gtrr" -> new Gtrr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "eqir" -> new Eqir(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "eqri" -> new Eqri(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            case "eqrr" -> new Eqrr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
-            default -> throw new IllegalStateException("Unexpected value: " + a[0]);
-        }).toList();
+        instructions = Arrays.stream(lines).skip(1).map(Instruction::stringToInstruction).toList();
 
         ipRegister = Character.getNumericValue(ipDirective.charAt(4));
     }

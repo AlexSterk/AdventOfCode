@@ -143,11 +143,103 @@ public class Day16 extends Day {
             }
         }
 
+        static void execute(Instruction instruction, long[] registers) {
+            switch (instruction) {
+                case Addr o -> registers[o.C] = registers[o.A] + registers[o.B];
+                case Addi o -> registers[o.C] = registers[o.A] + o.B;
+                case Mulr o -> registers[o.C] = registers[o.A] * registers[o.B];
+                case Muli o -> registers[o.C] = registers[o.A] * o.B;
+                case Banr o -> registers[o.C] = registers[o.A] & registers[o.B];
+                case Bani o -> registers[o.C] = registers[o.A] & o.B;
+                case Borr o -> registers[o.C] = registers[o.A] | registers[o.B];
+                case Bori o -> registers[o.C] = registers[o.A] | o.B;
+                case Setr o -> registers[o.C] = registers[o.A];
+                case Seti o -> registers[o.C] = o.A;
+                case Gtir o -> registers[o.C] = o.A > registers[o.B] ? 1 : 0;
+                case Gtri o -> registers[o.C] = registers[o.A] > o.B ? 1 : 0;
+                case Gtrr o -> registers[o.C] = registers[o.A] > registers[o.B] ? 1 : 0;
+                case Eqir o -> registers[o.C] = o.A == registers[o.B] ? 1 : 0;
+                case Eqri o -> registers[o.C] = registers[o.A] == o.B ? 1 : 0;
+                case Eqrr o -> registers[o.C] = registers[o.A] == registers[o.B] ? 1 : 0;
+            }
+        }
+
+        static Instruction stringToInstruction(String s) {
+            String[] a = s.split(" ");
+            return switch (a[0]) {
+                case "addr" -> new Addr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "addi" -> new Addi(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "mulr" -> new Mulr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "muli" -> new Muli(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "banr" -> new Banr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "bani" -> new Bani(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "borr" -> new Borr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "bori" -> new Bori(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "setr" -> new Setr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "seti" -> new Seti(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "gtir" -> new Gtir(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "gtri" -> new Gtri(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "gtrr" -> new Gtrr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "eqir" -> new Eqir(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "eqri" -> new Eqri(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                case "eqrr" -> new Eqrr(Integer.parseInt(a[1]), Integer.parseInt(a[2]), Integer.parseInt(a[3]));
+                default -> throw new IllegalStateException("Unexpected value: " + a[0]);
+            };
+        }
+
         int A();
 
         int B();
 
         int C();
+
+        record Addr(int A, int B, int C) implements Instruction {
+        }
+
+        record Addi(int A, int B, int C) implements Instruction {
+        }
+
+        record Mulr(int A, int B, int C) implements Instruction {
+        }
+
+        record Muli(int A, int B, int C) implements Instruction {
+        }
+
+        record Banr(int A, int B, int C) implements Instruction {
+        }
+
+        record Bani(int A, int B, int C) implements Instruction {
+        }
+
+        record Borr(int A, int B, int C) implements Instruction {
+        }
+
+        record Bori(int A, int B, int C) implements Instruction {
+        }
+
+        record Setr(int A, int B, int C) implements Instruction {
+        }
+
+        record Seti(int A, int B, int C) implements Instruction {
+        }
+
+        record Gtir(int A, int B, int C) implements Instruction {
+        }
+
+        record Gtri(int A, int B, int C) implements Instruction {
+        }
+
+        record Gtrr(int A, int B, int C) implements Instruction {
+        }
+
+        record Eqir(int A, int B, int C) implements Instruction {
+        }
+
+        record Eqri(int A, int B, int C) implements Instruction {
+        }
+
+        record Eqrr(int A, int B, int C) implements Instruction {
+        }
     }
 
     private record Sample(List<Integer> before, List<Integer> after, List<Integer> op) {
@@ -164,51 +256,4 @@ public class Day16 extends Day {
         }
     }
 
-    record Addr(int A, int B, int C) implements Instruction {
-    }
-
-    record Addi(int A, int B, int C) implements Instruction {
-    }
-
-    record Mulr(int A, int B, int C) implements Instruction {
-    }
-
-    record Muli(int A, int B, int C) implements Instruction {
-    }
-
-    record Banr(int A, int B, int C) implements Instruction {
-    }
-
-    record Bani(int A, int B, int C) implements Instruction {
-    }
-
-    record Borr(int A, int B, int C) implements Instruction {
-    }
-
-    record Bori(int A, int B, int C) implements Instruction {
-    }
-
-    record Setr(int A, int B, int C) implements Instruction {
-    }
-
-    record Seti(int A, int B, int C) implements Instruction {
-    }
-
-    record Gtir(int A, int B, int C) implements Instruction {
-    }
-
-    record Gtri(int A, int B, int C) implements Instruction {
-    }
-
-    record Gtrr(int A, int B, int C) implements Instruction {
-    }
-
-    record Eqir(int A, int B, int C) implements Instruction {
-    }
-
-    record Eqri(int A, int B, int C) implements Instruction {
-    }
-
-    record Eqrr(int A, int B, int C) implements Instruction {
-    }
 }
