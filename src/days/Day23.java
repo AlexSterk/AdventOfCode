@@ -2,10 +2,7 @@ package days;
 
 import setup.Day;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,12 +18,28 @@ public class Day23 extends Day {
     @Override
     public Object part1() {
         Nanobot strongest = Collections.max(nanobots, Comparator.comparing(nanobot -> nanobot.radius));
-        return nanobots.stream().filter(n -> n.distanceTo(strongest) <= strongest.radius).count();
+        return nanobots.stream().filter(n -> n.inRange(strongest)).count();
     }
 
     @Override
     public Object part2() {
-        return null;
+        TreeMap<Integer, Integer> ranges = new TreeMap<>();
+        Nanobot origin = new Nanobot(0, 0, 0, 0);
+        for (Nanobot n : nanobots) {
+            int originDistance = n.distanceTo(origin);
+            ranges.put(Math.max(0, originDistance - n.radius), 1);
+            ranges.put(originDistance + n.radius, -1);
+        }
+        int count = 0, maxCount = 0, result = 0;
+        for (Map.Entry<Integer, Integer> each : ranges.entrySet()) {
+            count += each.getValue();
+            if (count > maxCount) {
+                result = each.getKey();
+                maxCount = count;
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -55,6 +68,10 @@ public class Day23 extends Day {
 
         public int distanceTo(Nanobot other) {
             return Math.abs(x - other.x) + Math.abs(y - other.y) + Math.abs(z - other.z);
+        }
+
+        public boolean inRange(Nanobot other) {
+            return distanceTo(other) <= other.radius;
         }
     }
 }
