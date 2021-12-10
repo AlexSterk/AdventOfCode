@@ -27,8 +27,7 @@ public final class Graph<T> {
     }
 
     public void addEdge(T from, T to, int weight) {
-        nodes.get(from).put(to, weight);
-        addEdge(to, from, weight, true);
+        addEdge(from, to, weight, false);
     }
 
     public int getWeight(T from, T to) {
