@@ -10,11 +10,11 @@ public final class Graph<T> {
     }
 
     public Set<T> getNeighbours(T n) {
-        return nodes.get(n).keySet();
+        return Collections.unmodifiableSet(nodes.get(n).keySet());
     }
 
     public Set<T> nodes() {
-        return nodes.keySet();
+        return Collections.unmodifiableSet(nodes.keySet());
     }
 
     public void addNode(T node) {
