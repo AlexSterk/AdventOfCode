@@ -25,6 +25,15 @@ public class Day24 extends Day {
 
     @Override
     public Object part1() {
+        simulate();
+
+        return Stream.concat(immuneSystem.stream(), infection.stream())
+                .filter(Group::isAlive)
+                .mapToLong(g -> g.units)
+                .sum();
+    }
+
+    private void simulate() {
         while (immuneSystem.stream().anyMatch(Group::isAlive) && infection.stream().anyMatch(Group::isAlive)) {
             Set<Group> groups = new TreeSet<>(Group.POWER_COMPARATOR.thenComparing(Group.INIT_COMPARATOR));
             groups.addAll(immuneSystem);
@@ -35,18 +44,29 @@ public class Day24 extends Day {
             groups.addAll(immuneSystem);
             groups.addAll(infection);
 
+            long unitsBefore = groups.stream().mapToLong(g -> g.units).sum();
             groups.forEach(Group::attack);
+            long unitsAfter = groups.stream().mapToLong(g -> g.units).sum();
+            if (unitsAfter == unitsBefore) break;
         }
-
-        return Stream.concat(immuneSystem.stream(), infection.stream())
-                .filter(Group::isAlive)
-                .mapToLong(g -> g.units)
-                .sum();
     }
 
     @Override
     public Object part2() {
-        return null;
+        int boost = 0;
+        while (true) {
+            processInput();
+            int finalBoost = boost;
+            immuneSystem.forEach(g -> g.power += finalBoost);
+            System.out.println("Trying boost " + boost);
+            simulate();
+            if (immuneSystem.stream().anyMatch(Group::isAlive) && infection.stream().noneMatch(Group::isAlive)) {
+                break;
+            }
+            boost++;
+        }
+
+        return immuneSystem.stream().filter(Group::isAlive).mapToLong(g -> g.units).sum();
     }
 
     @Override
@@ -69,7 +89,7 @@ public class Day24 extends Day {
         private static final Pattern PATTERN = Pattern.compile("(?<units>\\d+) units each with (?<hp>\\d+) hit points(?: \\((?<immuneAndWeakness>.*)\\))? with an attack that does (?<power>\\d+) (?<type>\\w+) damage at initiative (?<init>\\d+)");
 
         private final int hp;
-        private final int power;
+        private int power;
         private final int initiative;
         private final String attack;
         private final Set<String> weaknesses;
@@ -131,10 +151,12 @@ public class Day24 extends Day {
             Optional<Group> target = possibleTargets.stream()
                     .filter(Group::isAlive)
                     .filter(t -> t.targetedBy == null)
-                    .min(Comparator.comparing((Group t) -> t.wouldTakeDamage(effectivePower(), attack))
+                    .sorted(Comparator.comparing((Group t) -> t.wouldTakeDamage(effectivePower(), attack))
                             .reversed()
                             .thenComparing(POWER_COMPARATOR)
-                            .thenComparing(INIT_COMPARATOR));
+                            .thenComparing(INIT_COMPARATOR))
+                    .filter(t -> t.wouldTakeDamage(effectivePower(), attack) > 0)
+                    .findFirst();
             target.ifPresent(this::target);
         }
 
@@ -155,8 +177,11 @@ public class Day24 extends Day {
             if (immunities.contains(type)) return;
             if (weaknesses.contains(type)) power *= 2;
             int taking = power / hp;
-//            System.out.println(taking);
             this.units -= taking;
+            if (!isAlive() && targeting != null) {
+                targeting.targetedBy = null;
+                targeting = null;
+            }
         }
 
         private int wouldTakeDamage(int power, String type) {
