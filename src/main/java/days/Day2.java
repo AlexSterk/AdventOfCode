@@ -3,7 +3,6 @@ package days;
 import setup.Day;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Day2 extends Day {
     List<List<Integer>> spreadsheet;
@@ -21,12 +20,12 @@ public class Day2 extends Day {
     }
 
     @Override
-    public void part1() {
-        System.out.println(spreadsheet.stream().mapToInt(l -> Math.abs(Collections.max(l) - Collections.min(l))).sum());
+    public Object part1() {
+        return spreadsheet.stream().mapToInt(l -> Math.abs(Collections.max(l) - Collections.min(l))).sum();
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         int sum = 0;
         r: for (List<Integer> row : spreadsheet) {
             for (Integer i : row) {
@@ -39,11 +38,21 @@ public class Day2 extends Day {
                 }
             }
         }
-        System.out.println(sum);
+        return sum;
     }
 
     @Override
     public int getDay() {
         return 2;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "43074";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "280";
     }
 }

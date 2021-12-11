@@ -13,7 +13,7 @@ public class Day3 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         Level s = new Level(1, 1, 1);
         while (Input > s.end() || Input < s.start()) {
             s = new Level(s.ring() + 2, s.end() + 1);
@@ -26,8 +26,7 @@ public class Day3 extends Day {
 
         while (x >= 0) {
             if (i == Input) {
-                _part1(x, y, s.ring());
-                return;
+                return _part1(x, y, s.ring());
             }
             i--;
             x--;
@@ -37,8 +36,7 @@ public class Day3 extends Day {
 
         while (y >= 0) {
             if (i == Input) {
-                _part1(x, y, s.ring());
-                return;
+                return _part1(x, y, s.ring());
             }
             i--;
             y--;
@@ -48,8 +46,7 @@ public class Day3 extends Day {
 
         while (x < s.ring()) {
             if (i == Input) {
-                _part1(x, y, s.ring());
-                return;
+                return _part1(x, y, s.ring());
             }
             i--;
             x++;
@@ -59,21 +56,22 @@ public class Day3 extends Day {
 
         while (y < s.ring()) {
             if (i == Input) {
-                _part1(x, y, s.ring());
-                return;
+                return _part1(x, y, s.ring());
             }
             i--;
             y++;
         }
+        return null;
     }
 
-    public void _part1(int x, int y, int ring) {
+    public int _part1(int x, int y, int ring) {
         int mid = (ring - 1) / 2 - 1;
-        System.out.println(Math.abs(mid - x) + Math.abs(mid - y));
+        int r = Math.abs(mid - x) + Math.abs(mid - y);
+        return r;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         HashMap<Pair, Integer> grid = new HashMap<>();
         grid.put(new Pair(0, 0), 1);
 
@@ -99,8 +97,7 @@ public class Day3 extends Day {
                 int value = neighboursSum(getNeighbours(p), grid);
 //                System.out.println(value);
                 if (value > Input) {
-                    System.out.println(value);
-                    return;
+                    return value;
                 }
                 grid.put(p, value);
             }
@@ -129,31 +126,42 @@ public class Day3 extends Day {
     private static int neighboursSum(Set<Pair> s, Map<Pair, Integer> m) {
         return s.stream().mapToInt(p -> m.getOrDefault(p, 0)).sum();
     }
-}
 
-record Level(int ring, Integer start, int end) {
-    Level(int ring, int start) {
-        this(ring, start, start + ring * 4 - 5);
+    private enum Direction {
+        UP(0, -1),
+        LEFT(-1, 0),
+        DOWN(0, 1),
+        RIGHT(1, 0);
+
+        int vx, vy;
+
+        Direction(int vx, int vy) {
+            this.vx = vx;
+            this.vy = vy;
+        }
+
+        Pair update(Pair pair) {
+            return new Pair(pair.x() + vx, pair.y() + vy);
+        }
+    }
+
+    record Level(int ring, Integer start, int end) {
+        Level(int ring, int start) {
+            this(ring, start, start + ring * 4 - 5);
+        }
+    }
+
+    record Pair(int x, int y) {
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "419";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "295229";
     }
 }
 
-record Pair(int x, int y) {
-}
-
-enum Direction {
-    UP(0, -1),
-    LEFT(-1, 0),
-    DOWN(0, 1),
-    RIGHT(1, 0);
-
-    int vx, vy;
-
-    Direction(int vx, int vy) {
-        this.vx = vx;
-        this.vy = vy;
-    }
-
-    Pair update(Pair pair) {
-        return new Pair(pair.x() + vx, pair.y() + vy);
-    }
-}

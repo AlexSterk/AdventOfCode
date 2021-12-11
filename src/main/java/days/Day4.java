@@ -17,18 +17,18 @@ public class Day4 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         int c = 0;
         for (String line : lines) {
             String[] split = line.split("\\s+");
             HashSet<String> passphrases = new HashSet<>(Arrays.asList(split));
             if (passphrases.size() == split.length) c++;
         }
-        System.out.println(c);
+        return c;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         int c = 0;
         for (String line : lines) {
             HashSet<List<Integer>> passphrases = new HashSet<>();
@@ -38,11 +38,21 @@ public class Day4 extends Day {
             }
             if (passphrases.size() == split.length) c++;
         }
-        System.out.println(c);
+        return c;
     }
 
     @Override
     public int getDay() {
         return 4;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "466";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "251";
     }
 }

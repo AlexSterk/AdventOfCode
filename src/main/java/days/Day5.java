@@ -4,7 +4,6 @@ import setup.Day;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,7 @@ public class Day5 extends Day {
     }
 
     @Override
-    public void part1() {
+    public Object part1() {
         List<Integer> instructions = new ArrayList<>(this.instructions);
         
         int pc = 0;
@@ -29,11 +28,11 @@ public class Day5 extends Day {
             instructions.set(old, instructions.get(old) + 1);
             steps++;
         }
-        System.out.println(steps);
+        return steps;
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         List<Integer> instructions = new ArrayList<>(this.instructions);
         
         int pc = 0;
@@ -46,7 +45,7 @@ public class Day5 extends Day {
             instructions.set(old, oldInstr >= 3 ? oldInstr - 1 : oldInstr + 1);
             steps++;
         }
-        System.out.println(steps);
+        return steps;
     }
 
     @Override
@@ -57,5 +56,15 @@ public class Day5 extends Day {
     @Override
     public boolean isTest() {
         return false;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "351282";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "24568703";
     }
 }
