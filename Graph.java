@@ -81,4 +81,26 @@ public final class Graph<T> {
         Collections.reverse(p);
         return p;
     }
+
+    public Map<T, Integer> floodFill() {
+        Map<T, Integer> labels = new HashMap<>();
+        int i = 1;
+
+        Optional<T> unlabeled;
+        while ((unlabeled = nodes().stream().filter(n -> !labels.containsKey(n)).findAny()).isPresent()) {
+            Queue<T> Q = new ArrayDeque<>();
+            T node = unlabeled.get();
+            Q.offer(node);
+            while (!Q.isEmpty()) {
+                T u = Q.poll();
+                labels.put(u, i);
+                for (T v : this.getNeighbours(u)) {
+                    if (!labels.containsKey(v)) Q.offer(v);
+                }
+            }
+            i++;
+        }
+
+        return labels;
+    }
 }
