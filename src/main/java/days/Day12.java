@@ -31,7 +31,7 @@ public class Day12 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        return graph.floodFill().values().stream().distinct().count();
     }
 
     @Override
@@ -47,5 +47,10 @@ public class Day12 extends Day {
     @Override
     public String partOneSolution() {
         return "283";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "195";
     }
 }
