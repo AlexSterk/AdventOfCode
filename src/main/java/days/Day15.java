@@ -63,6 +63,11 @@ public class Day15 extends Day {
         return "592";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "320";
+    }
+
     private static class Generator {
         private static final int DIV = 2147483647;
         private long prev;
