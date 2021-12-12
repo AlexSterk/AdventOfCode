@@ -18,11 +18,11 @@ public final class Graph<T> {
     }
 
     public void addNode(T node) {
-        nodes.put(node, new HashMap<>());
+        nodes.putIfAbsent(node, new HashMap<>());
     }
 
     public void addEdge(T from, T to, int weight, boolean directional) {
-        nodes.get(from).put(to, weight);
+        nodes.get(from).putIfAbsent(to, weight);
         if (!directional) addEdge(to, from, weight, true);
     }
 
@@ -102,5 +102,12 @@ public final class Graph<T> {
         }
 
         return labels;
+    }
+
+    @Override
+    public String toString() {
+        return "Graph{" +
+                "nodes=" + nodes +
+                '}';
     }
 }
