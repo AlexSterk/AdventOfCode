@@ -29,8 +29,19 @@ public class Day8 extends Day {
     }
 
     @Override
+    public boolean resetForPartTwo() {
+        return true;
+    }
+
+    @Override
     public Object part2() {
-        return null;
+        int max = Integer.MIN_VALUE;
+        for (Instruction ins : instructions) {
+            ins.execute(registers);
+            max = Math.max(max, Collections.max(registers.values()));
+        }
+
+        return max;
     }
 
     @Override
@@ -46,6 +57,11 @@ public class Day8 extends Day {
     @Override
     public String partOneSolution() {
         return "7296";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "8186";
     }
 
     private record Instruction(String register, boolean increment, int value, String conditionRegister, String op, int compare) {
