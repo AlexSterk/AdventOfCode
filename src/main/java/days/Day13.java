@@ -4,7 +4,6 @@ import setup.Day;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Day13 extends Day {
 
@@ -19,30 +18,38 @@ public class Day13 extends Day {
 
     @Override
     public Object part1() {
-        return runRound(0);
-    }
-
-    private int runRound(int x) {
+        int x = 0;
         int severity = 0;
 
         PriorityQueue<Integer> Q = new PriorityQueue<>(layers.keySet());
         while (!Q.isEmpty()) {
             Layer layer = layers.get(x);
             if (layer != null) {
-                if (layer.x == 0) severity += layer.severity();
+                if (layer.x(x) == 0) severity += layer.severity();
                 Q.poll();
             }
-            layers.values().forEach(Layer::move);
             x++;
         }
-
 
         return severity;
     }
 
     @Override
     public Object part2() {
-        return null;
+        /*
+        f_i(t) = t % (range_i * 2 - 2)
+        if f_i(t) == 0 --> caught (scanner in position 0 at time t)
+        find delay 'd' s.t. f_i(d + range_i) != 0 for all i
+         */
+        o: for (int t = 0; ; t++) {
+            for (Layer layer : layers.values()) {
+                int i = layer.x(t + layer.depth);
+                if (i == 0) {
+                    continue o;
+                }
+            }
+            return t;
+        }
     }
 
     @Override
@@ -55,30 +62,23 @@ public class Day13 extends Day {
         return false;
     }
 
-    private static class Layer {
-        private final int depth;
-        private final int range;
-
-        private int vx = 1;
-        private int x = 0;
-
-        private Layer(int depth, int range) {
-            this.depth = depth;
-            this.range = range;
-        }
-
-        private void move() {
-            x += vx;
-            if (x == 0 || x == range - 1) vx = -vx;
-        }
-
+    private record Layer(int depth, int range) {
         private int severity() {
             return range * depth;
         }
 
-        private void reset() {
-            x = 0;
-            vx = 1;
+        private int x(int t) {
+            return t % (range * 2 - 2);
         }
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "1728";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "3946838";
     }
 }
