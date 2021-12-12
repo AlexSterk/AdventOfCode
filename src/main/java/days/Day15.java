@@ -28,8 +28,24 @@ public class Day15 extends Day {
     }
 
     @Override
+    public boolean resetForPartTwo() {
+        return true;
+    }
+
+    @Override
     public Object part2() {
-        return null;
+        A.picky = 4;
+        B.picky = 8;
+
+        int count = 0;
+
+        for (int i = 0; i < 5_000_000; i++) {
+            String a = A.nextBitString().substring(16);
+            String b = B.nextBitString().substring(16);
+            if (a.equals(b)) count++;
+        }
+
+        return count;
     }
 
     @Override
@@ -51,6 +67,7 @@ public class Day15 extends Day {
         private static final int DIV = 2147483647;
         private long prev;
         private final int factor;
+        private int picky = -1;
 
         private Generator(int starting, int factor) {
             this.prev = starting;
@@ -58,7 +75,9 @@ public class Day15 extends Day {
         }
 
         private int next() {
-            prev = prev * factor % DIV;
+            do {
+                prev = prev * factor % DIV;
+            } while (picky > 0 && prev % picky != 0);
             return (int) prev;
         }
 
