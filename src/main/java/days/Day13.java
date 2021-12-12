@@ -2,8 +2,12 @@ package days;
 
 import setup.Day;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day13 extends Day {
 
@@ -18,20 +22,13 @@ public class Day13 extends Day {
 
     @Override
     public Object part1() {
-        int x = 0;
-        int severity = 0;
-
-        PriorityQueue<Integer> Q = new PriorityQueue<>(layers.keySet());
-        while (!Q.isEmpty()) {
-            Layer layer = layers.get(x);
-            if (layer != null) {
-                if (layer.x(x) == 0) severity += layer.severity();
-                Q.poll();
-            }
-            x++;
-        }
-
-        return severity;
+        int maxDepth = Collections.max(layers.keySet());
+        return IntStream.rangeClosed(0, maxDepth)
+                .mapToObj(layers::get)
+                .filter(Objects::nonNull)
+                .filter(l -> l.x(l.depth) == 0)
+                .mapToInt(Layer::severity)
+                .sum();
     }
 
     @Override
@@ -41,7 +38,8 @@ public class Day13 extends Day {
         if f_i(t) == 0 --> caught (scanner in position 0 at time t)
         find delay 'd' s.t. f_i(d + range_i) != 0 for all i
          */
-        o: for (int t = 0; ; t++) {
+        o:
+        for (int t = 0; ; t++) {
             for (Layer layer : layers.values()) {
                 int i = layer.x(t + layer.depth);
                 if (i == 0) {
@@ -62,16 +60,6 @@ public class Day13 extends Day {
         return false;
     }
 
-    private record Layer(int depth, int range) {
-        private int severity() {
-            return range * depth;
-        }
-
-        private int x(int t) {
-            return t % (range * 2 - 2);
-        }
-    }
-
     @Override
     public String partOneSolution() {
         return "1728";
@@ -80,5 +68,15 @@ public class Day13 extends Day {
     @Override
     public String partTwoSolution() {
         return "3946838";
+    }
+
+    private record Layer(int depth, int range) {
+        private int severity() {
+            return range * depth;
+        }
+
+        private int x(int t) {
+            return t % (range * 2 - 2);
+        }
     }
 }
