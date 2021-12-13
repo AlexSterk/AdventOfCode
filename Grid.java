@@ -8,8 +8,8 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class Grid<T> {
 
-    private final List<List<Tile<T>>> grid;
     public final int width, height;
+    private final List<List<Tile<T>>> grid;
     private Supplier<T> empty;
 
     public Grid(int w, int h) {
@@ -29,7 +29,7 @@ public class Grid<T> {
     public void init(Supplier<T> data, boolean overwrite) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (_getTile(x,y) == null || overwrite) set(x, y, data.get());
+                if (_getTile(x, y) == null || overwrite) set(x, y, data.get());
             }
         }
     }
@@ -136,7 +136,7 @@ public class Grid<T> {
     @Override
     public String toString() {
         return grid.stream()
-                .map(l -> l.stream().map(t -> t == null ? " " : t.data.toString()).collect(Collectors.joining()))
+                .map(l -> l.stream().map(t -> t == null ? "\033[31m\u25A1\033[0m" : t.data.toString()).collect(Collectors.joining()))
                 .collect(Collectors.joining("\n"));
     }
 
@@ -147,6 +147,23 @@ public class Grid<T> {
                     return t == null ? " " : t.data.toString();
                 }).collect(Collectors.joining()))
                 .collect(Collectors.joining("\n"));
+    }
+
+    public Grid<T> flip(boolean vertical) {
+        Grid<T> copy = this.copy();
+
+        if (vertical) {
+            Collections.reverse(copy.grid);
+        } else {
+            copy.grid.forEach(Collections::reverse);
+        }
+
+        for (int y = 0; y < copy.grid.size(); y++) {
+            for (int x = 0; x < copy.grid.get(y).size(); x++) {
+                copy.set(x, y, copy.getTile(x, y).data);
+            }
+        }
+        return copy;
     }
 
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
