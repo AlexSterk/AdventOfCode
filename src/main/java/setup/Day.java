@@ -31,6 +31,18 @@ public abstract class Day {
         input = i;
     }
 
+    public Day(String in) {
+        String i;
+        try {
+            i = Files.readString(Paths.get(in));
+        } catch (IOException e) {
+            i = "";
+            e.printStackTrace();
+            System.exit(1);
+        }
+        input = i;
+    }
+
     /**
      * Use {@link Day#input} to process the input, which is a single string, into a problem-specific input.
      * Store this input as a field in the inheriting class.
