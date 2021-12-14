@@ -5,7 +5,6 @@ import setup.Day;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public class Day14 extends Day {
     private Map<String, String> recipes;
@@ -50,7 +49,33 @@ public class Day14 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        Map<String, Long> substrings = new HashMap<>();
+        for (int i = 0; i < starting.length() - 1; i++) {
+            substrings.merge(starting.substring(i, i + 2), 1L, Long::sum);
+        }
+
+        for (int i = 0; i < 40; i++) {
+            var temp = new HashMap<>(substrings);
+            for (String s : temp.keySet()) {
+                if (recipes.containsKey(s)) {
+                    Long count = temp.get(s);
+                    substrings.merge(s, -count, Long::sum);
+                    String x = recipes.get(s);
+                    substrings.merge(s.charAt(0) + x, count, Long::sum);
+                    substrings.merge(x + s.charAt(1), count, Long::sum);
+                }
+            }
+        }
+
+        HashMap<Character, Long> counts = new HashMap<>();
+        for (Map.Entry<String, Long> e : substrings.entrySet()) {
+            counts.merge(e.getKey().charAt(0), e.getValue(), Long::sum);
+            counts.merge(e.getKey().charAt(1), e.getValue(), Long::sum);
+        }
+
+        Long max = Collections.max(counts.values());
+        Long min = Collections.min(counts.values());
+        return (max - min) / 2;
     }
 
     @Override
@@ -61,5 +86,15 @@ public class Day14 extends Day {
     @Override
     public boolean isTest() {
         return false;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "3230";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "3542388214529";
     }
 }
