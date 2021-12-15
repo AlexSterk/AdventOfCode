@@ -4,6 +4,7 @@ import setup.Day;
 import util.Graph;
 import util.Grid;
 import util.Grid.Tile;
+import util.Grid.Weighted;
 
 public class Day15 extends Day {
 
@@ -72,7 +73,7 @@ public class Day15 extends Day {
         return "2899";
     }
 
-    private record Int(int n) implements Grid.Weighted {
+    private record Int(int n) implements Weighted {
 
         @Override
         public String toString() {
