@@ -48,7 +48,7 @@ public class Day18 extends Day {
         private int ir = 0;
         private Long sound = null;
         private boolean recover = false;
-        private boolean jump = false;
+        private boolean incrementInstruction = false;
 
         private DuetCPU(List<Instruction> instructions) {
             this.instructions = instructions;
@@ -57,21 +57,23 @@ public class Day18 extends Day {
         private void run() {
             ir = 0;
             while (ir < instructions.size()) {
-                Instruction ins = instructions.get(ir);
-                ir++;
-                executeInstruction(ins);
+                cycle();
             }
         }
 
         private long runUntilRecover() {
             ir = 0;
             while (ir < instructions.size() && !recover) {
-                jump = false;
-                Instruction ins = instructions.get(ir);
-                executeInstruction(ins);
-                if (!jump) ir++;
+                cycle();
             }
             return sound;
+        }
+
+        private void cycle() {
+            incrementInstruction = true;
+            Instruction ins = instructions.get(ir);
+            executeInstruction(ins);
+            if (incrementInstruction) ir++;
         }
 
         private void executeInstruction(Instruction ins) {
@@ -90,7 +92,7 @@ public class Day18 extends Day {
                 case Instruction.JumpGreaterThanZero j -> {
                     if (resolve(j.x) > 0) {
                         ir += resolve(j.y);
-                        jump = true;
+                        incrementInstruction = false;
                     }
                 }
             }
