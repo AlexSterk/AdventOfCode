@@ -3,10 +3,11 @@ package days;
 import setup.Day;
 import util.Graph;
 import util.Grid;
+import util.Grid.Tile;
 
 public class Day15 extends Day {
 
-    private Graph<Grid.Tile<Int>> graph;
+    private Graph<Tile<Int>> graph;
     private Grid<Int> grid;
 
     @Override
@@ -33,7 +34,22 @@ public class Day15 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        Grid<Int> largerGrid = new Grid<>(grid.width * 5, grid.height * 5);
+
+        for (Tile<Int> tile : grid.getAll()) {
+            for (int vy = 0; vy <= 4; vy++) {
+                for (int vx = 0; vx <= 4; vx++) {
+                    int x = tile.x() + grid.width * vx;
+                    int y = tile.y() + grid.height * vy;
+                    int n = (tile.data().n() + vx + vy - 1) % 9 + 1;
+                    largerGrid.set(x, y, new Int(n));
+                }
+            }
+        }
+
+        var graph = Grid.gridToGraph(largerGrid);
+
+        return graph.getDistance(largerGrid.getTile(0, 0), largerGrid.getTile(largerGrid.width - 1, largerGrid.height - 1));
     }
 
     @Override
@@ -43,10 +59,15 @@ public class Day15 extends Day {
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
     private record Int(int n) implements Grid.Weighted {
+
+        @Override
+        public String toString() {
+            return Integer.toString(n);
+        }
 
         @Override
         public Integer getWeight() {
