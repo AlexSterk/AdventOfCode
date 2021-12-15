@@ -62,6 +62,16 @@ public class Day15 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "613";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "2899";
+    }
+
     private record Int(int n) implements Grid.Weighted {
 
         @Override
