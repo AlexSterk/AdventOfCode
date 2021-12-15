@@ -9,12 +9,20 @@ public final class Graph<T> {
         nodes = new HashMap<>();
     }
 
+    public Graph(Comparator<T> comparator) {
+        nodes = new TreeMap<>(comparator);
+    }
+
     public Set<T> getNeighbours(T n) {
         return Collections.unmodifiableSet(nodes.get(n).keySet());
     }
 
     public Set<T> nodes() {
         return Collections.unmodifiableSet(nodes.keySet());
+    }
+
+    public boolean containsNode(T node) {
+        return nodes.containsKey(node);
     }
 
     public void addNode(T node) {

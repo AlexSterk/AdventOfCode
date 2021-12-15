@@ -166,6 +166,26 @@ public class Grid<T> {
         return copy;
     }
 
+    public interface Weighted {
+        Integer getWeight();
+    }
+
+    public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
+        Graph<Tile<T>> graph = new Graph<>();
+
+        for (Tile<T> tTile : grid.getAll()) {
+            graph.addNode(tTile);
+        }
+
+        for (Tile<T> tTile : grid.getAll()) {
+            for (Tile<T> tile : grid.getAdjacent(tTile, false)) {
+                graph.addEdge(tTile, tile, tile.data.getWeight(), true);
+            }
+        }
+
+        return graph;
+    }
+
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
 
         public Tile<T> up() {
