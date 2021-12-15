@@ -2,24 +2,21 @@ package days;
 
 import setup.Day;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Day18 extends Day {
 
-    private DuetCPU duetCPU;
+    private List<DuetCPU.Instruction> instructions;
 
     @Override
     public void processInput() {
-        List<DuetCPU.Instruction> instructions = Arrays.stream(input.split("\n")).map(DuetCPU.Instruction::Instruction).toList();
-        duetCPU = new DuetCPU(instructions);
+        instructions = Arrays.stream(input.split("\n")).map(DuetCPU.Instruction::Instruction).toList();
     }
 
     @Override
     public Object part1() {
-        return duetCPU.runUntilRecover();
+        DuetCPU duetCPU = new DuetCPU(instructions, 0L);
+        return duetCPU.run();
     }
 
     @Override
@@ -46,44 +43,49 @@ public class Day18 extends Day {
         private final Map<Character, Long> registers = new HashMap<>();
         private final List<Instruction> instructions;
         private int ir = 0;
-        private Long sound = null;
-        private boolean recover = false;
+        private final Deque<Long> queue = new ArrayDeque<>();
         private boolean incrementInstruction = false;
+        private DuetCPU link;
 
-        private DuetCPU(List<Instruction> instructions) {
+        private DuetCPU(List<Instruction> instructions, long ID) {
             this.instructions = instructions;
+            registers.put('p', ID);
         }
 
-        private void run() {
+        private static void link(DuetCPU one, DuetCPU two) {
+            if (one.link != null) one.link.link = null;
+            if (two.link != null) two.link.link = null;
+            one.link = two;
+            two.link = one;
+        }
+
+        private Long run() {
             ir = 0;
             while (ir < instructions.size()) {
-                cycle();
+                try {
+                    cycle();
+                } catch (RecoverInstruction e) {
+                    return e.recovered;
+                }
             }
+            return null;
         }
 
-        private long runUntilRecover() {
-            ir = 0;
-            while (ir < instructions.size() && !recover) {
-                cycle();
-            }
-            return sound;
-        }
-
-        private void cycle() {
+        private void cycle() throws RecoverInstruction {
             incrementInstruction = true;
             Instruction ins = instructions.get(ir);
             executeInstruction(ins);
             if (incrementInstruction) ir++;
         }
 
-        private void executeInstruction(Instruction ins) {
+        private void executeInstruction(Instruction ins) throws RecoverInstruction {
             switch (ins) {
-                case Instruction.Sound s -> sound = resolve(s.x);
+                case Instruction.Sound s -> (link == null ? this : link).queue.offer(resolve(s.x));
                 case Instruction.Recover r -> {
-                    if (resolve(r.x()) != 0) {
-                        System.out.println(sound);
-                        recover = true;
-                    }
+                    if (link == null) {
+                        if (resolve(r.x) != 0) throw new RecoverInstruction(queue.getLast());
+                    } else if (queue.isEmpty()) incrementInstruction = false;
+                    else updateRegister(r.x, queue.poll());
                 }
                 case Instruction.Set s -> updateRegister(s.x, resolve(s.y));
                 case Instruction.Add a -> updateRegister(a.x, registers.getOrDefault(a.x.charAt(0), 0L) + resolve(a.y));
@@ -151,6 +153,15 @@ public class Day18 extends Day {
 
             record JumpGreaterThanZero(String x, String y) implements Instruction {
 
+            }
+        }
+
+        private static class RecoverInstruction extends Exception {
+            private final long recovered;
+
+
+            private RecoverInstruction(Long l) {
+                recovered = l;
             }
         }
     }
