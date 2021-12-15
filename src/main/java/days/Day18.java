@@ -21,7 +21,18 @@ public class Day18 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        DuetCPU one = new DuetCPU(instructions, 0L);
+        DuetCPU two = new DuetCPU(instructions, 1L);
+        DuetCPU.link(one, two);
+
+        while (true) {
+            while (!one.waiting()) one.run();
+            while (!two.waiting()) two.run();
+            if (one.terminated() && two.terminated()) break;
+            if (one.waiting()) break;
+        }
+
+        return two.log.size();
     }
 
     @Override
@@ -39,13 +50,19 @@ public class Day18 extends Day {
         return "3423";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "7493";
+    }
+
     private static class DuetCPU {
         private final Map<Character, Long> registers = new HashMap<>();
         private final List<Instruction> instructions;
-        private int ir = 0;
         private final Deque<Long> queue = new ArrayDeque<>();
+        private final List<Long> log = new ArrayList<>();
+        private int ir = 0;
         private boolean incrementInstruction = false;
-        private DuetCPU link;
+        private DuetCPU link = this;
 
         private DuetCPU(List<Instruction> instructions, long ID) {
             this.instructions = instructions;
@@ -59,33 +76,48 @@ public class Day18 extends Day {
             two.link = one;
         }
 
+        private boolean waiting() {
+            return queue.isEmpty() && getNextInstruction() instanceof Instruction.Receive;
+        }
+
+        private boolean terminated() {
+            return ir >= instructions.size();
+        }
+
         private Long run() {
-            ir = 0;
-            while (ir < instructions.size()) {
-                try {
-                    cycle();
-                } catch (RecoverInstruction e) {
-                    return e.recovered;
+            try {
+                while (!terminated() && !waiting()) {
+                    incrementInstruction = true;
+                    Instruction ins = getNextInstruction();
+                    executeInstruction(ins);
+                    if (incrementInstruction) ir++;
                 }
+            } catch (ReceiveException r) {
+                return r.recovered;
             }
+
             return null;
         }
 
-        private void cycle() throws RecoverInstruction {
-            incrementInstruction = true;
-            Instruction ins = instructions.get(ir);
-            executeInstruction(ins);
-            if (incrementInstruction) ir++;
+        private Instruction getNextInstruction() {
+            return instructions.get(ir);
         }
 
-        private void executeInstruction(Instruction ins) throws RecoverInstruction {
+        private void executeInstruction(Instruction ins) throws ReceiveException {
             switch (ins) {
-                case Instruction.Sound s -> (link == null ? this : link).queue.offer(resolve(s.x));
-                case Instruction.Recover r -> {
-                    if (link == null) {
-                        if (resolve(r.x) != 0) throw new RecoverInstruction(queue.getLast());
-                    } else if (queue.isEmpty()) incrementInstruction = false;
-                    else updateRegister(r.x, queue.poll());
+                case Instruction.Send s -> {
+                    Long resolve = resolve(s.x);
+                    link.queue.offer(resolve);
+                    log.add(resolve);
+                }
+                case Instruction.Receive r -> {
+                    if (link == this) {
+                        if (resolve(r.x) != 0) throw new ReceiveException(queue.getLast());
+                    } else if (queue.isEmpty()) {
+                        incrementInstruction = false;
+                    } else {
+                        updateRegister(r.x, queue.poll());
+                    }
                 }
                 case Instruction.Set s -> updateRegister(s.x, resolve(s.y));
                 case Instruction.Add a -> updateRegister(a.x, registers.getOrDefault(a.x.charAt(0), 0L) + resolve(a.y));
@@ -116,18 +148,18 @@ public class Day18 extends Day {
                 String a1 = ss[1];
                 String a2 = ss.length > 2 ? ss[2] : null;
                 return switch (op) {
-                    case "snd" -> new Sound(a1);
+                    case "snd" -> new Send(a1);
                     case "set" -> new Set(a1, a2);
                     case "add" -> new Add(a1, a2);
                     case "mul" -> new Mul(a1, a2);
                     case "mod" -> new Mod(a1, a2);
                     case "jgz" -> new JumpGreaterThanZero(a1, a2);
-                    case "rcv" -> new Recover(a1);
+                    case "rcv" -> new Receive(a1);
                     default -> throw new IllegalStateException(op);
                 };
             }
 
-            record Sound(String x) implements Instruction {
+            record Send(String x) implements Instruction {
 
             }
 
@@ -147,7 +179,7 @@ public class Day18 extends Day {
 
             }
 
-            record Recover(String x) implements Instruction {
+            record Receive(String x) implements Instruction {
 
             }
 
@@ -156,11 +188,11 @@ public class Day18 extends Day {
             }
         }
 
-        private static class RecoverInstruction extends Exception {
+        private static class ReceiveException extends Exception {
             private final long recovered;
 
 
-            private RecoverInstruction(Long l) {
+            private ReceiveException(Long l) {
                 recovered = l;
             }
         }
