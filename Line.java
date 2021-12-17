@@ -107,5 +107,9 @@ public record Line(Point a, Point b) {
         public String toString() {
             return "(%d,%d)".formatted(x(), y());
         }
+
+        public Point add(Point o) {
+            return new Point(x() + o.x(), y() + o.y());
+        }
     }
 }
