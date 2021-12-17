@@ -4,6 +4,7 @@ import setup.Day;
 import util.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Day20 extends Day {
 
@@ -11,7 +12,7 @@ public class Day20 extends Day {
 
     @Override
     public void processInput() {
-        points = Arrays.stream(input.split("\n")).map(Point::Point).toList();
+        points = Arrays.stream(input.split("\n")).map(Point::Point).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -34,8 +35,25 @@ public class Day20 extends Day {
     }
 
     @Override
+    public boolean resetForPartTwo() {
+        return true;
+    }
+
+    @Override
     public Object part2() {
-        return null;
+        for (int i = 0; i < 1000; i++) {
+            Map<Vector3, Set<Point>> positions = new HashMap<>();
+            points.forEach(Point::update);
+            points.forEach(p -> positions.merge(p.position, Set.of(p), (a, b) -> {
+                HashSet<Point> x = new HashSet<>();
+                x.addAll(a);
+                x.addAll(b);
+                return x;
+            }));
+            positions.values().stream().filter(s -> s.size() > 1).forEach(points::removeAll);
+        }
+
+        return points.size();
     }
 
     @Override
@@ -49,7 +67,9 @@ public class Day20 extends Day {
     }
 
     private static class Point {
-        private Vector3 position, velocity, acceleration;
+        private Vector3 position;
+        private Vector3 velocity;
+        private final Vector3 acceleration;
 
         private Point(Vector3 position, Vector3 velocity, Vector3 acceleration) {
             this.position = position;
