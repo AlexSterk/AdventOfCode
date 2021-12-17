@@ -6,15 +6,30 @@ import util.Line.Point;
 import java.util.Arrays;
 
 public class Day19 extends Day {
-    private char[][] routing;
-    private Point start;
-
     private static final Point DOWN = new Point(0, 1);
     private static final Point UP = new Point(0, -1);
     private static final Point LEFT = new Point(-1, 0);
     private static final Point RIGHT = new Point(1, 0);
-
+    private char[][] routing;
+    private Point start;
     private Point direction;
+    private int steps = 1;
+
+    private static Point turnLeft(Point dir) {
+        /*
+        0,1 --> 1,0
+        1,0 --> 0,-1
+         */
+        return new Point(dir.y(), -dir.x());
+    }
+
+    private static Point turnRight(Point dir) {
+        /*
+        0,1 --> -1,0
+        -1,0 --> 0,-1
+         */
+        return new Point(-dir.y(), dir.x());
+    }
 
     @Override
     public void processInput() {
@@ -41,15 +56,14 @@ public class Day19 extends Day {
             if (canMove(current, direction)) {
                 current = current.add(direction);
                 char c = routing[current.y()][current.x()];
+                steps++;
                 if (Character.isAlphabetic(c)) s.append(c);
             } else {
                 if (canMove(current, turnLeft(direction))) {
                     direction = turnLeft(direction);
-                }
-                else if (canMove(current, turnRight(direction))) {
+                } else if (canMove(current, turnRight(direction))) {
                     direction = turnRight(direction);
-                }
-                else break;
+                } else break;
             }
         }
         return s.toString();
@@ -60,25 +74,9 @@ public class Day19 extends Day {
         return add.x() >= 0 && add.x() < routing[0].length && add.y() >= 0 && add.y() < routing.length && routing[add.y()][add.x()] != 0;
     }
 
-    private static Point turnLeft(Point dir) {
-        /*
-        0,1 --> 1,0
-        1,0 --> 0,-1
-         */
-        return new Point(dir.y(), -dir.x());
-    }
-
-    private static Point turnRight(Point dir) {
-        /*
-        0,1 --> -1,0
-        -1,0 --> 0,-1
-         */
-        return new Point(-dir.y(), dir.x());
-    }
-
     @Override
     public Object part2() {
-        return null;
+        return steps;
     }
 
     @Override
@@ -89,5 +87,15 @@ public class Day19 extends Day {
     @Override
     public boolean isTest() {
         return false;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "YOHREPXWN";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "16734";
     }
 }
