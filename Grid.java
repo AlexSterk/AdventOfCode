@@ -21,9 +21,34 @@ public class Grid<T> {
         }
     }
 
+    public Grid(T[][] array) {
+        this(array[0].length, array.length);
+        for (int y = 0; y < array.length; y++) {
+            for (int x = 0; x < array[y].length; x++) {
+                set(x, y, array[y][x]);
+            }
+        }
+    }
+
     public Grid(int w, int h, Supplier<T> empty) {
         this(w, h);
         this.empty = empty;
+    }
+
+    public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
+        Graph<Tile<T>> graph = new Graph<>();
+
+        for (Tile<T> tTile : grid.getAll()) {
+            graph.addNode(tTile);
+        }
+
+        for (Tile<T> tTile : grid.getAll()) {
+            for (Tile<T> tile : grid.getAdjacent(tTile, false)) {
+                graph.addEdge(tTile, tile, tile.data.getWeight(), true);
+            }
+        }
+
+        return graph;
     }
 
     public void init(Supplier<T> data, boolean overwrite) {
@@ -76,10 +101,12 @@ public class Grid<T> {
 
     public Grid<T> subgrid(int xStart, int xEnd, int yStart, int yEnd) {
         Grid<T> sub = new Grid<>(xEnd - xStart + 1, yEnd - yStart + 1, empty);
-        getAll().stream()
-                .filter(Objects::nonNull)
-                .filter(t -> t.x >= xStart && t.x <= xEnd && t.y >= yStart && t.y <= yEnd)
-                .forEach(t -> sub.set(t.x - xStart, t.y - yStart, t.data));
+        for (int x = xStart; x <= xEnd; x++) {
+            for (int y = yStart; y <= yEnd; y++) {
+                Tile<T> t = getTile(x, y);
+                if (t != null) sub.set(t.x - xStart, t.y - yStart, t.data);
+            }
+        }
         return sub;
     }
 
@@ -133,20 +160,41 @@ public class Grid<T> {
         return IntStream.range(0, width).mapToObj(this::getColumn).toList();
     }
 
+    public Grid<T> rotate() {
+        Grid<T> grid = new Grid<>(width, height);
+
+        List<List<Tile<T>>> columns = this.getColumns();
+        columns.forEach(Collections::reverse);
+        for (int y = 0; y < columns.size(); y++) {
+            for (int x = 0; x < columns.get(y).size(); x++) {
+                grid.set(x, y, columns.get(y).get(x).data);
+            }
+        }
+
+        return grid;
+    }
+
+    public Set<Grid<T>> allVariations() {
+        Set<Grid<T>> set = new HashSet<>();
+        for (Grid<T> g : List.of(this, this.flip(false))) {
+            set.add(g);
+            set.add(g.rotate());
+            set.add(g.rotate().rotate());
+            set.add(g.rotate().rotate().rotate());
+        }
+        return set;
+    }
+
     @Override
     public String toString() {
-        return grid.stream()
-                .map(l -> l.stream().map(t -> t == null ? "\033[31m\u25A1\033[0m" : t.data.toString()).collect(Collectors.joining()))
-                .collect(Collectors.joining("\n"));
+        return grid.stream().map(l -> l.stream().map(t -> t == null ? "\033[31m\u25A1\033[0m" : t.data.toString()).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
     public String toString(Map<Tile<T>, String> custom) {
-        return grid.stream()
-                .map(l -> l.stream().map(t -> {
-                    if (custom.containsKey(t)) return custom.get(t);
-                    return t == null ? " " : t.data.toString();
-                }).collect(Collectors.joining()))
-                .collect(Collectors.joining("\n"));
+        return grid.stream().map(l -> l.stream().map(t -> {
+            if (custom.containsKey(t)) return custom.get(t);
+            return t == null ? " " : t.data.toString();
+        }).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
     public Grid<T> flip(boolean vertical) {
@@ -170,22 +218,6 @@ public class Grid<T> {
         Integer getWeight();
     }
 
-    public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
-        Graph<Tile<T>> graph = new Graph<>();
-
-        for (Tile<T> tTile : grid.getAll()) {
-            graph.addNode(tTile);
-        }
-
-        for (Tile<T> tTile : grid.getAll()) {
-            for (Tile<T> tile : grid.getAdjacent(tTile, false)) {
-                graph.addEdge(tTile, tile, tile.data.getWeight(), true);
-            }
-        }
-
-        return graph;
-    }
-
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
 
         public Tile<T> up() {
@@ -206,11 +238,7 @@ public class Grid<T> {
 
         @Override
         public String toString() {
-            return "Tile{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", data=" + data +
-                    '}';
+            return "Tile{" + "x=" + x + ", y=" + y + ", data=" + data + '}';
         }
 
         @Override
