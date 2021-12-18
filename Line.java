@@ -111,5 +111,13 @@ public record Line(Point a, Point b) {
         public Point add(Point o) {
             return new Point(x() + o.x(), y() + o.y());
         }
+
+        public Point rotateLeft() {
+            return new Point(y(), -x());
+        }
+
+        public Point rotateRight() {
+            return new Point(-y(), x());
+        }
     }
 }

@@ -1,5 +1,7 @@
 package util;
 
+import com.sun.source.tree.Tree;
+
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -9,15 +11,15 @@ import java.util.stream.IntStream;
 public class Grid<T> {
 
     public final int width, height;
-    private final List<List<Tile<T>>> grid;
+    private final Map<Integer, Map<Integer, Tile<T>>> grid;
     private Supplier<T> empty;
 
     public Grid(int w, int h) {
         this.width = w;
         this.height = h;
-        this.grid = new ArrayList<>(h);
+        this.grid = new TreeMap<>();
         for (int y = 0; y < h; y++) {
-            this.grid.add(new ArrayList<>(Collections.nCopies(w, null)));
+            this.grid.put(y, new TreeMap<>());
         }
     }
 
@@ -73,7 +75,7 @@ public class Grid<T> {
     }
 
     public void set(int x, int y, T data) {
-        grid.get(y).set(x, new Tile<>(x, y, data, this));
+        grid.get(y).put(x, new Tile<>(x, y, data, this));
     }
 
     public void set(Tile<T> tile, T data) {
@@ -82,7 +84,12 @@ public class Grid<T> {
 
     public Tile<T> getTile(int x, int y) {
         Tile<T> tTile = _getTile(x, y);
-        return tTile == null && empty != null ? new Tile<>(x, y, empty.get(), this) : tTile;
+        if (tTile == null && empty != null) {
+            Tile<T> t = new Tile<>(x, y, empty.get(), this);
+            grid.get(y).put(x, t);
+            return t;
+        }
+        return tTile;
     }
 
     private Tile<T> _getTile(int x, int y) {
@@ -90,7 +97,7 @@ public class Grid<T> {
     }
 
     public List<Tile<T>> getAll() {
-        return grid.stream().flatMap(Collection::stream).toList();
+        return grid.values().stream().flatMap(integerTileMap -> integerTileMap.values().stream()).toList();
     }
 
     public Grid<T> copy() {
@@ -143,35 +150,21 @@ public class Grid<T> {
     }
 
     public List<Tile<T>> getRow(int y) {
-        return new ArrayList<>(grid.get(y));
+        return new ArrayList<>(grid.get(y).values());
     }
 
     public List<Tile<T>> getColumn(int x) {
         List<Tile<T>> arr = new ArrayList<>();
-        grid.forEach(l -> arr.add(l.get(x)));
+        grid.keySet().forEach(y -> arr.add(grid.get(y).get(x)));
         return arr;
     }
 
     public List<List<Tile<T>>> getRows() {
-        return new ArrayList<>(grid);
+        return IntStream.range(0, height).mapToObj(this::getRow).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public List<List<Tile<T>>> getColumns() {
-        return IntStream.range(0, width).mapToObj(this::getColumn).toList();
-    }
-
-    public Grid<T> rotate() {
-        Grid<T> grid = new Grid<>(width, height);
-
-        List<List<Tile<T>>> columns = this.getColumns();
-        columns.forEach(Collections::reverse);
-        for (int y = 0; y < columns.size(); y++) {
-            for (int x = 0; x < columns.get(y).size(); x++) {
-                grid.set(x, y, columns.get(y).get(x).data);
-            }
-        }
-
-        return grid;
+        return IntStream.range(0, width).mapToObj(this::getColumn).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Set<Grid<T>> allVariations() {
@@ -187,28 +180,48 @@ public class Grid<T> {
 
     @Override
     public String toString() {
-        return grid.stream().map(l -> l.stream().map(t -> t == null ? "\033[31m\u25A1\033[0m" : t.data.toString()).collect(Collectors.joining())).collect(Collectors.joining("\n"));
+        return grid.values().stream().map(l -> l.values().stream().map(t -> t == null ? "\033[31m\u25A1\033[0m" : t.data.toString()).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
     public String toString(Map<Tile<T>, String> custom) {
-        return grid.stream().map(l -> l.stream().map(t -> {
+        return grid.values().stream().map(l -> l.values().stream().map(t -> {
             if (custom.containsKey(t)) return custom.get(t);
-            return t == null ? " " : t.data.toString();
+            return t == null ? "\033[31m\u25A1\033[0m" : t.data.toString();
         }).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
-    public Grid<T> flip(boolean vertical) {
-        Grid<T> copy = this.copy();
+    public Grid<T> rotate() {
+        Grid<T> grid = new Grid<>(height, width);
 
-        if (vertical) {
-            Collections.reverse(copy.grid);
-        } else {
-            copy.grid.forEach(Collections::reverse);
+        List<List<Tile<T>>> columns = this.getColumns();
+        columns.forEach(Collections::reverse);
+        for (int y = 0; y < columns.size(); y++) {
+            for (int x = 0; x < columns.get(y).size(); x++) {
+                grid.set(x, y, columns.get(y).get(x).data);
+            }
         }
 
-        for (int y = 0; y < copy.grid.size(); y++) {
-            for (int x = 0; x < copy.grid.get(y).size(); x++) {
-                copy.set(x, y, copy.getTile(x, y).data);
+        return grid;
+    }
+
+    public Grid<T> flip(boolean vertical) {
+        Grid<T> copy = new Grid<>(width, height);
+
+        if (vertical) {
+            List<List<Tile<T>>> rows = getRows();
+            Collections.reverse(rows);
+            for (int y = 0; y < rows.size(); y++) {
+                for (Tile<T> t : rows.get(y)) {
+                    copy.set(t.x, y, t.data);
+                }
+            }
+        } else {
+            List<List<Tile<T>>> columns = getColumns();
+            Collections.reverse(columns);
+            for (int x = 0; x < columns.size(); x++) {
+                for (Tile<T> t : columns.get(x)) {
+                    copy.set(x, t.y, t.data);
+                }
             }
         }
         return copy;
