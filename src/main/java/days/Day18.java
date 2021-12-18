@@ -32,7 +32,27 @@ public class Day18 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        int max = Integer.MIN_VALUE;
+
+        for (SnailfishNumber.PairNumber n1 : snailfishNumbers) {
+            for (SnailfishNumber.PairNumber n2 : snailfishNumbers) {
+                int magnitude = SnailfishNumber.reduce(n1.copy(), n2.copy()).magnitude();
+                if (magnitude > max) {
+                    max = magnitude;
+                }
+                magnitude = SnailfishNumber.reduce(n2.copy(), n1.copy()).magnitude();
+                if (magnitude > max) {
+                    max = magnitude;
+                }
+            }
+        }
+
+        return max;
+    }
+
+    @Override
+    public boolean resetForPartTwo() {
+        return true;
     }
 
     @Override
@@ -45,7 +65,19 @@ public class Day18 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "4057";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "4683";
+    }
+
     private static abstract class SnailfishNumber {
+        public PairNumber parent;
+
         private static SnailfishNumber parse(Queue<Character> s, PairNumber parent) {
             PairNumber num = new PairNumber(parent);
             while (!s.isEmpty()) {
@@ -135,8 +167,9 @@ public class Day18 extends Day {
 
         public abstract int magnitude();
 
+        public abstract SnailfishNumber copy();
+
         private static class PairNumber extends SnailfishNumber {
-            private PairNumber parent;
             private SnailfishNumber left;
             private SnailfishNumber right;
 
@@ -158,10 +191,19 @@ public class Day18 extends Day {
             public int magnitude() {
                 return 3 * left.magnitude() + 2 * right.magnitude();
             }
+
+            @Override
+            public PairNumber copy() {
+                PairNumber copy = new PairNumber(null);
+                copy.left = left.copy();
+                copy.right = right.copy();
+                copy.left.parent = copy;
+                copy.right.parent = copy;
+                return copy;
+            }
         }
 
         private static class SingleNumber extends SnailfishNumber {
-            private final PairNumber parent;
             private int value;
 
             private SingleNumber(int value, PairNumber parent) {
@@ -182,6 +224,11 @@ public class Day18 extends Day {
             @Override
             public int magnitude() {
                 return value;
+            }
+
+            @Override
+            public SingleNumber copy() {
+                return new SingleNumber(value, null);
             }
         }
     }
