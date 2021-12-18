@@ -66,6 +66,16 @@ public class Day20 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "376";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "574";
+    }
+
     private static class Point {
         private Vector3 position;
         private Vector3 velocity;

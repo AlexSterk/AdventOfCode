@@ -73,9 +73,9 @@ public class Day21 extends Day {
                 for (int x = 0; x < grid.width / 2; x++) {
                     Grid<Character> subgrid = grid.subgrid(x * 2, x * 2 + 1, y * 2, y * 2 + 1);
                     Grid<Character> match = subgrid.allVariations().stream().map(rules::get).filter(Objects::nonNull).findFirst().get();
-                    int finalX = x;
-                    int finalY = y;
-                    match.getAll().forEach(t -> newGrid.set(t.x() + finalX *3, t.y() + finalY *3, t.data()));
+                    for (Grid.Tile<Character> t : match.getAll()) {
+                        newGrid.set(t.x() + x * 3, t.y() + y * 3, t.data());
+                    }
                 }
             }
             return newGrid;
@@ -86,10 +86,8 @@ public class Day21 extends Day {
                 for (int x = 0; x < grid.width / 3; x++) {
                     Grid<Character> subgrid = grid.subgrid(x * 3, x * 3 + 2, y * 3, y * 3 + 2);
                     Grid<Character> match = subgrid.allVariations().stream().map(rules::get).filter(Objects::nonNull).findFirst().get();
-                    int finalX = x;
-                    int finalY = y;
                     for (Grid.Tile<Character> t : match.getAll()) {
-                        newGrid.set(t.x() + finalX * 4, t.y() + finalY * 4, t.data());
+                        newGrid.set(t.x() + x * 4, t.y() + y * 4, t.data());
                     }
                 }
             }

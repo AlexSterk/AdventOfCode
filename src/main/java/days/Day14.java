@@ -51,4 +51,14 @@ public class Day14 extends Day {
     public boolean isTest() {
         return false;
     }
+
+    @Override
+    public String partOneSolution() {
+        return "8292";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "1069";
+    }
 }
