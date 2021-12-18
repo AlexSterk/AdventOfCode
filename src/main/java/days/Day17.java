@@ -3,7 +3,6 @@ package days;
 import setup.Day;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 public class Day17 extends Day {
     public final int steps = Integer.parseInt(input.trim());
@@ -51,5 +50,10 @@ public class Day17 extends Day {
     @Override
     public String partOneSolution() {
         return "1025";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "37803463";
     }
 }
