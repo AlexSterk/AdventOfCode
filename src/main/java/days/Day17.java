@@ -78,6 +78,16 @@ public class Day17 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "4950";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "1477";
+    }
+
     private record Box(Point topLeft, Point bottomRight) {
         private boolean isWithin(Point p) {
             return isWithinX(p.x())

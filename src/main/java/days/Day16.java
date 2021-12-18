@@ -102,6 +102,16 @@ public class Day16 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "901";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "110434737925";
+    }
+
     private static abstract class Packet {
         public final int version;
         public final int type;
