@@ -82,50 +82,51 @@ def parse():
         ns = i.readlines()
     ns = list(map(str_to_pair, ns))
 
+def explode(p):
+    leaves = p.leaves()
+    try:
+        explode = next(t for t in leaves if t[1] > 4)
+        i = leaves.index(explode)
+        pair = explode[0].parent
+        if i > 0:
+            left_neighbour = leaves[i - 1]
+            left_neighbour[0].value += pair.left.value
+        if i < len(leaves) - 2:
+            right_neighbour = leaves[i + 2]
+            right_neighbour[0].value += pair.right.value
+
+        parent = pair.parent
+        if parent.left == pair:
+            parent.left = Leaf(0, parent)
+        else:
+            parent.right = Leaf(0, parent)
+        return True
+    except StopIteration:
+        return False
+
+def split(p):
+    leaves = p.leaves()
+    try:
+        split = next(t for t in leaves if t[0].value >= 10)
+        parent = split[0].parent
+        if parent.left == split[0]:
+            parent.left = Tree((
+                math.floor(split[0].value / 2),
+                math.ceil(split[0].value / 2)
+            ), parent)
+        else:
+            parent.right = Tree((
+                math.floor(split[0].value / 2),
+                math.ceil(split[0].value / 2)
+            ), parent)
+        return True
+    except StopIteration:
+        return False
 
 def reduce(a, b):
     c = Tree((a, b), None)
-    while True:
-        n = 0
-        leaves = c.leaves()
-        try:
-            explode = next(t for t in leaves if t[1] > 4)
-            i = leaves.index(explode)
-            pair = explode[0].parent
-            if i > 0:
-                left_neighbour = leaves[i - 1]
-                left_neighbour[0].value += pair.left.value
-            if i < len(leaves) - 2:
-                right_neighbour = leaves[i + 2]
-                right_neighbour[0].value += pair.right.value
-
-            parent = pair.parent
-            if parent.left == pair:
-                parent.left = Leaf(0, parent)
-            else:
-                parent.right = Leaf(0, parent)
-            continue
-        except StopIteration:
-            n += 1
-
-        try:
-            split = next(t for t in leaves if t[0].value >= 10)
-            parent = split[0].parent
-            if parent.left == split[0]:
-                parent.left = Tree((
-                    math.floor(split[0].value / 2),
-                    math.ceil(split[0].value / 2)
-                ), parent)
-            else:
-                parent.right = Tree((
-                    math.floor(split[0].value / 2),
-                    math.ceil(split[0].value / 2)
-                ), parent)
-        except StopIteration:
-            n += 1
-
-        if n == 2:
-            break
+    while explode(c) or split(c):
+        pass
 
     return c
 
