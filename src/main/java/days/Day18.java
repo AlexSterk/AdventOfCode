@@ -55,7 +55,7 @@ public class Day18 extends Day {
         return "7493";
     }
 
-    private static class DuetCPU {
+    public static class DuetCPU {
         private final Map<Character, Long> registers = new HashMap<>();
         private final List<Instruction> instructions;
         private final Deque<Long> queue = new ArrayDeque<>();
@@ -64,7 +64,7 @@ public class Day18 extends Day {
         private boolean incrementInstruction = false;
         private DuetCPU link = this;
 
-        private DuetCPU(List<Instruction> instructions, long ID) {
+        public DuetCPU(List<Instruction> instructions, long ID) {
             this.instructions = instructions;
             registers.put('p', ID);
         }
@@ -80,11 +80,11 @@ public class Day18 extends Day {
             return queue.isEmpty() && getNextInstruction() instanceof Instruction.Receive;
         }
 
-        private boolean terminated() {
+        public boolean terminated() {
             return ir >= instructions.size();
         }
 
-        private Long run() {
+        public Long run() {
             try {
                 while (!terminated() && !waiting()) {
                     incrementInstruction = true;
@@ -129,6 +129,13 @@ public class Day18 extends Day {
                         incrementInstruction = false;
                     }
                 }
+                case Instruction.Sub s -> updateRegister(s.x, registers.getOrDefault(s.x.charAt(0), 0L) - resolve(s.y));
+                case Instruction.JumpNotZero j -> {
+                    if (resolve(j.x) != 0) {
+                        ir += resolve(j.y);
+                        incrementInstruction = false;
+                    }
+                }
             }
         }
 
@@ -141,7 +148,7 @@ public class Day18 extends Day {
             registers.put(r.charAt(0), value);
         }
 
-        private sealed interface Instruction {
+        public sealed interface Instruction {
             static Instruction Instruction(String s) {
                 String[] ss = s.split(" ");
                 String op = ss[0];
@@ -151,9 +158,11 @@ public class Day18 extends Day {
                     case "snd" -> new Send(a1);
                     case "set" -> new Set(a1, a2);
                     case "add" -> new Add(a1, a2);
+                    case "sub" -> new Sub(a1, a2);
                     case "mul" -> new Mul(a1, a2);
                     case "mod" -> new Mod(a1, a2);
                     case "jgz" -> new JumpGreaterThanZero(a1, a2);
+                    case "jnz" -> new JumpNotZero(a1, a2);
                     case "rcv" -> new Receive(a1);
                     default -> throw new IllegalStateException(op);
                 };
@@ -171,6 +180,10 @@ public class Day18 extends Day {
 
             }
 
+            record Sub(String x, String y) implements Instruction {
+
+            }
+
             record Mul(String x, String y) implements Instruction {
 
             }
@@ -184,6 +197,10 @@ public class Day18 extends Day {
             }
 
             record JumpGreaterThanZero(String x, String y) implements Instruction {
+
+            }
+
+            record JumpNotZero(String x, String y) implements Instruction {
 
             }
         }
