@@ -3,11 +3,10 @@ package days;
 import setup.Day;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import static days.Day18.*;
-import static days.Day18.DuetCPU.*;
+import static days.Day18.DuetCPU;
+import static days.Day18.DuetCPU.Instruction;
 
 public class Day23 extends Day {
 
@@ -27,63 +26,59 @@ public class Day23 extends Day {
 
     @Override
     public Object part2() {
-        /*   LOOP one
-        set g d
-        mul g e
-        sub g b
-        jnz g 2
-        set f 0
-        sub e -1
-        set g e
-        sub g b
-        jnz g -8
-
-        so:
-
-        do:
-            g = d                   g = d * e - b
-            g *= e
-            g -= b
-            if g == 0:              if g == 0:
-                f = 0                   f = 0
-            e -= 1                  e += 1
-            g = e                   g = e - b                  loop breaks if e == b so needs to run  b - e times to get there
-            g -= b
-        while g == 0
-
-
-
-        Loop two:
-
-        ...
-        sub d -1
-        set g d
-        sub g b
-        jnz g -13
-
-        ...
-        d += 1
-        g = d
-        g -= b             g = d - b                       d - b must be 0 so d must be b
-        while g != 0
-
-
-        d should be 0 so it should run the loop long enough to overflow --> Long.MAX_VALUE * 2 - d times
-
-
-
-
-         f should be 0 so d * e - b should be 0
-         so d * e should be "b"
+        /*
+                               do:
+            set f 1                f = 1
+            set d 2                d = 2
+            set e 2                e = 2
+                                   do:
+                                       do:
+            set g d                         g = d
+            mul g e                         g *= e
+            sub g b                         g -= b
+            jnz g 2                         if g == 0:        h is incremented when f = 0, this is true when
+            set f 0                             f = 0         d * e - b == 0 --> d * e == b
+            sub e -1                        e += 1
+            set g e                         g = e             if d and e are factors of b, increment h
+            sub g b                         g -= b            then add 17 to b until b == c
+            jnz g -8                   while g != 0
+            sub d -1                   d += 1
+            set g d                    g = d
+            sub g b                    g -= b
+            jnz g -13              while g != 0
+            jnz f 2                if f == 0:
+            sub h -1                   h += 1
+            set g b                g = b
+            sub g c                g -= c                    b - c == 0 --> b == c exits the program
+            jnz g 2                if g == 0:                what is h when that is true?
+            jnz 1 3                    return
+            sub b -17              b += 17
+            jnz 1 -23          while True
          */
-        DuetCPU cpu = new DuetCPU(instructions);
-        cpu.registers.put('a', 1L);
-        cpu.runUntil(c -> c.ir == 11);
-        cpu.registers.put('e', cpu.registers.get('b') - 1);
-        cpu.runUntil(c -> c.ir == 21);
-        cpu.registers.put('d', cpu.registers.get('b'));
-        cpu.run();
-        return cpu.registers.get('h');
+
+        int b = 93;
+        int c = 93;
+        b *= 100;
+        b += 100000;
+        c = b;
+        c += 17000;
+        int h = 0;
+        while (true) {
+            boolean f = false;
+            int d = 2;
+            do {
+                if (b % d == 0) {
+                    f = true;
+                    break;
+                }
+                d++;
+            } while (d != b);
+            if (f) h++;
+            if (b == c) break;
+            b += 17;
+        }
+
+        return h;
     }
 
     @Override
@@ -99,5 +94,10 @@ public class Day23 extends Day {
     @Override
     public String partOneSolution() {
         return "8281";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "911";
     }
 }
