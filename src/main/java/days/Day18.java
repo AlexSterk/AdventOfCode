@@ -32,7 +32,7 @@ public class Day18 extends Day {
             if (one.waiting()) break;
         }
 
-        return two.log.size();
+        return two.sendLog.size();
     }
 
     @Override
@@ -59,12 +59,14 @@ public class Day18 extends Day {
         private final Map<Character, Long> registers = new HashMap<>();
         private final List<Instruction> instructions;
         private final Deque<Long> queue = new ArrayDeque<>();
-        private final List<Long> log = new ArrayList<>();
+        private final List<Long> sendLog = new ArrayList<>();
         private int ir = 0;
         private boolean incrementInstruction = false;
         private DuetCPU link = this;
 
-        public DuetCPU(List<Instruction> instructions, long ID) {
+        public int mulCount = 0;
+
+        public DuetCPU(List<Instruction> instructions, Long ID) {
             this.instructions = instructions;
             registers.put('p', ID);
         }
@@ -108,7 +110,7 @@ public class Day18 extends Day {
                 case Instruction.Send s -> {
                     Long resolve = resolve(s.x);
                     link.queue.offer(resolve);
-                    log.add(resolve);
+                    sendLog.add(resolve);
                 }
                 case Instruction.Receive r -> {
                     if (link == this) {
@@ -121,7 +123,10 @@ public class Day18 extends Day {
                 }
                 case Instruction.Set s -> updateRegister(s.x, resolve(s.y));
                 case Instruction.Add a -> updateRegister(a.x, registers.getOrDefault(a.x.charAt(0), 0L) + resolve(a.y));
-                case Instruction.Mul m -> updateRegister(m.x, registers.getOrDefault(m.x.charAt(0), 0L) * resolve(m.y));
+                case Instruction.Mul m -> {
+                    updateRegister(m.x, registers.getOrDefault(m.x.charAt(0), 0L) * resolve(m.y));
+                    mulCount++;
+                }
                 case Instruction.Mod m -> updateRegister(m.x, registers.getOrDefault(m.x.charAt(0), 0L) % resolve(m.y));
                 case Instruction.JumpGreaterThanZero j -> {
                     if (resolve(j.x) > 0) {
