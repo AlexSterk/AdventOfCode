@@ -3,6 +3,7 @@ package days;
 import setup.Day;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Day18 extends Day {
 
@@ -56,11 +57,11 @@ public class Day18 extends Day {
     }
 
     public static class DuetCPU {
-        private final Map<Character, Long> registers = new HashMap<>();
+        public final Map<Character, Long> registers = new HashMap<>();
         private final List<Instruction> instructions;
         private final Deque<Long> queue = new ArrayDeque<>();
         private final List<Long> sendLog = new ArrayList<>();
-        private int ir = 0;
+        public int ir = 0;
         private boolean incrementInstruction = false;
         private DuetCPU link = this;
 
@@ -69,6 +70,10 @@ public class Day18 extends Day {
         public DuetCPU(List<Instruction> instructions, Long ID) {
             this.instructions = instructions;
             registers.put('p', ID);
+        }
+
+        public DuetCPU(List<Instruction> instructions) {
+            this.instructions = instructions;
         }
 
         private static void link(DuetCPU one, DuetCPU two) {
@@ -89,6 +94,21 @@ public class Day18 extends Day {
         public Long run() {
             try {
                 while (!terminated() && !waiting()) {
+                    incrementInstruction = true;
+                    Instruction ins = getNextInstruction();
+                    executeInstruction(ins);
+                    if (incrementInstruction) ir++;
+                }
+            } catch (ReceiveException r) {
+                return r.recovered;
+            }
+
+            return null;
+        }
+
+        public Long runUntil(Predicate<DuetCPU> predicate) {
+            try {
+                while (!terminated() && !waiting() && !predicate.test(this)) {
                     incrementInstruction = true;
                     Instruction ins = getNextInstruction();
                     executeInstruction(ins);
