@@ -8,21 +8,20 @@ public class Day20 extends Day {
 
     private InfiniteGrid<Character> grid;
     private String lookupTable;
-    private Switch flip;
-
+    private boolean flip;
 
     @Override
     public void processInput() {
         String[] split = input.split("\n\n");
         lookupTable = split[0];
         String[] lines = split[1].split("\n");
-        grid = new InfiniteGrid<>(() -> flip.value ? '#' : '.');
+        grid = new InfiniteGrid<>(() -> flip ? '#' : '.');
         for (int y = 0; y < lines.length; y++) {
             for (int x = 0; x < lines[y].length(); x++) {
                 grid.set(x, y, lines[y].charAt(x));
             }
         }
-        flip = new Switch();
+        flip = false;
     }
 
     @Override
@@ -66,8 +65,8 @@ public class Day20 extends Day {
                 grid.set(x, y, lookupTable.charAt(index));
             }
         }
-        if (lookupTable.charAt(0) == '#' && !flip.value) flip.value = true;
-        else if (lookupTable.charAt(511) == '.' && flip.value) flip.value = false;
+        if (lookupTable.charAt(0) == '#' && !flip) flip = true;
+        else if (lookupTable.charAt(511) == '.' && flip) flip = false;
     }
 
     @Override
@@ -90,7 +89,4 @@ public class Day20 extends Day {
         return "17628";
     }
 
-    private static class Switch {
-        public boolean value = false;
-    }
 }
