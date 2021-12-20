@@ -30,8 +30,6 @@ public class Day20 extends Day {
             enhance();
         }
 
-//        System.out.println(grid);
-
         return grid.getAll().stream().filter(t -> t.data() == '#').count();
     }
 
