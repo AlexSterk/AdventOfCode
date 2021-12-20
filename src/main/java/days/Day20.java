@@ -66,7 +66,8 @@ public class Day20 extends Day {
                 grid.set(x, y, lookupTable.charAt(index));
             }
         }
-        flip.value = !flip.value;
+        if (lookupTable.charAt(0) == '#' && !flip.value) flip.value = true;
+        else if (lookupTable.charAt(511) == '.' && flip.value) flip.value = false;
     }
 
     @Override
