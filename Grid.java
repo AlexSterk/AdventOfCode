@@ -11,8 +11,8 @@ import java.util.stream.IntStream;
 public class Grid<T> {
 
     public final int width, height;
-    private final Map<Integer, Map<Integer, Tile<T>>> grid;
-    private Supplier<T> empty;
+    final Map<Integer, Map<Integer, Tile<T>>> grid;
+    Supplier<T> empty;
 
     public Grid(int w, int h) {
         this.width = w;
@@ -265,6 +265,57 @@ public class Grid<T> {
         @Override
         public int hashCode() {
             return Objects.hash(x, y, data);
+        }
+    }
+
+    public static class InfiniteGrid<T> extends Grid<T> {
+        public InfiniteGrid(Supplier<T> s) {
+            super(0, 0, s);
+        }
+
+        @Override
+        public void set(int x, int y, T data) {
+            grid.computeIfAbsent(y, (k) -> new TreeMap<>()).put(x, new Tile<>(x, y, data, this));
+        }
+
+        @Override
+        public Tile<T> getTile(int x, int y) {
+            return grid.computeIfAbsent(y, k -> new TreeMap<>()).computeIfAbsent(x, k -> new Tile<T>(x, y, empty.get(), this));
+        }
+
+        public int minY() {
+            return Collections.min(grid.keySet());
+        }
+
+        public int maxY() {
+            return Collections.max(grid.keySet());
+        }
+
+        public int minX() {
+            return grid.values().stream().mapToInt(m -> Collections.min(m.keySet())).min().orElse(0);
+        }
+
+        public int maxX() {
+            return grid.values().stream().mapToInt(m -> Collections.max(m.keySet())).max().orElse(0);
+        }
+
+        @Override
+        public InfiniteGrid<T> subgrid(int xStart, int xEnd, int yStart, int yEnd) {
+            InfiniteGrid<T> sub = new InfiniteGrid<>(empty);
+            for (int x = xStart; x <= xEnd; x++) {
+                for (int y = yStart; y <= yEnd; y++) {
+                    Tile<T> t = getTile(x, y);
+                    sub.set(t.x - xStart, t.y - yStart, t.data);
+                }
+            }
+            return sub;
+        }
+
+        @Override
+        public InfiniteGrid<T> copy() {
+            InfiniteGrid<T> g = new InfiniteGrid<>(empty);
+            getAll().forEach(t -> g.set(t, t.data));
+            return g;
         }
     }
 }
