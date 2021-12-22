@@ -37,6 +37,11 @@ public class Day25 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "3145";
+    }
+
     private static class TuringMachine {
         private final int checkAt;
         private final Map<String, State> states = new HashMap<>();
