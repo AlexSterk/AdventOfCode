@@ -10,20 +10,26 @@ import java.util.List;
 public class Day24 extends Day {
 
     private List<Pair<Integer, Integer>> parts;
+    private List<List<Pair<Integer, Integer>>> allBridges;
 
-    private static int strongestBridge(List<Pair<Integer, Integer>> remainingParts, int connecting, int max) {
+    private int strongestBridge(List<Pair<Integer, Integer>> current, List<Pair<Integer, Integer>> remainingParts, int connecting, int max) {
+        allBridges.add(current);
         int localMax = max;
         for (Pair<Integer, Integer> part : remainingParts) {
             int m = Integer.MIN_VALUE;
             if (part.a() == connecting) {
                 ArrayList<Pair<Integer, Integer>> parts = new ArrayList<>(remainingParts);
                 parts.remove(part);
-                m = strongestBridge(parts, part.b(), max + part.a() + part.b());
+                ArrayList<Pair<Integer, Integer>> curUpdate = new ArrayList<>(current);
+                curUpdate.add(part);
+                m = strongestBridge(curUpdate, parts, part.b(), max + part.a() + part.b());
             }
             else if (part.b() == connecting) {
                 ArrayList<Pair<Integer, Integer>> parts = new ArrayList<>(remainingParts);
                 parts.remove(part);
-                m = strongestBridge(parts, part.a(), max + part.a() + part.b());
+                ArrayList<Pair<Integer, Integer>> curUpdate = new ArrayList<>(current);
+                curUpdate.add(part);
+                m = strongestBridge(curUpdate, parts, part.a(), max + part.a() + part.b());
             }
             if (m > localMax) localMax = m;
         }
@@ -40,12 +46,24 @@ public class Day24 extends Day {
 
     @Override
     public Object part1() {
-        return strongestBridge(List.copyOf(parts), 0, 0);
+        allBridges = new ArrayList<>();
+        return strongestBridge(new ArrayList<>(), List.copyOf(parts), 0, 0);
     }
 
     @Override
     public Object part2() {
-        return null;
+        var maxLength = allBridges.stream().mapToInt(List::size).max().getAsInt();
+        return allBridges.stream().filter(l -> l.size() == maxLength).mapToInt(l -> l.stream().mapToInt(p -> p.a() + p.b()).sum()).max().getAsInt();
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "1695";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "1673";
     }
 
     @Override
