@@ -20,7 +20,7 @@ public class Day23 extends Day {
 
     @Override
     public Object part1() {
-        if (true) return null;
+//        if (true) return null;
         State begin = State.parse(input);
         State end = new State(
                 Map.of(
@@ -64,9 +64,6 @@ public class Day23 extends Day {
                     for (Point target : targets) {
                         executeMove(graph, queue, state, a, target);
                     }
-            }
-            if (queue.size() < s) {
-                System.out.println(1);
             }
         }
 
@@ -153,6 +150,11 @@ public class Day23 extends Day {
         return "17400";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "46120";
+    }
+
     private record Amphipod(int x, int y, int target, int factor) {
         private static Amphipod A(int x, int y) {
             return new Amphipod(x, y, 2, 1);
@@ -171,8 +173,6 @@ public class Day23 extends Day {
         }
 
         private Set<Point> targets(State state, boolean part2) {
-            if (x == target) return Set.of();
-//            if (y == 2 && state.amphipods.containsKey(new Point(x, 1))) return Set.of();
             Set<Point> targets = new HashSet<>();
 
             if (y > 0) {
@@ -192,7 +192,9 @@ public class Day23 extends Day {
 
                 if (
                         state.amphipods.containsKey(p)
+                                || p.x() == target && p.y() <= y
                                 || p.y() > 0 && state.amphipods.containsKey(new Point(p.x(), p.y() - 1))
+                                || p.x() == target && state.amphipods.values().stream().anyMatch(a -> a.x == target && a.target != target)
                                 || IntStream.rangeClosed(Math.min(x, p.x()) + 1, Math.max(x, p.x()) - 1).map(x1 -> state.amphipods.containsKey(new Point(x1, 0)) ? 1 : 0).sum() > 0
                 ) {
                     set.remove(p);
