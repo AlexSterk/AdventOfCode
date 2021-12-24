@@ -1,413 +1,54 @@
-import random
+import z3
 
+prog = []
 
-class ALU:
+with open('../../../..//data/day24/input.txt', 'r') as f:
+    for line in f:
+        prog.append(line.split())
 
-    def run(self, A=1, B=1, C=1, D=1, E=1, F=1, G=1, H=1, I=1, J=1, K=1, L=1, M=1, N=1) -> int:
-        if C + 8 != D:
-            if D + 1 != E:
-                if H + 2 != I:
-                    if I + 2 != J:
-                        z = (((((A + 1) * 26 + B + 1) * 26 + E + 9) * 26 + F + 3) * 26 + G + 2) * 26 + J + 11
-                    else:
-                        z = (((((A + 1) * 26 + B + 1) * 26 + E + 9) * 26 + F + 3) * 26 + G + 2)
-                else:
-                    if G - 1 != J:
-                        z = ((((A + 1) * 26 + B + 1) * 26 + E + 9) * 26 + F + 3) * 26 + J + 11
-                    else:
-                        z = ((((A + 1) * 26 + B + 1) * 26 + E + 9) * 26 + F + 3)
-            else:
-                if H + 2 != I:
-                    z = ((((A + 1) * 26 + B + 1) * 26 + F + 3) * 26 + G + 2)
-                    x = I + 2 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
-                else:
-                    z = (((A + 1) * 26 + B + 1) * 26 + F + 3)
-                    x = G - 1 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
+    solver = z3.Optimize()
 
+    digits = [z3.BitVec(f'd_{i}', 64) for i in range(14)]
+
+    for d in digits:
+        solver.add(1 <= d)
+        solver.add(d <= 9)
+    digit_input = iter(digits)
+
+    zero, one = z3.BitVecVal(0, 64), z3.BitVecVal(1, 64)
+
+    registers = {r: zero for r in 'xyzw'}
+
+    for i, inst in enumerate(prog):
+        if inst[0] == 'inp':
+            registers[inst[1]] = next(digit_input)
+            continue
+        a, b = inst[1:]
+        b = registers[b] if b in registers else int(b)
+        c = z3.BitVec(f'v{i}', 64)
+        if inst[0] == 'add':
+            solver.add(c == registers[a] + b)
+        elif inst[0] == 'mul':
+            solver.add(c == registers[a] * b)
+        elif inst[0] == 'mod':
+            solver.add(registers[a] >= 0)
+            solver.add(b > 0)
+            solver.add(c == registers[a] % b)
+        elif inst[0] == 'div':
+            solver.add(b != 0)
+            solver.add(c == registers[a] / b)
+        elif inst[0] == 'eql':
+            solver.add(c == z3.If(registers[a] == b, one, zero))
         else:
-            if B - 3 != E:
-                if H + 2 != I:
-                    z = ((((A + 1) * 26 + E + 9) * 26 + F + 3) * 26 + G + 2)
-                    x = I + 2 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
+            assert False
+        registers[a] = c
 
-                else:
-                    z = (((A + 1) * 26 + E + 9) * 26 + F + 3)
-                    x = G - 1 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
+    solver.add(registers['z'] == 0)
 
-            else:
-                if H + 2 != I:
-                    z = (((A + 1) * 26 + F + 3) * 26 + G + 2)
-                    x = I + 2 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
-
-                else:
-                    z = ((A + 1) * 26 + F + 3)
-                    x = G - 1 != J
-                    z = z * (25 * x + 1) + (J + 11) * x
-
-
-
-        w = K
-        x = 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -7
-        x = int(x == w)
-        x = int(x == 0)
-        y = (J + 11) * x * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 7
-        y = y * x
-        z = z + y
-
-        w = L
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 10
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 1
-        y = y * x
-        z = z + y
-
-        w = M
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -6
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 10
-        y = y * x
-        z = z + y
-
-        w = N
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -8
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 3
-        y = y * x
-        z = z + y
-
-        return z
-
-    def run_no_change(self, A, B, C, D, E, F, G, H, I, J, K, L, M, N):
-        w = 0
-        x = 0
-        y = 0
-        z = 0
-
-        w = A
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 12
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 1
-        y = y * x
-        z = z + y
-
-        w = B
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 12
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 1
-        y = y * x
-        z = z + y
-
-        w = C
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 15
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 16
-        y = y * x
-        z = z + y
-
-        w = D
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -8
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 5
-        y = y * x
-        z = z + y
-
-        w = E
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -4
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 9
-        y = y * x
-        z = z + y
-
-        w = F
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 15
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 3
-        y = y * x
-        z = z + y
-
-        w = G
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 14
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 2
-        y = y * x
-        z = z + y
-
-        w = H
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 14
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 15
-        y = y * x
-        z = z + y
-
-        w = I
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -13
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 5
-        y = y * x
-        z = z + y
-
-        w = J
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -3
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 11
-        y = y * x
-        z = z + y
-
-        w = K
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -7
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 7
-        y = y * x
-        z = z + y
-
-        w = L
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 1
-        x = x + 10
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 1
-        y = y * x
-        z = z + y
-
-        w = M
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -6
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 10
-        y = y * x
-        z = z + y
-
-        w = N
-        x = x * 0
-        x = x + z
-        x = x % 26
-        z = z // 26
-        x = x + -8
-        x = int(x == w)
-        x = int(x == 0)
-        y = y * 0
-        y = y + 25
-        y = y * x
-        y = y + 1
-        z = z * y
-        y = y * 0
-        y = y + w
-        y = y + 3
-        y = y * x
-        z = z + y
-
-        return z
-
-
-for _ in range(20000):
-    arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    alu = ALU()
-    In = [random.choice(arr) for _ in range(14)]
-    assert alu.run(*In) == alu.run_no_change(*In)
-
-print(ALU().run())
+    for f in (solver.maximize, solver.minimize):
+        solver.push()
+        f(sum((10 ** i) * d for i, d in enumerate(digits[::-1])))
+        print(solver.check())
+        m = solver.model()
+        print(''.join([str(m[d]) for d in digits]))
+        solver.pop()
