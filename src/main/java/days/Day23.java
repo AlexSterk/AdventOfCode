@@ -6,10 +6,13 @@ import util.Graph;
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static util.Line.Point;
 
 public class Day23 extends Day {
+    private boolean part2 = false;
+
     @Override
     public void processInput() {
 
@@ -17,20 +20,25 @@ public class Day23 extends Day {
 
     @Override
     public Object part1() {
+        if (true) return null;
         State begin = State.parse(input);
         State end = new State(
                 Map.of(
-                        new Point(2, 1), new Amphipod(2, 1, 2, 1),
-                        new Point(2, 2), new Amphipod(2, 2, 2, 1),
-                        new Point(4, 1), new Amphipod(4, 1, 4, 10),
-                        new Point(4, 2), new Amphipod(4, 2, 4, 10),
-                        new Point(6, 1), new Amphipod(6, 1, 6, 100),
-                        new Point(6, 2), new Amphipod(6, 2, 6, 100),
-                        new Point(8, 1), new Amphipod(8, 1, 8, 1000),
-                        new Point(8, 2), new Amphipod(8, 2, 8, 1000)
+                        new Point(2, 1), Amphipod.A(2, 1),
+                        new Point(2, 2), Amphipod.A(2, 2),
+                        new Point(4, 1), Amphipod.B(4, 1),
+                        new Point(4, 2), Amphipod.B(4, 2),
+                        new Point(6, 1), Amphipod.C(6, 1),
+                        new Point(6, 2), Amphipod.C(6, 2),
+                        new Point(8, 1), Amphipod.D(8, 1),
+                        new Point(8, 2), Amphipod.D(8, 2)
                 )
         );
 
+        return solve(begin, end);
+    }
+
+    private int solve(State begin, State end) {
         Graph<State> graph = new Graph<>();
         Set<State> visited = new HashSet<>();
         Queue<State> queue = new ArrayDeque<>();
@@ -38,34 +46,96 @@ public class Day23 extends Day {
         queue.add(begin);
         graph.addNode(begin);
 
+        int s;
+
         while (!queue.isEmpty()) {
+            s = queue.size();
             State state = queue.poll();
-            if (visited.contains(state)) continue;
-            visited.add(state);
+            if (!visited.add(state)) continue;
+
+            if (state.equals(end)) System.out.println("END FOUND");
 
             for (Amphipod a : state.amphipods.values()) {
-                Set<Point> targets = a.targets(state);
-                for (Point target : targets) {
-                    int energy = Math.abs(a.x - target.x()) + a.y + target.y();
-                    energy *= a.factor;
-                    HashMap<Point, Amphipod> newStateMap = new HashMap<>(state.amphipods);
-                    newStateMap.remove(new Point(a.x, a.y));
-                    newStateMap.put(target, new Amphipod(target.x(), target.y(), a.target, a.factor));
-
-                    State newState = new State(newStateMap);
-                    queue.offer(newState);
-                    graph.addNode(newState);
-                    graph.addEdge(state, newState, energy, true);
-                }
+                Set<Point> targets = a.targets(state, part2);
+                Optional<Point> furthestIntoBurrow = targets.stream().filter(p -> p.x() == a.target).max(Comparator.comparing(Point::y));
+                if (furthestIntoBurrow.isPresent()) {
+                    executeMove(graph, queue, state, a, furthestIntoBurrow.get());
+                } else
+                    for (Point target : targets) {
+                        executeMove(graph, queue, state, a, target);
+                    }
+            }
+            if (queue.size() < s) {
+                System.out.println(1);
             }
         }
 
-        return graph.getDistance(begin, end);
+        System.out.println("Graph building complete");
+
+        int distance = graph.getDistance(begin, end);
+        System.out.println(distance);
+        return distance;
+    }
+
+    private void executeMove(Graph<State> graph, Queue<State> queue, State state, Amphipod a, Point target) {
+        int energy = Math.abs(a.x - target.x()) + a.y + target.y();
+        energy *= a.factor;
+        HashMap<Point, Amphipod> newStateMap = new HashMap<>(state.amphipods);
+        newStateMap.remove(new Point(a.x, a.y));
+        newStateMap.put(target, new Amphipod(target.x(), target.y(), a.target, a.factor));
+
+        State newState = new State(newStateMap);
+        queue.offer(newState);
+        graph.addNode(newState);
+        graph.addEdge(state, newState, energy, true);
     }
 
     @Override
     public Object part2() {
-        return null;
+        part2 = true;
+//        if (true) return null;
+        State begin = State.parse(input);
+
+        Set.copyOf(begin.amphipods.values()).stream().filter(a -> a.y() == 2).forEach(a -> {
+            begin.amphipods.remove(new Point(a.x, a.y));
+            begin.amphipods.put(new Point(a.x, 4), new Amphipod(a.x, 4, a.target, a.factor));
+        });
+
+        begin.amphipods.put(new Point(2, 2), Amphipod.D(2, 2));
+        begin.amphipods.put(new Point(2, 3), Amphipod.D(2, 3));
+
+        begin.amphipods.put(new Point(4, 2), Amphipod.C(4, 2));
+        begin.amphipods.put(new Point(4, 3), Amphipod.B(4, 3));
+
+        begin.amphipods.put(new Point(6, 2), Amphipod.B(6, 2));
+        begin.amphipods.put(new Point(6, 3), Amphipod.A(6, 3));
+
+        begin.amphipods.put(new Point(8, 2), Amphipod.A(8, 2));
+        begin.amphipods.put(new Point(8, 3), Amphipod.C(8, 3));
+
+
+        State end = new State(new HashMap<>());
+        end.amphipods.put(new Point(2, 1), Amphipod.A(2, 1));
+        end.amphipods.put(new Point(2, 2), Amphipod.A(2, 2));
+        end.amphipods.put(new Point(2, 3), Amphipod.A(2, 3));
+        end.amphipods.put(new Point(2, 4), Amphipod.A(2, 4));
+
+        end.amphipods.put(new Point(4, 1), Amphipod.B(4, 1));
+        end.amphipods.put(new Point(4, 2), Amphipod.B(4, 2));
+        end.amphipods.put(new Point(4, 3), Amphipod.B(4, 3));
+        end.amphipods.put(new Point(4, 4), Amphipod.B(4, 4));
+
+        end.amphipods.put(new Point(6, 1), Amphipod.C(6, 1));
+        end.amphipods.put(new Point(6, 2), Amphipod.C(6, 2));
+        end.amphipods.put(new Point(6, 3), Amphipod.C(6, 3));
+        end.amphipods.put(new Point(6, 4), Amphipod.C(6, 4));
+
+        end.amphipods.put(new Point(8, 1), Amphipod.D(8, 1));
+        end.amphipods.put(new Point(8, 2), Amphipod.D(8, 2));
+        end.amphipods.put(new Point(8, 3), Amphipod.D(8, 3));
+        end.amphipods.put(new Point(8, 4), Amphipod.D(8, 4));
+
+        return solve(begin, end);
     }
 
     @Override
@@ -78,8 +148,29 @@ public class Day23 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "17400";
+    }
+
     private record Amphipod(int x, int y, int target, int factor) {
-        private Set<Point> targets(State state) {
+        private static Amphipod A(int x, int y) {
+            return new Amphipod(x, y, 2, 1);
+        }
+
+        private static Amphipod B(int x, int y) {
+            return new Amphipod(x, y, 4, 10);
+        }
+
+        private static Amphipod C(int x, int y) {
+            return new Amphipod(x, y, 6, 100);
+        }
+
+        private static Amphipod D(int x, int y) {
+            return new Amphipod(x, y, 8, 1000);
+        }
+
+        private Set<Point> targets(State state, boolean part2) {
             if (x == target) return Set.of();
 //            if (y == 2 && state.amphipods.containsKey(new Point(x, 1))) return Set.of();
             Set<Point> targets = new HashSet<>();
@@ -90,25 +181,20 @@ public class Day23 extends Day {
                     targets.add(new Point(i, 0));
                 }
             } else {
+                if (part2) targets.add(new Point(target, 4));
+                if (part2) targets.add(new Point(target, 3));
                 targets.add(new Point(target, 2));
                 targets.add(new Point(target, 1));
             }
 
-//            targets.removeIf(state.amphipods::containsKey);
-//            targets.removeIf(p -> state.amphipods.keySet().stream().anyMatch(a -> p.x() < x && p.x() < a.x() && a.x() < x));
-//            targets.removeIf(p -> state.amphipods.keySet().stream().anyMatch(a -> p.x() > x && p.x() > a.x() && a.x() > x));
-//            targets.removeIf(p -> p.y() == 2 && state.amphipods.containsKey(new Point(p.x(), 1)));
-
             Set<Point> set = new HashSet<>(targets);
             for (Point p : targets) {
-                var b1 = state.amphipods.containsKey(p);
-                var b2 = state.amphipods.keySet().stream().filter(a -> a.y() == 0 && p.x() < x && p.x() < a.x() && a.x() < x).findAny();
-                var b3 = state.amphipods.keySet().stream().filter(a -> a.y() == 0 && p.x() > x && p.x() > a.x() && a.x() > x).findAny();
-                var b4 = p.y() == 2 && state.amphipods.containsKey(new Point(p.x(), 1));
-                if (b1
-                        || b2.isPresent()
-                        || b3.isPresent()
-                        || b4) {
+
+                if (
+                        state.amphipods.containsKey(p)
+                                || p.y() > 0 && state.amphipods.containsKey(new Point(p.x(), p.y() - 1))
+                                || IntStream.rangeClosed(Math.min(x, p.x()) + 1, Math.max(x, p.x()) - 1).map(x1 -> state.amphipods.containsKey(new Point(x1, 0)) ? 1 : 0).sum() > 0
+                ) {
                     set.remove(p);
                 }
             }
@@ -131,19 +217,13 @@ public class Day23 extends Day {
                 x = (i % 4) * 2 + 2;
                 y = i / 4 + 1;
                 String group = matchResults.get(i).group();
-                map.put(new Point(x, y), new Amphipod(x, y, switch (group) {
-                    case "A" -> 2;
-                    case "B" -> 4;
-                    case "C" -> 6;
-                    case "D" -> 8;
+                map.put(new Point(x, y), switch (group) {
+                    case "A" -> Amphipod.A(x, y);
+                    case "B" -> Amphipod.B(x, y);
+                    case "C" -> Amphipod.C(x, y);
+                    case "D" -> Amphipod.D(x, y);
                     default -> throw new IllegalStateException("Unexpected value: " + group);
-                }, switch (group) {
-                    case "A" -> 1;
-                    case "B" -> 10;
-                    case "C" -> 100;
-                    case "D" -> 1000;
-                    default -> throw new IllegalStateException("Unexpected value: " + group);
-                }));
+                });
             }
 
             return new State(map);
