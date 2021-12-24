@@ -2,6 +2,9 @@ package days;
 
 import setup.Day;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Day24 extends Day {
@@ -16,11 +19,11 @@ public class Day24 extends Day {
         alu.input.addAll(Collections.nCopies(14, 1L));
         alu.run();
 
-//        try {
-//            Files.write(Path.of("data/day24/program.txt"), alu.instructions.stream().map(ALU.Instruction::toJava).toList());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Files.write(Path.of("data/day24/program.txt"), alu.instructions.stream().map(ALU.Instruction::toPython).toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return alu.variables.get("z");
     }
@@ -90,6 +93,7 @@ public class Day24 extends Day {
             abstract void execute();
 
             abstract String toJava();
+            abstract String toPython();
         }
 
         private class Input extends Instruction {
@@ -107,6 +111,11 @@ public class Day24 extends Day {
             @Override
             String toJava() {
                 return "%s = input();".formatted(var);
+            }
+
+            @Override
+            String toPython() {
+                return "%s = ...".formatted(var);
             }
 
             @Override
@@ -133,6 +142,11 @@ public class Day24 extends Day {
             @Override
             String toJava() {
                 return "%s += %s;".formatted(a, b);
+            }
+
+            @Override
+            String toPython() {
+                return "%s = %s + %s".formatted(a, a, b);
             }
 
             @Override
@@ -169,6 +183,11 @@ public class Day24 extends Day {
             void execute() {
                 variables.put(a, variables.get(a) * resolve(b));
             }
+
+            @Override
+            String toPython() {
+                return "%s = %s * %s".formatted(a, a, b);
+            }
         }
 
         private class Div extends Instruction {
@@ -195,6 +214,11 @@ public class Day24 extends Day {
             @Override
             String toJava() {
                 return "%s /= %s;".formatted(a, b);
+            }
+
+            @Override
+            String toPython() {
+                return "%s = %s // %s".formatted(a, a, b);
             }
         }
 
@@ -223,6 +247,11 @@ public class Day24 extends Day {
             String toJava() {
                 return "%s %%= %s;".formatted(a, b);
             }
+
+            @Override
+            String toPython() {
+                return "%s = %s %% %s".formatted(a, a, b);
+            }
         }
 
         private class Eql extends Instruction {
@@ -250,62 +279,11 @@ public class Day24 extends Day {
             String toJava() {
                 return "%s = %s == %s ? 1L : 0L;".formatted(a, a, b);
             }
-        }
-    }
 
-    @SuppressWarnings("SuspiciousNameCombination")
-    private static class ALU2 {
-        void run() {
-            run(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-        }
-
-
-        void run(long A, long B, long C, long D, long E, long F, long G, long H, long I, long J, long K, long L, long M, long N) {
-            long z;
-
-            long z1 = (A * 676 + (B * 26) + C + 718) / 26;
-            z = z1 * 25 * (z1 % 26 - 8 != D ? 1L : 0L) + z1;
-
-            z = (z + (D + 5) * (z % 26 - 8 != D ? 1L : 0L)) / 26;
-            z = z * 25 * (z % 26 - 4 != E ? 1L : 0L) + z;
-            z = z + (E + 9) * (z % 26 - 4 != E ? 1L : 0L);
-
-            z = z * 25 + z + F + 3;
-
-            z = z * 25 + z + G + 2;
-
-            z = z * 25 + z + H + 15;
-
-            z /= 26;
-            z = z * 25 * ((z % 26 - 13 == I ? 1L : 0L) == 0 ? 1L : 0L) + z;
-            z = z + (I + 5) * ((z % 26 - 13 == I ? 1L : 0L) == 0 ? 1L : 0L);
-
-            z /= 26;
-            z = z * 25 * ((z % 26 - 3 == J ? 1L : 0L) == 0 ? 1L : 0L) + z;
-            z = z + (J + 11) * ((z % 26 - 3 == J ? 1L : 0L) == 0 ? 1L : 0L);
-
-            z /= 26;
-            z = z * 25 * (((z) % 26 - 7 == K ? 1L : 0L) == 0 ? 1L : 0L) + z;
-            z = z + (K + 7) * (((z) % 26 - 7 == K ? 1L : 0L) == 0 ? 1L : 0L);
-
-            z = z * 26;
-            z = z + L + 1;
-
-            z /= 26;
-            z = z * 25 * ((z % 26 - 6 == M ? 1L : 0L) == 0 ? 1L : 0L) + z;
-            z = z + (M + 10) * ((z % 26 - 6 == M ? 1L : 0L) == 0 ? 1L : 0L);
-
-            z /= 26;
-            z = z * 25 * ((z % 26 - 8 == N ? 1L : 0L) == 0 ? 1L : 0L) + z;
-            z = z + (N + 3) * ((z % 26 - 8 == N ? 1L : 0L) == 0 ? 1L : 0L);
-
-            // For valid input z == 0;
-
-            System.out.println(z);
-        }
-
-        public static void main(String[] args) {
-            new ALU2().run();
+            @Override
+            String toPython() {
+                return "%s = int(%s == %s)".formatted(a, a, b);
+            }
         }
     }
 }
