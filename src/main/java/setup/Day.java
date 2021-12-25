@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 
 public abstract class Day {
     /**
@@ -27,7 +29,18 @@ public abstract class Day {
             System.exit(1);
         }
         input = i;
-        processInput();
+    }
+
+    public Day(String in) {
+        String i;
+        try {
+            i = Files.readString(Paths.get(in));
+        } catch (IOException e) {
+            i = "";
+            e.printStackTrace();
+            System.exit(1);
+        }
+        input = i;
     }
 
     /**
@@ -39,12 +52,12 @@ public abstract class Day {
     /**
      * Implementation for part 1. Print the answer {@link System#out}
      */
-    public abstract void part1();
+    public abstract Object part1();
 
     /**
      * Implementation for part 2. Print the answer {@link System#out}
      */
-    public abstract void part2();
+    public abstract Object part2();
 
     /**
      * @return the day of the puzzle you are solving
@@ -59,6 +72,21 @@ public abstract class Day {
     }
 
     /**
+     * @return Whether input should be parsed again for Part 2
+     */
+    public boolean resetForPartTwo() {
+        return false;
+    }
+
+    public String partOneSolution() {
+        return null;
+    }
+
+    public String partTwoSolution() {
+        return null;
+    }
+
+    /**
      * Main method to dynamically run each problem class.
      */
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -67,7 +95,19 @@ public abstract class Day {
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
 
-        day.part1();
-        day.part2();
+        day.processInput();
+        System.out.println("================ PART 1 ================");
+        Instant now = Instant.now();
+        Object part1 = day.part1();
+        Duration partOneTime = Duration.between(now, Instant.now());
+
+        if (day.resetForPartTwo()) day.processInput();
+        System.out.println("================ PART 2 ================");
+        now = Instant.now();
+        Object part2 = day.part2();
+        Duration partTwoTime = Duration.between(now, Instant.now());
+
+        System.out.format("Solution to part 1: %s (%02d.%04ds)%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());
+        System.out.format("Solution to part 2: %s (%02d.%04ds)%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
     }
 }
