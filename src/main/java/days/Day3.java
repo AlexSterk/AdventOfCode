@@ -17,45 +17,47 @@ public class Day3 extends Day {
     }
 
     @Override
-    public void part1() {
-        System.out.println(triangles.stream().filter(Triangle::isValid).count());
+    public Object part1() {
+        return triangles.stream().filter(Triangle::isValid).count();
     }
 
     @Override
-    public void part2() {
+    public Object part2() {
         List<Triangle> newTriangles = new ArrayList<>();
 
-        for (int i = 0; i < triangles.size(); i+=3) {
+        for (int i = 0; i < triangles.size(); i += 3) {
             Triangle one = triangles.get(i);
-            Triangle two = triangles.get(i+1);
-            Triangle three = triangles.get(i+2);
-            
+            Triangle two = triangles.get(i + 1);
+            Triangle three = triangles.get(i + 2);
+
             newTriangles.add(new Triangle(one.a(), two.a(), three.a()));
             newTriangles.add(new Triangle(one.b(), two.b(), three.b()));
             newTriangles.add(new Triangle(one.c(), two.c(), three.c()));
         }
 
-        System.out.println(newTriangles.stream().filter(Triangle::isValid).count());
+        return newTriangles.stream().filter(Triangle::isValid).count();
     }
+
 
     @Override
     public int getDay() {
         return 3;
     }
-}
 
-record Triangle(int a, int b, int c) {
-    Triangle(String a, String b, String c) {
-        this(Integer.parseInt(a), Integer.parseInt(b), Integer.parseInt(c));
-    }
-    
-    boolean isValid() {
-        return (a + b) > c && (a + c) > b && (b + c) > a;
-    }
-    
-    static Triangle stringToTriangle(String s) {
-        String[] split = s.split("\\s+");
+    private record Triangle(int a, int b, int c) {
+        Triangle(String a, String b, String c) {
+            this(Integer.parseInt(a), Integer.parseInt(b), Integer.parseInt(c));
+        }
 
-        return new Triangle(split[1], split[2], split[3]);
+        static Triangle stringToTriangle(String s) {
+            String[] split = s.split("\\s+");
+
+            return new Triangle(split[1], split[2], split[3]);
+        }
+
+        boolean isValid() {
+            return (a + b) > c && (a + c) > b && (b + c) > a;
+        }
     }
+
 }
