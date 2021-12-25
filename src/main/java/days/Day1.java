@@ -62,6 +62,16 @@ public class Day1 extends Day {
     }
 
     @Override
+    public String partOneSolution() {
+        return "287";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "133";
+    }
+
+    @Override
     public int getDay() {
         return 1;
     }

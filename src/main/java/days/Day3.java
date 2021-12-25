@@ -44,6 +44,16 @@ public class Day3 extends Day {
         return 3;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "983";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "1836";
+    }
+
     private record Triangle(int a, int b, int c) {
         Triangle(String a, String b, String c) {
             this(Integer.parseInt(a), Integer.parseInt(b), Integer.parseInt(c));

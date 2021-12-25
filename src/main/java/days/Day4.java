@@ -25,12 +25,22 @@ public class Day4 extends Day {
     public Object part2() {
         return rooms.stream()
                 .filter(r -> r.decryptName().contains("north"))
-                .map(Objects::toString).collect(Collectors.joining("\n"));
+                .findFirst().get().sectorId;
     }
 
     @Override
     public int getDay() {
         return 4;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "158835";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "993";
     }
 
     private record Room(String encryptedName, int sectorId, String checksum) {

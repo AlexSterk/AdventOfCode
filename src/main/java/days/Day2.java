@@ -61,6 +61,16 @@ public class Day2 extends Day {
         return 2;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "76792";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "A7AC3";
+    }
+
     private enum Movement {
         UP('U', 0, -1),
         DOWN('D', 0, 1),

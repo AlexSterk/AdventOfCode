@@ -86,6 +86,16 @@ public class Day5 extends Day {
         return password.stream().map(Objects::toString).collect(Collectors.joining());
     }
 
+    @Override
+    public String partOneSolution() {
+        return "f77a0e6e".toUpperCase();
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "999828ec".toUpperCase();
+    }
+
     private Hash getHash(int i, MessageDigest md5, boolean partTwo) {
         String hash;
         String toHash;
