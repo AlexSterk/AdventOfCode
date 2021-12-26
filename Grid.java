@@ -1,7 +1,5 @@
 package util;
 
-import com.sun.source.tree.Tree;
-
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -24,7 +22,7 @@ public class Grid<T> {
     }
 
     public Grid(T[][] array) {
-        this(array[0].length, array.length);
+        this(Arrays.stream(array).map(a -> Arrays.stream(a).toList()).mapToInt(List::size).max().orElse(array.length), array.length);
         for (int y = 0; y < array.length; y++) {
             for (int x = 0; x < array[y].length; x++) {
                 set(x, y, array[y][x]);
@@ -35,6 +33,10 @@ public class Grid<T> {
     public Grid(int w, int h, Supplier<T> empty) {
         this(w, h);
         this.empty = empty;
+    }
+
+    public static Character[][] stringToGrid(String string) {
+        return Arrays.stream(string.split("\n")).map(s -> s.chars().mapToObj(c -> (char) c).toArray(Character[]::new)).toArray(Character[][]::new);
     }
 
     public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
@@ -316,6 +318,40 @@ public class Grid<T> {
             InfiniteGrid<T> g = new InfiniteGrid<>(empty);
             getAll().forEach(t -> g.set(t, t.data));
             return g;
+        }
+    }
+
+    public static class NonEuclidianGrid<T> extends Grid<T> {
+        public NonEuclidianGrid(int w, int h) {
+            super(w, h);
+        }
+
+        public NonEuclidianGrid(T[][] array) {
+            super(array);
+        }
+
+        @Override
+        public Tile<T> getTile(int x, int y) {
+            x = x % width;
+            y = y % height;
+            return super.getTile(x, y);
+        }
+
+        @Override
+        public void set(int x, int y, T data) {
+            x = x % width;
+            y = y % height;
+            super.set(x, y, data);
+        }
+
+        public void shiftRowRight(int y, int n) {
+            List<Tile<T>> row = getRow(y);
+            row.forEach(t -> this.set(t.x + n, t.y, t.data));
+        }
+
+        public void shiftColumnDown(int x, int n) {
+            List<Tile<T>> column = getColumn(x);
+            column.forEach(t -> this.set(t.x, t.y + n, t.data));
         }
     }
 }
