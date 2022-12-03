@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class Day {
     /**
@@ -109,5 +111,9 @@ public abstract class Day {
 
         System.out.format("Solution to part 1: %s (%02d.%04ds)%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());
         System.out.format("Solution to part 2: %s (%02d.%04ds)%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
+    }
+
+    public List<String> lines() {
+        return Arrays.asList(input.split("\r?\n"));
     }
 }
