@@ -3,11 +3,13 @@ package days;
 import setup.Day;
 import util.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Day3 extends Day {
 
     private List<Pair<String, String>> rucksacks;
+    private List<List<Pair<String, String>>> groups;
 
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -17,6 +19,16 @@ public class Day3 extends Day {
             int l = s.length();
             return new Pair<String, String>(s.substring(0, l / 2), s.substring(l / 2));
         }).toList();
+
+        // divide rucksacks into groups of 3
+        groups = new ArrayList<>();
+        for (int i = 0; i < rucksacks.size(); i += 3) {
+            List<Pair<String, String>> group = new ArrayList<>();
+            group.add(rucksacks.get(i));
+            group.add(rucksacks.get(i + 1));
+            group.add(rucksacks.get(i + 2));
+            groups.add(group);
+        }
     }
 
     @Override
@@ -38,7 +50,20 @@ public class Day3 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        int priority = 0;
+
+        for (List<Pair<String, String>> group : groups) {
+            List<String> strings = group.stream().map(p -> p.a() + p.b()).toList();
+            for (char c : strings.get(0).toCharArray()) {
+                if (strings.get(1).indexOf(c) != -1 && strings.get(2).indexOf(c) != -1) {
+                    int value = ALPHABET.indexOf(c) + 1;
+                    priority += value;
+                    break;
+                }
+            }
+        }
+
+        return priority;
     }
 
     @Override
@@ -54,5 +79,10 @@ public class Day3 extends Day {
     @Override
     public String partOneSolution() {
         return "8185";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "2817";
     }
 }
