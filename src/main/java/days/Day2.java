@@ -57,7 +57,7 @@ public class Day2 extends Day {
 
     @Override
     public void processInput() {
-        guide = Arrays.stream(input.split("\n\r?")).map(s -> s.split("\s+")).collect(Collectors.toList());
+        guide = Arrays.stream(input.split("\r?\n")).map(s -> s.split("\s+")).collect(Collectors.toList());
     }
 
     @Override

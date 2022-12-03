@@ -11,7 +11,7 @@ public class Day1 extends Day {
 
     @Override
     public void processInput() {
-        elfs = Arrays.stream(input.split("(\n\r?){2}")).map(s -> Arrays.stream(s.split("\n\r?")).map(Integer::parseInt).toList()).toList();
+        elfs = Arrays.stream(input.split("(\r?\n){2}")).map(s -> Arrays.stream(s.split("\r?\n")).map(Integer::parseInt).toList()).toList();
     }
 
     @Override
