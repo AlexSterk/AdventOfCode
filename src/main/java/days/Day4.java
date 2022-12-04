@@ -37,7 +37,21 @@ public class Day4 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        int overlap = 0;
+
+        for (Ranges range : ranges) {
+            if (range.a1 <= range.b1 && range.a2 >= range.b2) {
+                overlap ++;
+            } else if (range.b1 <= range.a1 && range.b2 >= range.a2) {
+                overlap ++;
+            } else if (range.a1 <= range.b1 && range.a2 >= range.b1) {
+                overlap ++;
+            } else if (range.b1 <= range.a1 && range.b2 >= range.a1) {
+                overlap ++;
+            }
+        }
+
+        return overlap;
     }
 
     @Override
@@ -53,6 +67,11 @@ public class Day4 extends Day {
     @Override
     public String partOneSolution() {
         return "599";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "928";
     }
 
     private record Ranges(int a1, int a2, int b1, int b2) {}
