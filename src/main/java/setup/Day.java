@@ -113,7 +113,7 @@ public abstract class Day {
         System.out.format("Solution to part 2: %s (%02d.%04ds)%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
     }
 
-    public List<String> lines() {
+    public final List<String> lines() {
         return Arrays.asList(input.split("\r?\n"));
     }
 }
