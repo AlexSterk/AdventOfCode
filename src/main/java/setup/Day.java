@@ -97,9 +97,11 @@ public abstract class Day {
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
 
-        day.processInput();
-        System.out.println("================ PART 1 ================");
         Instant now = Instant.now();
+        day.processInput();
+        Duration processTime = Duration.between(now, Instant.now());
+        System.out.println("================ PART 1 ================");
+        now = Instant.now();
         Object part1 = day.part1();
         Duration partOneTime = Duration.between(now, Instant.now());
 
@@ -109,6 +111,7 @@ public abstract class Day {
         Object part2 = day.part2();
         Duration partTwoTime = Duration.between(now, Instant.now());
 
+        System.out.format("Processing input: (%02d.%04ds)%n", processTime.getSeconds(), processTime.toMillis());
         System.out.format("Solution to part 1: %s (%02d.%04ds)%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());
         System.out.format("Solution to part 2: %s (%02d.%04ds)%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
     }
