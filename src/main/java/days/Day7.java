@@ -3,6 +3,7 @@ package days;
 import setup.Day;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class Day7 extends Day {
@@ -63,23 +64,34 @@ public class Day7 extends Day {
     @Override
     public Object part1() {
         // flatten the tree
-        HashMap<String, FileSystemNode> map = new HashMap<>();
+        Map<String, FileSystemNode> map = new HashMap<>();
         flatten(root, map, "");
 
-        return map.values().stream().filter(n -> n.type == FileSystemNode.Type.FOLDER && n.size <= 100000).peek(n -> System.out.println(n.name + " " + n.size)).mapToLong(n -> n.size).sum();
+        return map.values().stream().filter(n -> n.type == FileSystemNode.Type.FOLDER && n.size <= 100000)
+                .mapToLong(n -> n.size).sum();
     }
 
-    private void flatten(FileSystemNode node, HashMap<String, FileSystemNode> map, String path) {
-        String name = path + "/" + node.name;
+    private void flatten(FileSystemNode node, Map<String, FileSystemNode> map, String path) {
+        String name = path + node.name;
         map.put(name, node);
         for (FileSystemNode child : node.values()) {
-            flatten(child, map, name);
+            flatten(child, map, name + "/");
         }
     }
 
     @Override
     public Object part2() {
-        return null;
+        HashMap<String, FileSystemNode> map = new HashMap<>();
+        flatten(root, map, "");
+
+        long totalDiskSpace = 70000000;
+        long totalSpaceNeeded = 30000000;
+        long usedSpace = root.size;
+        long freeSpace = totalDiskSpace - usedSpace;
+        long spaceNeeded = totalSpaceNeeded - freeSpace;
+
+        return map.values().stream().filter(n -> n.type == FileSystemNode.Type.FOLDER && n.size >= spaceNeeded)
+                .mapToLong(n -> n.size).min().orElseThrow();
     }
 
     @Override
@@ -97,8 +109,14 @@ public class Day7 extends Day {
         return "1543140";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "1117448";
+    }
+
+    // Use TreeMap so it's sorted by name
     private static class FileSystemNode extends TreeMap<String, FileSystemNode> {
-        private static enum Type {
+        private enum Type {
             FILE, FOLDER
         }
 
@@ -124,13 +142,13 @@ public class Day7 extends Day {
         }
 
         public String toString(int indent) {
-            String s = "- %s (%s, size=%d)".formatted(name, type, size);
+            StringBuilder s = new StringBuilder("- %s (%s, size=%d)".formatted(name, type, size));
             if (type == Type.FOLDER) {
                 for (FileSystemNode value : this.values()) {
-                    s += "\n%s".formatted(value.toString(indent)).replace("\n", "\n" + "\t".repeat(indent+1));
+                    s.append("\n%s".formatted(value.toString(indent)).replace("\n", "\n" + "\t".repeat(indent + 1)));
                 }
             }
-            return s;
+            return s.toString();
         }
 
         @Override
