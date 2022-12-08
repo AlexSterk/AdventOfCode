@@ -41,14 +41,6 @@ public class Grid<T> {
         return new Grid<>(grid);
     }
 
-    public static <T> Grid<T> mapGrid(Grid<String> grid, Function<String, T> mapper) {
-        Grid<T> newGrid = new Grid<>(grid.width, grid.height);
-        for (Tile<String> tile : grid.getAll()) {
-            newGrid.set(tile.x(), tile.y(), mapper.apply(tile.data()));
-        }
-        return newGrid;
-    }
-
     public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
         Graph<Tile<T>> graph = new Graph<>();
 
@@ -63,6 +55,14 @@ public class Grid<T> {
         }
 
         return graph;
+    }
+
+    public <V> Grid<V> map(Function<T, V> mapper) {
+        Grid<V> newGrid = new Grid<>(width, height);
+        for (Tile<T> tile : getAll()) {
+            newGrid.set(tile.x(), tile.y(), mapper.apply(tile.data()));
+        }
+        return newGrid;
     }
 
     public void init(Supplier<T> data, boolean overwrite) {
