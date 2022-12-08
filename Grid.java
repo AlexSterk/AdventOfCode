@@ -1,8 +1,7 @@
 package util;
 
-import com.sun.source.tree.Tree;
-
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -35,6 +34,19 @@ public class Grid<T> {
     public Grid(int w, int h, Supplier<T> empty) {
         this(w, h);
         this.empty = empty;
+    }
+
+    public static Grid<String> parseGrid(String s) {
+        String[][] grid = s.lines().map(String::trim).filter(l -> !l.isEmpty()).map(l -> l.split("")).toArray(String[][]::new);
+        return new Grid<>(grid);
+    }
+
+    public static <T> Grid<T> mapGrid(Grid<String> grid, Function<String, T> mapper) {
+        Grid<T> newGrid = new Grid<>(grid.width, grid.height);
+        for (Tile<String> tile : grid.getAll()) {
+            newGrid.set(tile.x(), tile.y(), mapper.apply(tile.data()));
+        }
+        return newGrid;
     }
 
     public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
@@ -280,7 +292,7 @@ public class Grid<T> {
 
         @Override
         public Tile<T> getTile(int x, int y) {
-            return grid.computeIfAbsent(y, k -> new TreeMap<>()).computeIfAbsent(x, k -> new Tile<T>(x, y, empty.get(), this));
+            return grid.computeIfAbsent(y, k -> new TreeMap<>()).computeIfAbsent(x, k -> new Tile<>(x, y, empty.get(), this));
         }
 
         public int minY() {
