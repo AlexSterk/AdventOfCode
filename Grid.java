@@ -282,6 +282,10 @@ public class Grid<T> {
         public int hashCode() {
             return Objects.hash(x, y, data);
         }
+
+        public int manhattanDistance(Tile<T> other) {
+            return Math.abs(x - other.x) + Math.abs(y - other.y);
+        }
     }
 
     public static class InfiniteGrid<T> extends Grid<T> {
