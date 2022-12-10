@@ -4,6 +4,8 @@ import setup.Day;
 import util.Grid;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class Day8 extends Day {
 
@@ -43,11 +45,11 @@ public class Day8 extends Day {
         if (up.isEmpty() || right.isEmpty() || down.isEmpty() || left.isEmpty()) {
             return true;
         }
+        // create a list of streams for the four sublists
+        List<Stream<Grid.Tile<Integer>>> streams = List.of(up.stream(), right.stream(), down.stream(), left.stream());
 
-        return up.stream().allMatch(t -> t.data() < tree.data()) ||
-                right.stream().allMatch(t -> t.data() < tree.data()) ||
-                down.stream().allMatch(t -> t.data() < tree.data()) ||
-                left.stream().allMatch(t -> t.data() < tree.data());
+        // check if all the elements in any of the four sublists have a data value that is less than the data value of the given tree
+        return streams.stream().anyMatch(s -> s.allMatch(t -> t.data() < tree.data()));
     }
 
     private int scenicScore(Grid.Tile<Integer> tree) {
