@@ -3,9 +3,6 @@ package days;
 import setup.Day;
 import util.Grid;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Day10 extends Day {
 
 
@@ -16,29 +13,31 @@ public class Day10 extends Day {
 
     @Override
     public Object part1() {
-        List<Integer> strengths  = new ArrayList<>();
-        int cycles = 1;
         int X = 1;
-        boolean wait = false;
+
+        int signalStrength = 0;
+
+        int cycles = 1;
+
+        Integer value = null;
 
         for (int i = 0; i < lines().size(); i++, cycles++) {
             if ((cycles + 20) % 40 == 0) {
-                strengths.add(cycles * X);
+                signalStrength += cycles * X;
             }
 
-            String[] args = lines().get(i).split(" ");
+            String[] tokens = lines().get(i).split(" ");
 
-            if (wait) {
-                X += Integer.parseInt(args[1]);
-                wait = false;
-            } else if (args[0].equals("addx")) {
-                wait = true;
+            if (value != null) {
+                X += value;
+                value = null;
+            } else if (tokens[0].equals("addx")) {
+                value = Integer.parseInt(tokens[1]);
                 i--;
             }
         }
 
-
-        return strengths.stream().mapToInt(Integer::intValue).sum();
+        return signalStrength;
     }
 
     @Override
@@ -90,12 +89,12 @@ public class Day10 extends Day {
     @Override
     public String partTwoSolution() {
         return """
-        
-        ###..###....##.#....####.#..#.#....###..
-        #..#.#..#....#.#....#....#..#.#....#..#.
-        ###..#..#....#.#....###..#..#.#....#..#.
-        #..#.###.....#.#....#....#..#.#....###..
-        #..#.#.#..#..#.#....#....#..#.#....#....
-        ###..#..#..##..####.#.....##..####.#....""";
+                        
+                ###..###....##.#....####.#..#.#....###..
+                #..#.#..#....#.#....#....#..#.#....#..#.
+                ###..#..#....#.#....###..#..#.#....#..#.
+                #..#.###.....#.#....#....#..#.#....###..
+                #..#.#.#..#..#.#....#....#..#.#....#....
+                ###..#..#..##..####.#.....##..####.#....""";
     }
 }
