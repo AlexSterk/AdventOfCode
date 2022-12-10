@@ -68,10 +68,8 @@ public class Day10 extends Day {
             }
         }
 
-        System.out.println(grid);
 
-
-        return null;
+        return "\n" + grid;
     }
 
     @Override
@@ -87,5 +85,17 @@ public class Day10 extends Day {
     @Override
     public String partOneSolution() {
         return "12980";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return """
+        
+        ###..###....##.#....####.#..#.#....###..
+        #..#.#..#....#.#....#....#..#.#....#..#.
+        ###..#..#....#.#....###..#..#.#....#..#.
+        #..#.###.....#.#....#....#..#.#....###..
+        #..#.#.#..#..#.#....#....#..#.#....#....
+        ###..#..#..##..####.#.....##..####.#....""";
     }
 }
