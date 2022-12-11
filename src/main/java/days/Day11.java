@@ -21,9 +21,7 @@ public class Day11 extends Day {
     public Object part1() {
         p1 = true;
         for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < monkeys.size(); j++) {
-                Monkey monkey = monkeys.get(j);
-//                System.out.println("Monkey " + j);
+            for (Monkey monkey : monkeys) {
                 monkey.turn();
             }
         }
@@ -40,9 +38,7 @@ public class Day11 extends Day {
         p1 = false;
         mod = monkeys.stream().map(m -> m.test).reduce((a, b) -> a * b).orElseThrow();
         for (int i = 0; i < 10000; i++) {
-            for (int j = 0; j < monkeys.size(); j++) {
-                Monkey monkey = monkeys.get(j);
-//                System.out.println("Monkey " + j);
+            for (Monkey monkey : monkeys) {
                 monkey.turn();
             }
         }
@@ -72,6 +68,11 @@ public class Day11 extends Day {
     @Override
     public String partOneSolution() {
         return "110264";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "23612457316";
     }
 
     private static class Monkey {
@@ -108,18 +109,17 @@ public class Day11 extends Day {
         private void turn() {
             while (!items.isEmpty()) {
                 long item = items.poll();
-//                System.out.println("Inspecting item: " + item);
+
                 item = applyOperation(item);
-//                System.out.println("New worry: " + operation + " = " + item);
+
                 if (p1) {
                     item = item / 3;
                 } else {
                     item = item % mod;
                 }
-//                System.out.println("Divided by 3 = " + item);
-//                System.out.println("Test: " + item + " % " + test + " = " + item % test);
+
                 int targetMonkey = (int) (item % test == 0 ? ifTrue : ifFalse);
-//                System.out.println("Throwing to monkey " + targetMonkey);
+
                 monkeys.get(targetMonkey).items.add(item);
                 inspected++;
             }
@@ -130,7 +130,6 @@ public class Day11 extends Day {
             String m = operation.replaceAll("old", value.toString());
 
             boolean isAdd = m.contains("+");
-
 
             return Arrays.stream(m.split(" *[*+] *")).map(Long::parseLong).reduce(isAdd ? Long::sum : (a, b) -> a * b).orElseThrow();
         }
