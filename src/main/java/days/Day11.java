@@ -10,7 +10,7 @@ public class Day11 extends Day {
 
     private static boolean p1 = true;
 
-    private static long mod;
+    private static int mod;
 
     @Override
     public void processInput() {
@@ -77,10 +77,10 @@ public class Day11 extends Day {
 
     private static class Monkey {
 
-        private final Queue<Long> items = new ArrayDeque<>();
+        private final Queue<Integer> items = new ArrayDeque<>();
         private final String operation;
 
-        private final long test, ifTrue, ifFalse;
+        private final int test, ifTrue, ifFalse;
 
         private int inspected = 0;
 
@@ -94,7 +94,7 @@ public class Day11 extends Day {
         private static Monkey parse(String input) {
             // get lines of input and trim each line
             String[] lines = input.lines().map(String::trim).skip(1).toArray(String[]::new);
-            var startingItems = Arrays.stream(lines[0].replaceAll("Starting items: ", "").split(", ")).map(Long::parseLong).toList();
+            var startingItems = Arrays.stream(lines[0].replaceAll("Starting items: ", "").split(", ")).map(Integer::parseInt).toList();
             var operation = lines[1].replaceAll("Operation: new = ", "");
             var test = Integer.parseInt(lines[2].replaceAll("Test: divisible by ", ""));
             var ifTrue = Integer.parseInt(lines[3].replaceAll("If true: throw to monkey ", ""));
@@ -118,9 +118,9 @@ public class Day11 extends Day {
                     item = item % mod;
                 }
 
-                int targetMonkey = (int) (item % test == 0 ? ifTrue : ifFalse);
+                int targetMonkey = item % test == 0 ? ifTrue : ifFalse;
 
-                monkeys.get(targetMonkey).items.add(item);
+                monkeys.get(targetMonkey).items.add((int) item);
                 inspected++;
             }
 
