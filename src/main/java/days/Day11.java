@@ -8,6 +8,10 @@ public class Day11 extends Day {
 
     private static List<Monkey> monkeys;
 
+    private static boolean p1 = true;
+
+    private static long mod;
+
     @Override
     public void processInput() {
         monkeys = Arrays.stream(input.split("(\r?\n){2}")).map(Monkey::parse).toList();
@@ -15,6 +19,7 @@ public class Day11 extends Day {
 
     @Override
     public Object part1() {
+        p1 = true;
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < monkeys.size(); j++) {
                 Monkey monkey = monkeys.get(j);
@@ -32,7 +37,26 @@ public class Day11 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        p1 = false;
+        mod = monkeys.stream().map(m -> m.test).reduce((a, b) -> a * b).orElseThrow();
+        for (int i = 0; i < 10000; i++) {
+            for (int j = 0; j < monkeys.size(); j++) {
+                Monkey monkey = monkeys.get(j);
+//                System.out.println("Monkey " + j);
+                monkey.turn();
+            }
+        }
+
+        List<Integer> integers = new ArrayList<>(monkeys.stream().map(m -> m.inspected).sorted().toList());
+        Collections.reverse(integers);
+
+        System.out.println(integers);
+        return (long) integers.get(0) * (long) integers.get(1);
+    }
+
+    @Override
+    public boolean resetForPartTwo() {
+        return true;
     }
 
     @Override
@@ -52,10 +76,10 @@ public class Day11 extends Day {
 
     private static class Monkey {
 
-        private final Queue<Integer> items = new ArrayDeque<>();
+        private final Queue<Long> items = new ArrayDeque<>();
         private final String operation;
 
-        private final int test, ifTrue, ifFalse;
+        private final long test, ifTrue, ifFalse;
 
         private int inspected = 0;
 
@@ -69,7 +93,7 @@ public class Day11 extends Day {
         private static Monkey parse(String input) {
             // get lines of input and trim each line
             String[] lines = input.lines().map(String::trim).skip(1).toArray(String[]::new);
-            var startingItems = Arrays.stream(lines[0].replaceAll("Starting items: ", "").split(", ")).map(Integer::parseInt).toList();
+            var startingItems = Arrays.stream(lines[0].replaceAll("Starting items: ", "").split(", ")).map(Long::parseLong).toList();
             var operation = lines[1].replaceAll("Operation: new = ", "");
             var test = Integer.parseInt(lines[2].replaceAll("Test: divisible by ", ""));
             var ifTrue = Integer.parseInt(lines[3].replaceAll("If true: throw to monkey ", ""));
@@ -83,14 +107,18 @@ public class Day11 extends Day {
 
         private void turn() {
             while (!items.isEmpty()) {
-                int item = items.poll();
+                long item = items.poll();
 //                System.out.println("Inspecting item: " + item);
                 item = applyOperation(item);
 //                System.out.println("New worry: " + operation + " = " + item);
-                item = item / 3;
+                if (p1) {
+                    item = item / 3;
+                } else {
+                    item = item % mod;
+                }
 //                System.out.println("Divided by 3 = " + item);
 //                System.out.println("Test: " + item + " % " + test + " = " + item % test);
-                int targetMonkey = item % test == 0 ? ifTrue : ifFalse;
+                int targetMonkey = (int) (item % test == 0 ? ifTrue : ifFalse);
 //                System.out.println("Throwing to monkey " + targetMonkey);
                 monkeys.get(targetMonkey).items.add(item);
                 inspected++;
@@ -98,13 +126,13 @@ public class Day11 extends Day {
 
         }
 
-        private int applyOperation(Integer value) {
+        private long applyOperation(Long value) {
             String m = operation.replaceAll("old", value.toString());
 
             boolean isAdd = m.contains("+");
 
 
-            return Arrays.stream(m.split(" *[*+] *")).map(Integer::parseInt).reduce(isAdd ? Integer::sum : (a, b) -> a * b).orElseThrow();
+            return Arrays.stream(m.split(" *[*+] *")).map(Long::parseLong).reduce(isAdd ? Long::sum : (a, b) -> a * b).orElseThrow();
         }
 
         @Override
