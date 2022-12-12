@@ -52,7 +52,7 @@ public class Day12 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        return graph.nodes().stream().filter(n -> n.data().s.equals("a")).map(n -> graph.getDistance(n, end)).min(Integer::compareTo).get();
     }
 
     @Override
@@ -68,6 +68,11 @@ public class Day12 extends Day {
     @Override
     public String partOneSolution() {
         return "472";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "465";
     }
 
     private record WeightedString(String s) implements Grid.Weighted {
