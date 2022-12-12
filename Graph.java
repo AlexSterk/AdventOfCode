@@ -34,6 +34,11 @@ public final class Graph<T> {
         if (!directional) addEdge(to, from, weight, true);
     }
 
+    public void removeEdge(T from, T to, boolean directional) {
+        nodes.get(from).remove(to);
+        if (!directional) removeEdge(to, from, true);
+    }
+
     public void addEdge(T from, T to, int weight) {
         addEdge(from, to, weight, false);
     }
