@@ -31,11 +31,10 @@ public class Day13 extends Day {
             CList left = packet.get(0);
             CList right = packet.get(1);
 
-            if (Objects.equals(correctOrder(left, right), true)) {
+            if (left.compareTo(right) < 0) {
                 sum += i+1;
             }
         }
-
 
         return sum;
     }
@@ -93,7 +92,7 @@ public class Day13 extends Day {
         return "5882";
     }
 
-    private interface CVal {
+    private interface CVal extends Comparable<CVal> {
         private static CVal parse(String s) {
             if (s.startsWith("[")) {
                 return CList.parse(s);
@@ -110,9 +109,16 @@ public class Day13 extends Day {
 
         @Override
         public String toString() {
-            return "CNum{" +
-                    "n=" + n +
-                    '}';
+            return Integer.toString(n);
+        }
+
+        @Override
+        public int compareTo(CVal o) {
+            if (o instanceof CNum cNum) {
+                return Integer.compare(n, cNum.n);
+            } else {
+                return new CList(List.of(this)).compareTo(o);
+            }
         }
     }
 
@@ -149,9 +155,38 @@ public class Day13 extends Day {
 
         @Override
         public String toString() {
-            return "CList{" +
-                    "items=" + items +
-                    '}';
+            return items.toString();
+        }
+
+        @Override
+        public int compareTo(CVal o) {
+            if (o instanceof CNum cNum) {
+                return this.compareTo(new CList(List.of(cNum)));
+            }
+
+            if (o == null) {
+                return -1;
+            }
+
+            Queue<CVal> leftItems = new ArrayDeque<>(this.items);
+            Queue<CVal> rightItems = new ArrayDeque<>(((CList) o).items);
+
+            int compare = 0;
+            while (compare == 0 && !leftItems.isEmpty() && !rightItems.isEmpty()) {
+                compare = leftItems.poll().compareTo(rightItems.poll());
+            }
+
+            if (compare == 0) {
+                if (leftItems.isEmpty() && rightItems.isEmpty()) {
+                    return 0;
+                } else if (leftItems.isEmpty()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+
+            return compare;
         }
     }
 }
