@@ -7,17 +7,18 @@ import java.util.*;
 public class Day13 extends Day {
 
     private List<List<CList>> packets;
+    private List<CList> cLists;
 
     @Override
     public void processInput() {
-        List<CList> CLists = lines().stream().filter(s -> s.length() > 0).map(CVal::parse).map(c -> (CList) c).toList();
+        cLists = lines().stream().filter(s -> s.length() > 0).map(CVal::parse).map(c -> (CList) c).toList();
 
         // group Clists in groups of 2
         packets = new ArrayList<>();
-        for (int i = 0; i < CLists.size(); i += 2) {
+        for (int i = 0; i < cLists.size(); i += 2) {
             List<CList> group = new ArrayList<>();
-            group.add(CLists.get(i));
-            group.add(CLists.get(i + 1));
+            group.add(cLists.get(i));
+            group.add(cLists.get(i + 1));
             packets.add(group);
         }
     }
@@ -74,7 +75,16 @@ public class Day13 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        CList div1 = new CList(List.of(new CList(List.of(new CNum(2)))));
+        CList div2 = new CList(List.of(new CList(List.of(new CNum(6)))));
+        var packets = new ArrayList<>(cLists);
+
+        packets.add(div1);
+        packets.add(div2);
+
+        Collections.sort(packets);
+
+        return (packets.indexOf(div1) + 1) * (packets.indexOf(div2) + 1);
     }
 
     @Override
@@ -90,6 +100,11 @@ public class Day13 extends Day {
     @Override
     public String partOneSolution() {
         return "5882";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "24948";
     }
 
     private interface CVal extends Comparable<CVal> {
