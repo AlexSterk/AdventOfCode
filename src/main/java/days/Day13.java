@@ -11,7 +11,7 @@ public class Day13 extends Day {
 
     @Override
     public void processInput() {
-        cLists = lines().stream().filter(s -> s.length() > 0).map(CVal::parse).map(c -> (CList) c).toList();
+        cLists = lines().stream().filter(s -> s.length() > 0).map(CList::parse).toList();
 
         // group Clists in groups of 2
         packets = new ArrayList<>();
@@ -33,44 +33,11 @@ public class Day13 extends Day {
             CList right = packet.get(1);
 
             if (left.compareTo(right) < 0) {
-                sum += i+1;
+                sum += i + 1;
             }
         }
 
         return sum;
-    }
-
-    private Boolean correctOrder(CVal left, CVal right) {
-        if (left instanceof CNum leftNum && right instanceof CNum rightNum) {
-            if (leftNum.n < rightNum.n) {
-                return true;
-            } else if (leftNum.n > rightNum.n) {
-                return false;
-            }
-            return null;
-        }
-        if (left instanceof CList leftList && right instanceof CList rightList) {
-            Queue<CVal> leftItems = new ArrayDeque<>(leftList.items);
-            Queue<CVal> rightItems = new ArrayDeque<>(rightList.items);
-
-            Boolean compare = null;
-
-            while (compare == null && !leftItems.isEmpty() && !rightItems.isEmpty()) {
-                compare = correctOrder(leftItems.poll(), rightItems.poll());
-            }
-
-            if (compare == null) {
-                if (leftItems.isEmpty() && rightItems.isEmpty()) {
-                    return null;
-                } else return leftItems.isEmpty();
-            }
-
-            return compare;
-        } else if (left instanceof CNum) {
-            return correctOrder(new CList(List.of(left)), right);
-        } else {
-            return correctOrder(left, new CList(List.of(right)));
-        }
     }
 
     @Override
@@ -188,7 +155,10 @@ public class Day13 extends Day {
 
             int compare = 0;
             while (compare == 0 && !leftItems.isEmpty() && !rightItems.isEmpty()) {
-                compare = leftItems.poll().compareTo(rightItems.poll());
+                CVal left = leftItems.poll();
+                CVal right = rightItems.poll();
+                //noinspection ConstantConditions
+                compare = left.compareTo(right);
             }
 
             if (compare == 0) {
