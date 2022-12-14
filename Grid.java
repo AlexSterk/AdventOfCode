@@ -77,6 +77,14 @@ public class Grid<T> {
         }
     }
 
+    public void fill(T data) {
+        init(() -> data, true);
+    }
+
+    public void print() {
+        System.out.println(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
