@@ -119,5 +119,9 @@ public record Line(Point a, Point b) {
         public Point rotateRight() {
             return new Point(-y(), x());
         }
+
+        public int manhattanDistance(Point o) {
+            return Math.abs(x() - o.x()) + Math.abs(y() - o.y());
+        }
     }
 }
