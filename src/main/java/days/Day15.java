@@ -45,21 +45,21 @@ public class Day15 extends Day {
         int y = isTest() ? 10 : 2000000;
 
         int minX, maxX;
-        minX  = Integer.MAX_VALUE;
-        maxX  = Integer.MIN_VALUE;
-
+//        minX  = Integer.MAX_VALUE;
+//        maxX  = Integer.MIN_VALUE;
+//
+//
+//        for (Point sensor : sensors) {
+//            int closest = beacons.stream().map(sensor::manhattanDistance).min(Integer::compareTo).get();
+//
+//            minX = Math.min(minX, sensor.x() - closest);
+//            maxX = Math.max(maxX, sensor.x() + closest);
+//
+//        }
 
         for (Point sensor : sensors) {
             int closest = beacons.stream().map(sensor::manhattanDistance).min(Integer::compareTo).get();
-
-            minX = Math.min(minX, sensor.x() - closest);
-            maxX = Math.max(maxX, sensor.x() + closest);
-
-        }
-
-        for (Point sensor : sensors) {
-            int closest = beacons.stream().map(sensor::manhattanDistance).min(Integer::compareTo).get();
-            IntStream.rangeClosed(minX, maxX)
+            IntStream.rangeClosed(sensor.x() - closest, sensor.x() + closest)
                     .mapToObj(x -> new Point(x, y))
                     .filter(p -> !beacons.contains(p))
                     .filter(p -> p.manhattanDistance(sensor) <= closest)
