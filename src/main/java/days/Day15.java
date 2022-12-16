@@ -1,15 +1,12 @@
 package days;
 
 import setup.Day;
-import util.Line;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 import static util.Line.Point;
 
@@ -41,69 +38,40 @@ public class Day15 extends Day {
 
     @Override
     public Object part1() {
-        Set<Point> cannotContainBeacon = new HashSet<>();
         int y = isTest() ? 10 : 2000000;
 
+        // This solution assumes that there is no free spot on line y. So not a general case/solution
+        int maxX = sensors.stream().map(s -> s.x() - Math.abs(y - s.y()) + s.distance()).max(Integer::compareTo).get();
+        int minX = sensors.stream().map(s -> s.x() + Math.abs(y - s.y()) - s.distance()).min(Integer::compareTo).get();
 
-        List<Point> beacons = sensors.stream().map(Sensor::beacon).toList();
-        for (Sensor sensor : sensors) {
-            IntStream.rangeClosed(sensor.x() - sensor.distance(), sensor.x() + sensor.distance())
-                    .mapToObj(x -> new Point(x, y))
-                    .filter(o -> !beacons.contains(o))
-                    .filter(p -> p.manhattanDistance(sensor.sensor()) <= sensor.distance())
-                    .forEach(cannotContainBeacon::add);
-        }
-
-
-        return cannotContainBeacon.size();
+        return maxX - minX;
     }
 
     @Override
     public Object part2() {
-        Set<Point> possiblePoints = new HashSet<>();
-        Set<Point> visited = new HashSet<>();
+        long limit = 4000000;
+
+        Set<Integer> A = new HashSet<>();
+        Set<Integer> B = new HashSet<>();
 
         for (Sensor sensor : sensors) {
+            A.add(sensor.y() - sensor.x() + sensor.distance() + 1);
+            A.add(sensor.y() - sensor.x() - sensor.distance() - 1);
+            B.add(sensor.x() + sensor.y() + sensor.distance() + 1);
+            B.add(sensor.x() + sensor.y() - sensor.distance() - 1);
+        }
 
-//
-            int minX = sensor.x() - sensor.distance() - 1;
-            int maxX = sensor.x() + sensor.distance() + 1;
-            int minY = sensor.y() - sensor.distance() - 1;
-            int maxY = sensor.y() + sensor.distance() + 1;
-//
-            Line topLeft = new Line(minX, sensor.y(), sensor.x(), minY);
-            Line topRight = new Line(sensor.x(), minY, maxX, sensor.y());
-            Line botRight = new Line(sensor.x(), maxY, minX, sensor.y());
-            Line botLeft = new Line(maxX, sensor.y(), sensor.x(), maxY);
-
-            for (Line line : List.of(topLeft, topRight, botRight, botLeft)) {
-                System.out.println(line.expand());
-                for (Point p : line.expand()) {
-                    if (p.x() >= 0 && p.x() <= 4000000 && p.y() >= 0 && p.y() <= 4000000) {
-                        if (visited.contains(p)) {
-                            possiblePoints.remove(p);
-                        } else {
-                            possiblePoints.add(p);
-                            visited.add(p);
-                        }
+        for (Integer a : A) {
+            for (Integer b : B) {
+                Point p = new Point((b-a) / 2, (a + b) / 2);
+                if (0 < p.x() && p.x() < limit && 0 < p.y() && p.y() < limit) {
+                    if (sensors.stream().allMatch(s -> s.sensor.manhattanDistance(p) > s.distance())) {
+                        return p.x() * limit + p.y();
                     }
                 }
             }
-
-
         }
 
-        System.out.println(possiblePoints.size());
-
-//        System.out.println(possiblePoints.entrySet().stream().limit(10).toList());
-
-//        System.out.println(possiblePoints.entrySet().stream().filter(e -> e.getValue() == 1).count());
-//        List<Point> points = possiblePoints.entrySet().stream().filter(e -> e.getValue() == 1).map(Map.Entry::getKey).toList();
-//        System.out.println(points);
-//        long x = points.get(0).x();
-//        long y = points.get(0).y();
-//
-//        return x * 4000000 + y;
 
         return null;
     }
@@ -115,7 +83,7 @@ public class Day15 extends Day {
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
     @Override
