@@ -2,14 +2,45 @@ package days;
 
 import setup.Day;
 import util.Grid;
+import util.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Day17 extends Day {
 
+    private static final boolean[][] LINE_SHAPE = new boolean[][]{
+            {true, true, true, true}
+    };
+    private static final boolean[][] PLUS_SHAPE = new boolean[][]{
+            {false, true, false},
+            {true, true, true},
+            {false, true, false}
+    };
+    private static final boolean[][] L_SHAPE = new boolean[][]{
+            {false, false, true},
+            {false, false, true},
+            {true, true, true}
+    };
+    private static final boolean[][] I_SHAPE = new boolean[][]{
+            {true},
+            {true},
+            {true},
+            {true}
+    };
+    private static final boolean[][] BLOCK_SHAPE = new boolean[][]{
+            {true, true},
+            {true, true}
+    };
+    private static final List<boolean[][]> SHAPES = List.of(LINE_SHAPE, PLUS_SHAPE, L_SHAPE, I_SHAPE, BLOCK_SHAPE);
+    private final String input = super.input.trim();
+    private final Map<State, Pair<Integer, Integer>> seen = new HashMap<>();
     private Grid<Character> grid;
+    private int instructionIndex = 0;
+    private int minY;
+    private int floorY;
 
     @Override
     public void processInput() {
@@ -19,77 +50,50 @@ public class Day17 extends Day {
     @Override
     public Object part1() {
         int loop = 2022;
-//        loop = 4;
         int maxHeight = 4 * loop + 1;
+
         grid = new Grid<>(7, maxHeight, () -> '.');
         grid.fill('.');
-
-        int floorY = maxHeight - 1;
+        floorY = maxHeight - 1;
         grid.getRow(floorY).forEach(t -> grid.set(t, '-'));
-
-//        System.out.println(grid);
-
-        int minY = floorY;
+        minY = floorY;
 
         for (int i = 0; i < loop; i++) {
-            boolean[][] shape = SHAPES.get(i % SHAPES.size());
-            Rock currentRock = new Rock(2, minY - shape.length - 3, shape);
-
-
-
-            while (true) {
-//                if (i == 431) {
-//                    currentRock.drawFalling();
-//                    grid.subgrid(0, grid.width, minY - 8, minY + 4).print();
-//                    System.out.println("====================================");
-//                    currentRock.clearDrawing();
-//                }
-
-                jetRock(currentRock);
-                if (currentRock.canMoveDown()) {
-                    currentRock.moveDown();
-                } else {
-                    currentRock.place();
-                    minY = Math.min(minY, currentRock.y);
-                    break;
-                }
-            }
-
-//            System.out.println((floorY - minY) );
-//            grid.print();
+            minY = simulateRock(minY, i);
         }
 
-//        grid.print();
         return floorY - minY;
-
-//        return null;
     }
 
-    private int instructionIndex = 0;
-    private final String input = super.input.trim();
+    private int simulateRock(int minY, long i) {
+        boolean[][] shape = SHAPES.get(Math.toIntExact(i % SHAPES.size()));
+        Rock currentRock = new Rock(2, minY - shape.length - 3, shape);
+
+        while (true) {
+            jetRock(currentRock);
+            if (currentRock.canMoveDown()) {
+                currentRock.moveDown();
+            } else {
+                currentRock.place();
+                minY = Math.min(minY, currentRock.y);
+                break;
+            }
+        }
+
+        return minY;
+    }
 
     private void jetRock(Rock rock) {
-//        System.out.println(input.substring(0, instructionIndex + 1));
         char c = input.charAt(instructionIndex++);
         instructionIndex %= input.length();
 
         if (c == '>') {
             if (rock.x + rock.width() < grid.width && rock.canMoveRight()) {
-//                System.out.println("Moving right");
-//                System.out.println(Arrays.deepToString(rock.shape));
-//                rock.clearDrawing();
                 rock.x++;
-            } else {
-//                System.out.println("Can't move right");
             }
         } else if (c == '<') {
             if (rock.x - 1 >= 0 && rock.canMoveLeft()) {
-//                System.out.println("Moving left");
-//                System.out.println(Arrays.deepToString(rock.shape));
-//                rock.clearDrawing();
                 rock.x--;
-            } else {
-//                System.out.println("Can't move left");
             }
         } else {
             throw new RuntimeException("Unknown instruction: " + c);
@@ -99,7 +103,37 @@ public class Day17 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        long limit = 1_000_000_000_000L;
+        int maxHeight = 4 * 10000 + 1;
+        long offset = 0;
+
+        instructionIndex = 0;
+        grid = new Grid<>(7, maxHeight, () -> '.');
+        grid.fill('.');
+        floorY = maxHeight - 1;
+        grid.getRow(floorY).forEach(t -> grid.set(t, '-'));
+        minY = floorY;
+
+        for (long i = 0; i < limit; i++) {
+            minY = simulateRock(minY, i);
+
+            if (i >= 2022 && offset == 0) {
+                String gridState = grid.subgrid(0, grid.width, minY, minY + 30).toString();
+                State state = new State(instructionIndex, (int) (i % SHAPES.size()), gridState);
+                if (seen.containsKey(state)) {
+                    var old = seen.get(state);
+                    long di = i - old.a();
+                    int dy = minY - old.b();
+                    long remaining = limit - i;
+                    long loops = remaining / di;
+                    i += loops * di;
+                    offset += loops * dy;
+                }
+                seen.put(state, new Pair<>((int) i, minY));
+            }
+        }
+
+        return floorY - minY - offset;
     }
 
     @Override
@@ -112,40 +146,28 @@ public class Day17 extends Day {
         return false;
     }
 
-    private static final boolean[][] LINE_SHAPE = new boolean[][] {
-            {true, true, true, true}
-    };
+    @Override
+    public String partOneSolution() {
+        return "3197";
+    }
 
-    private static final boolean[][] PLUS_SHAPE = new boolean[][] {
-        {false, true, false},
-        {true, true, true},
-        {false, true, false}
-    };
+    @Override
+    public String partTwoSolution() {
+        return "1568513119571";
+    }
 
-    private static final boolean[][] L_SHAPE = new boolean[][] {
-        {false, false, true},
-        {false, false, true},
-        {true, true, true}
-    };
-
-    private static final boolean[][] I_SHAPE = new boolean[][] {
-        {true},
-        {true},
-        {true},
-        {true}
-    };
-
-    private static final boolean[][] BLOCK_SHAPE = new boolean[][] {
-        {true, true},
-        {true, true}
-    };
-
-    private static final List<boolean[][]> SHAPES = List.of(LINE_SHAPE, PLUS_SHAPE, L_SHAPE, I_SHAPE, BLOCK_SHAPE);
-
+    private record State(int inputIndex, int rockIndex, String gridState) {
+    }
 
     private class Rock {
         int x, y;
         boolean[][] shape;
+
+        Rock(int x, int y, boolean[][] shape) {
+            this.x = x;
+            this.y = y;
+            this.shape = shape;
+        }
 
         int width() {
             return shape[0].length;
@@ -153,12 +175,6 @@ public class Day17 extends Day {
 
         int height() {
             return shape.length;
-        }
-
-        Rock(int x, int y, boolean[][] shape) {
-            this.x = x;
-            this.y = y;
-            this.shape = shape;
         }
 
         public List<Grid.Tile<Character>> getTiles() {
