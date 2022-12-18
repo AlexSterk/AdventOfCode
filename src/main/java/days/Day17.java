@@ -159,6 +159,7 @@ public class Day17 extends Day {
     private record State(int inputIndex, int rockIndex, String gridState) {
     }
 
+    @SuppressWarnings("DataFlowIssue")
     private class Rock {
         int x, y;
         boolean[][] shape;
@@ -191,7 +192,7 @@ public class Day17 extends Day {
             return List.copyOf(t);
         }
 
-        public void drawFalling() {
+        private void drawFalling() {
             for (int _y = 0; _y < height(); _y++) {
                 for (int _x = 0; _x < width(); _x++) {
                     if (shape[_y][_x]) grid.set(x + _x, y + _y, '@');
@@ -199,12 +200,18 @@ public class Day17 extends Day {
             }
         }
 
-        public void clearDrawing() {
+        private void clearDrawing() {
             for (int _y = 0; _y < height(); _y++) {
                 for (int _x = 0; _x < width(); _x++) {
                     if (shape[_y][_x]) grid.set(x + _x, y + _y, '.');
                 }
             }
+        }
+
+        public void debugDraw() {
+            drawFalling();
+            grid.subgrid(0, grid.width - 1, y - 1, Math.min(y + 10, floorY)).print();
+            clearDrawing();
         }
 
         public boolean canMoveDown() {
@@ -220,9 +227,7 @@ public class Day17 extends Day {
         }
 
         public void moveDown() {
-
             y++;
-
         }
 
         public void place() {
