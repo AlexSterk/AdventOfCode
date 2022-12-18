@@ -17,7 +17,18 @@ public class Day18 extends Day {
 
     @Override
     public Object part1() {
-        return points.stream().map(p -> p.neighbours().stream().filter(points::contains).toList()).mapToInt(n -> 6 - n.size()).sum();
+        int sum = 0;
+        for (Point p : points) {
+            List<Point> n = new ArrayList<>();
+            for (Point point : p.neighbours()) {
+                if (points.contains(point)) {
+                    n.add(point);
+                }
+            }
+            int i = 6 - n.size();
+            sum += i;
+        }
+        return sum;
     }
 
     @Override
