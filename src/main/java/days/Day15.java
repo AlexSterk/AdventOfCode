@@ -91,6 +91,11 @@ public class Day15 extends Day {
         return "4725496";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "12051287042458";
+    }
+
     private record Sensor(Point sensor, Point beacon) {
         public Sensor(int x, int y, int x2, int y2) {
             this(new Point(x, y), new Point(x2, y2));
