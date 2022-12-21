@@ -2,6 +2,9 @@ package days;
 
 import setup.Day;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.regex.MatchResult;
@@ -54,7 +57,7 @@ public class Day21 extends Day {
     @Override
     public Object part2() {
         Monkey root = monkeys.get("root");
-        root.equation = root.equation.replaceAll("[-+*/]", "=");
+        root.equation = root.equation.replaceAll("[-+*/]", "-");
         monkeys.remove("humn");
 
         var toCheck = new HashSet<>(monkeys.values());
@@ -70,10 +73,37 @@ public class Day21 extends Day {
 
         // substitute equations, starting with root
         var test = substitute(root.equation).replaceAll("humn", "x");
-        System.out.println("Paste the following equation into https://www.mathpapa.com/equation-solver/");
-        System.out.println(test);
 
-        return null;
+        // binary search to find X
+        return binarySearch(0L, 1_000_000_000_000_000L, test);
+    }
+
+    private long tryEval(String equation) {
+        try {
+            var p = new ProcessBuilder("python", "-c", "print(eval('%s'))".formatted(equation)).start();
+            return Long.parseLong(getProcessOutput(p).replaceAll("\\..*", ""));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private long binarySearch(long min, long max, String equation) {
+        if (min == max) {
+            return min;
+        }
+        long mid = (min + max) / 2;
+        long result = tryEval(equation.replaceAll("x", String.valueOf(mid)));
+        if (result == 0) {
+            return mid;
+        } else if (result > 0) {
+            return binarySearch(mid + 1, max, equation);
+        } else {
+            return binarySearch(min, mid - 1, equation);
+        }
+    }
+
+    private String getProcessOutput(Process p) {
+        return new BufferedReader(new InputStreamReader(p.getInputStream())).lines().collect(Collectors.joining());
     }
 
     private String substitute(String equation) {
@@ -82,7 +112,7 @@ public class Day21 extends Day {
         for (MatchResult m : pattern.matcher(equation).results().toList()) {
             String s = m.group();
             if (monkeys.containsKey(s)) {
-                equation = equation.replace(s,"(%s)".formatted(substitute(monkeys.get(s).equation)));
+                equation = equation.replace(s, "(%s)".formatted(substitute(monkeys.get(s).equation)));
             }
         }
 
@@ -103,6 +133,12 @@ public class Day21 extends Day {
     public String partOneSolution() {
         return "66174565793494";
     }
+
+    // cant run python on github actions
+//    @Override
+//    public String partTwoSolution() {
+//        return "3327575724809";
+//    }
 
     @Override
     public boolean resetForPartTwo() {
@@ -144,7 +180,7 @@ public class Day21 extends Day {
                     case "-" -> a - b;
                     case "*" -> a * b;
                     case "/" -> a / b;
-                    case "=" -> a == b ? 1 : 0;
+//                    case "==" -> a == b ? 1 : 0;
                     default -> 0;
                 };
                 equation = String.valueOf(result);
