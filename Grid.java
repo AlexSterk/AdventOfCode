@@ -37,7 +37,7 @@ public class Grid<T> {
     }
 
     public static Grid<String> parseGrid(String s) {
-        String[][] grid = s.lines().map(String::trim).filter(l -> !l.isEmpty()).map(l -> l.split("")).toArray(String[][]::new);
+        String[][] grid = s.lines().map(s1 -> s1.replaceAll("[\r\n]", "")).filter(l -> !l.isEmpty()).map(l -> l.split("")).toArray(String[][]::new);
         return new Grid<>(grid);
     }
 
