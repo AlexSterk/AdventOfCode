@@ -55,8 +55,6 @@ public class Day5 extends Day {
 
     @Override
     public Object part2() {
-        System.out.println(towers);
-
         for (Instruction ins : instructions) {
             Stack<String> temp = new Stack<>();
             for (int i = 0; i < ins.amount; i++) {

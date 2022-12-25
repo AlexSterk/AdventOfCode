@@ -106,15 +106,6 @@ public class Day24 extends Day {
             return (a % b + b) % b;
         }
 
-        public static void main(String[] args) {
-            Day24.maxX = 5;
-            Day24.maxY = 5;
-            var blizzard = new Blizzard(new Point(2, 3), Direction.W);
-            for (int i = 0; i < 10; i++) {
-                System.out.println(blizzard.positionAtTime(i));
-            }
-        }
-
         private Point positionAtTime(int t) {
             return new Point(1 + modulo(position.x() - 1 + facing.dx * t, maxX - 1), 1 + modulo(position.y() - 1 + facing.dy * t, maxY - 1));
         }

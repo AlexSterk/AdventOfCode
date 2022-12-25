@@ -28,7 +28,6 @@ public class Day6 extends Day {
             }
             queue.add(c);
             if (queue.size() == targetSize) {
-                System.out.println(queue);
                 return i + 1;
             }
         }

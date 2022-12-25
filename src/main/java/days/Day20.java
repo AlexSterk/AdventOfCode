@@ -41,9 +41,6 @@ public class Day20 extends Day {
             }
             list.remove(i);
             list.add(i + n.value, n);
-            if (isTest()) {
-                System.out.println(n + " " + list);
-            }
         }
         return zero;
     }

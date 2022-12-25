@@ -32,7 +32,6 @@ public class RegressionTest {
                 .map(s -> s.replaceFirst("\\.java", ""))
                 .toList();
         CI = System.getenv("CI") != null;
-        System.out.println(CI);
     }
 
     public static Stream<Arguments> daysToTest() {

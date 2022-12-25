@@ -46,7 +46,6 @@ public class Day11 extends Day {
         List<Integer> integers = new ArrayList<>(monkeys.stream().map(m -> m.inspected).sorted().toList());
         Collections.reverse(integers);
 
-        System.out.println(integers);
         return (long) integers.get(0) * (long) integers.get(1);
     }
 

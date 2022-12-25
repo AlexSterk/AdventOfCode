@@ -32,8 +32,6 @@ public class Day22 extends Day {
         var current = grid.getRow(0).stream().filter(s -> s.data().equals(".")).findFirst().get();
         Direction dir = Direction.EAST;
 
-        System.out.println(grid);
-
         for (String instruction : instructions) {
             if (instruction.equals("L")) {
                 dir = dir.turnLeft();
