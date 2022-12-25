@@ -214,6 +214,9 @@ public class Grid<T> {
         }).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
+    /**
+     * Rotates the grid 90 degrees clockwise
+     */
     public Grid<T> rotate() {
         Grid<T> grid = new Grid<>(height, width);
 
