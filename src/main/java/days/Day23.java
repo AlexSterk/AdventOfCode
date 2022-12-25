@@ -11,15 +11,15 @@ import java.util.stream.Stream;
 
 public class Day23 extends Day {
 
-    private final Grid.InfiniteGrid<Tile> grid = new Grid.InfiniteGrid<>(() -> Tile.EMPTY);
+    private Grid.InfiniteGrid<Tile> grid;
     private List<Elf> elves;
 
     @Override
     public void processInput() {
         Grid<String> stringGrid = Grid.parseGrid(input);
+        grid = new Grid.InfiniteGrid<>(() -> Tile.EMPTY);
         stringGrid.getAll().forEach((tile) -> grid.set(tile.x() + 1000, tile.y() + 1000, tile.data().equals("#") ? Tile.ELF : Tile.EMPTY));
         elves = grid.getAll().stream().filter(tile -> tile.data() == Tile.ELF).map(Elf::new).toList();
-
     }
 
     @Override
@@ -43,6 +43,16 @@ public class Day23 extends Day {
     }
 
     @Override
+    public String partOneSolution() {
+        return "3788";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "921";
+    }
+
+    @Override
     public Object part2() {
         int i = 1;
         do {
@@ -51,6 +61,17 @@ public class Day23 extends Day {
         } while (!elves.stream().allMatch(Elf::allNeighboursEmpty));
 
         return i;
+    }
+
+    private void debugPrintSmallestPossibleGrind() {
+        var minX = elves.stream().mapToInt(e -> e.position.x()).min().orElseThrow();
+        var maxX = elves.stream().mapToInt(e -> e.position.x()).max().orElseThrow();
+        var minY = elves.stream().mapToInt(e -> e.position.y()).min().orElseThrow();
+        var maxY = elves.stream().mapToInt(e -> e.position.y()).max().orElseThrow();
+
+        Grid.InfiniteGrid<Tile> subgrid = grid.subgrid(minX, maxX, minY, maxY);
+
+        subgrid.print();
     }
 
     private void simulateRound() {
