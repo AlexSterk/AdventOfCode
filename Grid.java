@@ -107,6 +107,7 @@ public class Grid<T> {
     }
 
     public Tile<T> getTile(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return null;
         Tile<T> tTile = _getTile(x, y);
         if (tTile == null && empty != null) {
             Tile<T> t = new Tile<>(x, y, empty.get(), this);
@@ -261,19 +262,19 @@ public class Grid<T> {
     public record Tile<T>(int x, int y, T data, Grid<T> grid) {
 
         public Tile<T> up() {
-            return y - 1 >= 0 ? grid.getTile(x, y - 1) : null;
+            return  grid.getTile(x, y - 1);
         }
 
         public Tile<T> down() {
-            return y + 1 < grid.height ? grid.getTile(x, y + 1) : null;
+            return grid.getTile(x, y + 1) ;
         }
 
         public Tile<T> left() {
-            return x - 1 >= 0 ? grid.getTile(x - 1, y) : null;
+            return grid.getTile(x - 1, y);
         }
 
         public Tile<T> right() {
-            return x + 1 < grid.width ? grid.getTile(x + 1, y) : null;
+            return  grid.getTile(x + 1, y);
         }
 
         @Override
