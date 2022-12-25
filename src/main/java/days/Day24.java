@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import util.Direction;
 import util.Line.Point;
 
 import java.util.*;
@@ -58,8 +59,8 @@ public class Day24 extends Day {
             Set<Point> blocked = blizzards.stream().map(b -> b.positionAtTime(finalT)).collect(Collectors.toSet());
             while (!positions.isEmpty()) {
                 var point = positions.poll();
-                for (Direction value : Direction.values()) {
-                    var next = point.add(new Point(value.x, value.y));
+                for (Direction value : Direction.CARDINAL) {
+                    var next = point.add(new Point(value.dx, value.dy));
                     if (next.equals(end)) {
                         return t;
                     }
@@ -98,20 +99,7 @@ public class Day24 extends Day {
         return false;
     }
 
-    private enum Direction {
-        N(0, -1),
-        S(0, 1),
-        E(1, 0),
-        W(-1, 0);
 
-        private final int x;
-        private final int y;
-
-        Direction(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
 
     private record Blizzard(Point position, Direction facing) {
         private static int modulo(int a, int b) {
@@ -128,7 +116,7 @@ public class Day24 extends Day {
         }
 
         private Point positionAtTime(int t) {
-            return new Point(1 + modulo(position.x() - 1 + facing.x * t, maxX - 1), 1 + modulo(position.y() - 1 + facing.y * t, maxY - 1));
+            return new Point(1 + modulo(position.x() - 1 + facing.dx * t, maxX - 1), 1 + modulo(position.y() - 1 + facing.dy * t, maxY - 1));
         }
     }
 }

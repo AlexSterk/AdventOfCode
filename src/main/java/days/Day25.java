@@ -64,8 +64,13 @@ public class Day25 extends Day {
     }
 
     @Override
+    public String partTwoSolution() {
+        return "true";
+    }
+
+    @Override
     public Object part2() {
-        return null;
+        return true;
     }
 
     @Override

@@ -3,6 +3,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import setup.Day;
+import util.SkipCI;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -19,6 +20,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class RegressionTest {
 
     private static List<String> days;
+    private static boolean CI;
+
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -28,6 +31,8 @@ public class RegressionTest {
                 .filter(s -> s.endsWith(".java"))
                 .map(s -> s.replaceFirst("\\.java", ""))
                 .toList();
+        CI = System.getenv("CI") != null;
+        System.out.println(CI);
     }
 
     public static Stream<Arguments> daysToTest() {
@@ -41,16 +46,25 @@ public class RegressionTest {
     @MethodSource("daysToTest")
     public void testPartOne(String d) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         assumeFalse(d.isEmpty());
-        Day day = getDay(d);
+        Day day = getDay(d, 1);
         assumeTrue(day.partOneSolution() != null);
         day.processInput();
         assertEquals(day.partOneSolution(), day.part1().toString());
     }
 
-    private Day getDay(String d) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    private Day getDay(String d, int part) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Class<?> C = ClassLoader.getSystemClassLoader().loadClass("days." + d);
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
+        if (CI) {
+            SkipCI annotation = C.getAnnotation(SkipCI.class);
+            if (annotation != null) {
+                switch (part) {
+                    case 1 -> assumeFalse(annotation.part1());
+                    case 2 -> assumeFalse(annotation.part2());
+                }
+            }
+        }
         return new Day() {
             @Override
             public void processInput() {
@@ -98,7 +112,7 @@ public class RegressionTest {
     @MethodSource("daysToTest")
     public void testPartTwo(String d) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         assumeFalse(d.isEmpty());
-        Day day = getDay(d);
+        Day day = getDay(d, 2);
         assumeTrue(day.partTwoSolution() != null);
         day.processInput();
         if (!day.resetForPartTwo()) day.part1();

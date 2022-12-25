@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import util.SkipCI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SkipCI(part2 = true)
 public class Day21 extends Day {
 
     private Map<String, Monkey> monkeys;
@@ -134,11 +136,11 @@ public class Day21 extends Day {
         return "66174565793494";
     }
 
-    // cant run python on github actions
-//    @Override
-//    public String partTwoSolution() {
-//        return "3327575724809";
-//    }
+
+    @Override
+    public String partTwoSolution() {
+        return "3327575724809";
+    }
 
     @Override
     public boolean resetForPartTwo() {

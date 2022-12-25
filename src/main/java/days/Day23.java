@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import util.Direction;
 import util.Grid;
 
 import java.util.Arrays;
@@ -107,17 +108,6 @@ public class Day23 extends Day {
                 case ELF -> "#";
                 case EMPTY -> ".";
             };
-        }
-    }
-
-    private enum Direction {
-        E(1, 0), S(0, 1), W(-1, 0), N(0, -1), NE(1, -1), NW(-1, -1), SE(1, 1), SW(-1, 1);
-
-        public final int dx, dy;
-
-        Direction(int dx, int dy) {
-            this.dx = dx;
-            this.dy = dy;
         }
     }
 

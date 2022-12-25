@@ -1,11 +1,14 @@
 package days;
 
 import setup.Day;
+import util.SkipCI;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+@SkipCI(part2 = true)
 public class Day16 extends Day {
 
     private HashMap<String, Valve> valves;
@@ -100,11 +103,10 @@ public class Day16 extends Day {
         return "2359";
     }
 
-// CI runner lacks heap space to run this test
-//    @Override
-//    public String partTwoSolution() {
-//        return "2999";
-//    }
+    @Override
+    public String partTwoSolution() {
+        return "2999";
+    }
 
     @Override
     public boolean isTest() {
