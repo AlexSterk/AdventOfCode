@@ -31,7 +31,7 @@ public class Day5 extends Day {
         Pattern p = Pattern.compile("\\[([A-Z])]");
         for (String line : lines()) {
             p.matcher(line).results().forEach(m -> {
-                int i = map.get( m.start(1)) - 1;
+                int i = map.get(m.start(1)) - 1;
                 towers.get(i).push(m.group(1));
             });
         }

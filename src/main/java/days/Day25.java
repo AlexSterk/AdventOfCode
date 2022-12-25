@@ -32,10 +32,10 @@ public class Day25 extends Day {
         for (int i = digits.length - 1; i > 0; i--) {
             int c = digits[i];
             if (c > 2) {
-                digits[i] = c-5;
+                digits[i] = c - 5;
             }
 
-            digits[i-1] += c/3;
+            digits[i - 1] += c / 3;
         }
 
         StringBuilder sb = new StringBuilder();

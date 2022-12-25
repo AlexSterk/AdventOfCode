@@ -9,24 +9,6 @@ public class Day19 extends Day {
 
     private List<Blueprint> blueprints;
 
-    @Override
-    public void processInput() {
-        blueprints = lines().stream().map(Blueprint::parse).toList();
-    }
-
-    @Override
-    public Object part1() {
-        int sum = 0;
-        int minutes = 24;
-
-        for (Blueprint blueprint : blueprints) {
-            List<State> queue = simulate(minutes, blueprint);
-            sum += queue.stream().mapToInt(s -> s.have.geode).max().getAsInt() * blueprint.id;
-        }
-
-        return sum;
-    }
-
     private static List<State> simulate(int minutes, Blueprint blueprint) {
         List<State> queue = new ArrayList<>();
         queue.add(new State(new Tuple(0, 0, 0, 0), new Tuple(1, 0, 0, 0)));
@@ -71,6 +53,24 @@ public class Day19 extends Day {
             }).limit(1000).toList();
         }
         return queue;
+    }
+
+    @Override
+    public void processInput() {
+        blueprints = lines().stream().map(Blueprint::parse).toList();
+    }
+
+    @Override
+    public Object part1() {
+        int sum = 0;
+        int minutes = 24;
+
+        for (Blueprint blueprint : blueprints) {
+            List<State> queue = simulate(minutes, blueprint);
+            sum += queue.stream().mapToInt(s -> s.have.geode).max().getAsInt() * blueprint.id;
+        }
+
+        return sum;
     }
 
     @Override

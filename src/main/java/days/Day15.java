@@ -63,7 +63,7 @@ public class Day15 extends Day {
 
         for (Integer a : A) {
             for (Integer b : B) {
-                Point p = new Point((b-a) / 2, (a + b) / 2);
+                Point p = new Point((b - a) / 2, (a + b) / 2);
                 if (0 < p.x() && p.x() < limit && 0 < p.y() && p.y() < limit) {
                     if (sensors.stream().allMatch(s -> s.sensor.manhattanDistance(p) > s.distance())) {
                         return p.x() * limit + p.y();

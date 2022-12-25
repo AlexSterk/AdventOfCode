@@ -78,13 +78,13 @@ public class Day12 extends Day {
     private record WeightedString(String s) implements Grid.Weighted {
 
         @Override
-            public Integer getWeight() {
-                return 1;
-            }
-
-            @Override
-            public String toString() {
-                return s;
-            }
+        public Integer getWeight() {
+            return 1;
         }
+
+        @Override
+        public String toString() {
+            return s;
+        }
+    }
 }

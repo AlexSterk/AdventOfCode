@@ -116,17 +116,10 @@ public class Day7 extends Day {
 
     // Use TreeMap so it's sorted by name
     private static class FileSystemNode extends TreeMap<String, FileSystemNode> {
-        private enum Type {
-            FILE, FOLDER
-        }
-
-        private Long size;
-
         private final Type type;
-
         private final String name;
-
         private final FileSystemNode parent;
+        private Long size;
 
         private FileSystemNode(String name, Type type, FileSystemNode parent) {
             this.name = name;
@@ -154,6 +147,10 @@ public class Day7 extends Day {
         @Override
         public String toString() {
             return toString(0);
+        }
+
+        private enum Type {
+            FILE, FOLDER
         }
     }
 }

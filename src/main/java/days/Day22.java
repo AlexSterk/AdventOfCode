@@ -5,7 +5,10 @@ import util.Grid;
 import util.Grid.Tile;
 import util.Line.Point;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.TreeMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
@@ -123,8 +126,8 @@ public class Day22 extends Day {
         SOUTH(0, 1),
         WEST(-1, 0),
         NORTH(0, -1);
-        public final int dx, dy;
         private static final List<Direction> values = List.of(Direction.values());
+        public final int dx, dy;
 
         Direction(int dx, int dy) {
             this.dx = dx;

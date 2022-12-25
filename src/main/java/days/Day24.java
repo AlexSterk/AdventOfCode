@@ -114,10 +114,6 @@ public class Day24 extends Day {
     }
 
     private record Blizzard(Point position, Direction facing) {
-        private Point positionAtTime(int t) {
-            return new Point(1 + modulo(position.x() - 1 + facing.x * t, maxX - 1), 1 + modulo(position.y() - 1 + facing.y * t, maxY - 1));
-        }
-
         private static int modulo(int a, int b) {
             return (a % b + b) % b;
         }
@@ -129,6 +125,10 @@ public class Day24 extends Day {
             for (int i = 0; i < 10; i++) {
                 System.out.println(blizzard.positionAtTime(i));
             }
+        }
+
+        private Point positionAtTime(int t) {
+            return new Point(1 + modulo(position.x() - 1 + facing.x * t, maxX - 1), 1 + modulo(position.y() - 1 + facing.y * t, maxY - 1));
         }
     }
 }

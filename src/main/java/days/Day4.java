@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class Day4 extends Day {
 
     private final List<Ranges> ranges = new ArrayList<>();
+
     @Override
     public void processInput() {
         var p = Pattern.compile("\\d+");
@@ -31,7 +32,6 @@ public class Day4 extends Day {
         }
 
 
-
         return fullOverlap;
     }
 
@@ -41,13 +41,13 @@ public class Day4 extends Day {
 
         for (Ranges range : ranges) {
             if (range.a1 <= range.b1 && range.a2 >= range.b2) {
-                overlap ++;
+                overlap++;
             } else if (range.b1 <= range.a1 && range.b2 >= range.a2) {
-                overlap ++;
+                overlap++;
             } else if (range.a1 <= range.b1 && range.a2 >= range.b1) {
-                overlap ++;
+                overlap++;
             } else if (range.b1 <= range.a1 && range.b2 >= range.a1) {
-                overlap ++;
+                overlap++;
             }
         }
 
@@ -74,5 +74,6 @@ public class Day4 extends Day {
         return "928";
     }
 
-    private record Ranges(int a1, int a2, int b1, int b2) {}
+    private record Ranges(int a1, int a2, int b1, int b2) {
+    }
 }

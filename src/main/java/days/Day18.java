@@ -7,6 +7,7 @@ import java.util.*;
 public class Day18 extends Day {
 
     private List<Point> points;
+
     @Override
     public void processInput() {
         points = lines().stream().map(s -> {
@@ -70,7 +71,8 @@ public class Day18 extends Day {
             for (Point n : cur.neighbours()) {
                 if (visited.contains(n)) continue;
                 if (points.contains(n)) area += 1;
-                else if (n.x >= minX && n.x <= maxX && n.y >= minY && n.y <= maxY && n.z >= minZ && n.z <= maxZ) toVisit.offer(n);
+                else if (n.x >= minX && n.x <= maxX && n.y >= minY && n.y <= maxY && n.z >= minZ && n.z <= maxZ)
+                    toVisit.offer(n);
             }
         }
 

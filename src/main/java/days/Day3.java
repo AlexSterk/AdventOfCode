@@ -8,10 +8,9 @@ import java.util.List;
 
 public class Day3 extends Day {
 
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private List<Pair<String, String>> rucksacks;
     private List<List<Pair<String, String>>> groups;
-
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Override
     public void processInput() {

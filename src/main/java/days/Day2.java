@@ -11,14 +11,10 @@ import java.util.stream.Collectors;
 
 public class Day2 extends Day {
 
-    private List<String[]> guide;
-
-    static private Map<String, Integer> map = new HashMap<>();
-    static private Map<Pair<String, String>, Integer> outcomes = new HashMap<>();
-
-    static private Map<Pair<String, String>, String> options = new HashMap<>();
-
-    static private Map<String, Integer> stats  = new HashMap<>();
+    static private final Map<String, Integer> map = new HashMap<>();
+    static private final Map<Pair<String, String>, Integer> outcomes = new HashMap<>();
+    static private final Map<Pair<String, String>, String> options = new HashMap<>();
+    static private final Map<String, Integer> stats = new HashMap<>();
 
     static {
         map.put("X", 1);
@@ -54,6 +50,8 @@ public class Day2 extends Day {
         options.put(new Pair<>("B", "Z"), "C");
         options.put(new Pair<>("C", "Z"), "A");
     }
+
+    private List<String[]> guide;
 
     @Override
     public void processInput() {
