@@ -32,12 +32,7 @@ public class Day23 extends Day {
             }
         }
 
-        var minX = elves.stream().mapToInt(e -> e.position.x()).min().orElseThrow();
-        var maxX = elves.stream().mapToInt(e -> e.position.x()).max().orElseThrow();
-        var minY = elves.stream().mapToInt(e -> e.position.y()).min().orElseThrow();
-        var maxY = elves.stream().mapToInt(e -> e.position.y()).max().orElseThrow();
-
-        Grid.InfiniteGrid<Tile> subgrid = grid.subgrid(minX, maxX, minY, maxY);
+        Grid.InfiniteGrid<Tile> subgrid = getSmallestGrid();
 
         return subgrid.getAll().stream().filter(tile -> tile.data() == Tile.EMPTY).count();
     }
@@ -64,14 +59,19 @@ public class Day23 extends Day {
     }
 
     private void debugPrintSmallestPossibleGrind() {
+        Grid.InfiniteGrid<Tile> subgrid = getSmallestGrid();
+
+        subgrid.print();
+    }
+
+    private Grid.InfiniteGrid<Tile> getSmallestGrid() {
         var minX = elves.stream().mapToInt(e -> e.position.x()).min().orElseThrow();
         var maxX = elves.stream().mapToInt(e -> e.position.x()).max().orElseThrow();
         var minY = elves.stream().mapToInt(e -> e.position.y()).min().orElseThrow();
         var maxY = elves.stream().mapToInt(e -> e.position.y()).max().orElseThrow();
 
         Grid.InfiniteGrid<Tile> subgrid = grid.subgrid(minX, maxX, minY, maxY);
-
-        subgrid.print();
+        return subgrid;
     }
 
     private void simulateRound() {
