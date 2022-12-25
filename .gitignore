@@ -1,2 +1,6 @@
 out/
 **/*.token
+target/
+**/*.py
+**/*.js
+**/*.mjs
