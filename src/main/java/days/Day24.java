@@ -32,8 +32,24 @@ public class Day24 extends Day {
     public Object part1() {
         var start = new Point(1, 0);
         var end = new Point(maxX - 1, maxY);
+
+        return run(start, end, 1);
+    }
+
+    @Override
+    public Object part2() {
+        var start = new Point(1, 0);
+        var end = new Point(maxX - 1, maxY);
         int t = 1;
 
+        var run1 = run(start, end, t);
+        var run2 = run(end, start, run1 + 1);
+        var run3 = run(start, end, run2 + 1);
+
+        return run3;
+    }
+
+    private int run(Point start, Point end, int t) {
         Queue<Point> positions = new LinkedList<>();
         positions.add(start);
         while (true) {
@@ -63,13 +79,18 @@ public class Day24 extends Day {
     }
 
     @Override
-    public Object part2() {
-        return null;
+    public int getDay() {
+        return 24;
     }
 
     @Override
-    public int getDay() {
-        return 24;
+    public String partOneSolution() {
+        return "251";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "758";
     }
 
     @Override
