@@ -1,5 +1,6 @@
 package util;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Pair<A, B> {
@@ -9,6 +10,14 @@ public class Pair<A, B> {
     public Pair(A a, B b) {
         this.a = a;
         this.b = b;
+    }
+
+    public static <A extends Comparable<? super A>, B> Comparator<Pair<A, B>> comparingByA() {
+        return Comparator.comparing(pair -> pair.a);
+    }
+
+    public static <A, B extends Comparable<? super B>> Comparator<Pair<A, B>> comparingByB() {
+        return Comparator.comparing(pair -> pair.b);
     }
 
     public A a() {
@@ -39,7 +48,6 @@ public class Pair<A, B> {
                 "a=" + a + ", " +
                 "b=" + b + ']';
     }
-
 }
 
 
