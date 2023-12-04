@@ -18,14 +18,13 @@ public class Day2 extends Day {
 
             var subsets = Stream.of(s.split(";")).map(set -> {
                 var split2 = set.split(",");
-                var pairs = Stream.of(split2).map(pair -> {
+                return Stream.of(split2).map(pair -> {
                     pair = pair.trim();
                     var split3 = pair.split(" ");
                     var num = Integer.parseInt(split3[0]);
                     var color = split3[1];
                     return new Pair<>(num, color);
                 }).toList();
-                return pairs;
             }).toList();
 
             return new Game(id, subsets);
@@ -42,7 +41,7 @@ public class Day2 extends Day {
 
     @Override
     public Object part2() {
-        return this.games.stream().mapToLong(Game::power).sum();
+        return this.games.stream().mapToInt(Game::power).sum();
     }
 
     @Override
@@ -71,8 +70,6 @@ public class Day2 extends Day {
             var maxGreen = this.max("green");
             var maxBlue = this.max("blue");
 
-            System.out.println(maxRed + " " + maxGreen + " " + maxBlue);
-
             return maxRed <= red && maxGreen <= green && maxBlue <= blue;
         }
 
@@ -80,10 +77,10 @@ public class Day2 extends Day {
             return this.subsets.stream().flatMap(List::stream).filter(p -> p.b().equals(color)).mapToInt(Pair::a).max().orElse(0);
         }
 
-        public long power() {
-            var r = (long) this.max("red");
-            var g = (long) this.max("green");
-            var b = (long) this.max("blue");
+        public int power() {
+            var r = this.max("red");
+            var g = this.max("green");
+            var b = this.max("blue");
 
             return r * g * b;
         }
