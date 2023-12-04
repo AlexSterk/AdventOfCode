@@ -3,14 +3,13 @@ package days;
 import setup.Day;
 import util.Grid;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day3 extends Day {
     private Grid<String> grid;
     private Set<String> symbols;
+    private HashMap<Grid.Tile<String>, Set<Integer>> potentialGears = new HashMap<>();
 
     @Override
     public void processInput() {
@@ -53,12 +52,29 @@ public class Day3 extends Day {
     }
 
     private boolean isConnected(List<Grid.Tile<String>> number) {
-        return number.stream().flatMap(tile -> this.grid.getAdjacent(tile, true).stream()).anyMatch(tile -> symbols.contains(tile.data()));
+        return number.stream()
+                .flatMap(tile -> this.grid.getAdjacent(tile, true).stream())
+                .filter(tile -> symbols.contains(tile.data()))
+                .peek(tile -> {
+                    if (tile.data().equals("*")) {
+                        var s = potentialGears.getOrDefault(tile, new HashSet<>());
+                        s.add(this.getNumber(number));
+                        potentialGears.put(tile, s);
+                    }
+                })
+                .count() > 0;
     }
 
     @Override
     public Object part2() {
-        return null;
+        var gears = potentialGears.values().stream().filter(integers -> integers.size() == 2).map(s -> s.stream().toList()).toList();
+        long r = 0;
+
+        for (var gear : gears) {
+            r += (long) gear.get(0) * gear.get(1);
+        }
+
+        return r;
     }
 
     @Override
@@ -74,5 +90,10 @@ public class Day3 extends Day {
     @Override
     public String partOneSolution() {
         return "530495";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "80253814";
     }
 }
