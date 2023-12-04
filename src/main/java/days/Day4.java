@@ -5,6 +5,10 @@ import setup.Day;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+/**
+ * I'm aware that a dynamic programming approach would be better, but I'm too lazy to implement it.
+ */
 public class Day4 extends Day {
     private List<Card> cards;
     private Map<Integer, Card> cardsMap;
