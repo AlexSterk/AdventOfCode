@@ -42,7 +42,7 @@ public class Day2 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        return this.games.stream().mapToLong(Game::power).sum();
     }
 
     @Override
@@ -60,13 +60,32 @@ public class Day2 extends Day {
         return "2810";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "69110";
+    }
+
     record Game(int id, List<List<Pair<Integer, String>>> subsets) {
         public boolean isPossible(int red, int green, int blue) {
-            var maxRed = this.subsets.stream().flatMap(List::stream).filter(p -> p.b().equals("red")).mapToInt(Pair::a).max().orElse(0);
-            var maxGreen = this.subsets.stream().flatMap(List::stream).filter(p -> p.b().equals("green")).mapToInt(Pair::a).max().orElse(0);
-            var maxBlue = this.subsets.stream().flatMap(List::stream).filter(p -> p.b().equals("blue")).mapToInt(Pair::a).max().orElse(0);
+            var maxRed = this.max("red");
+            var maxGreen = this.max("green");
+            var maxBlue = this.max("blue");
+
+            System.out.println(maxRed + " " + maxGreen + " " + maxBlue);
 
             return maxRed <= red && maxGreen <= green && maxBlue <= blue;
+        }
+
+        private int max(String color) {
+            return this.subsets.stream().flatMap(List::stream).filter(p -> p.b().equals(color)).mapToInt(Pair::a).max().orElse(0);
+        }
+
+        public long power() {
+            var r = (long) this.max("red");
+            var g = (long) this.max("green");
+            var b = (long) this.max("blue");
+
+            return r * g * b;
         }
     }
 }
