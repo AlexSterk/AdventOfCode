@@ -6,9 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-/**
- * I'm aware that a dynamic programming approach would be better, but I'm too lazy to implement it.
- */
 public class Day4 extends Day {
     private List<Card> cards;
     private Map<Integer, Card> cardsMap;
@@ -26,20 +23,24 @@ public class Day4 extends Day {
 
     @Override
     public Object part2() {
-        new ArrayList<>(cards).forEach(this::processWins);
+        var dp = new HashMap<Integer, Long>();
+        var cards1 = this.cards.stream().sorted(Comparator.comparingInt(Card::id).reversed()).toList();
 
-        return cards.size();
-    }
+        for (Card card : cards1) {
+            var wins = card.wins();
+            var id = card.id();
 
-    private void processWins(Card card) {
-        var wins = card.wins();
-        var id = card.id();
+            var sum = (long) wins;
+            for (int i = 1; i <= wins; i++) {
+                Card nCard = cardsMap.get(id + i);
+                Long futureWin = dp.get(nCard.id());
+                sum += futureWin;
+            }
 
-        for (int i = 1; i <= wins; i++) {
-            var nCard = cardsMap.get(id + i);
-            cards.add(nCard);
-            this.processWins(nCard);
+            dp.put(id, sum);
         }
+
+        return dp.values().stream().mapToLong(Long::longValue).sum() + cards1.size();
     }
 
     @Override
