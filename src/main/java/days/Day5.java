@@ -8,6 +8,7 @@ public class Day5 extends Day {
     private Map<String, List<Mapping>> mappings;
     private List<Long> seeds;
     private List<String> mappingOrder;
+    private List<Mapping> seedRanges;
 
     @Override
     public void processInput() {
@@ -56,8 +57,44 @@ public class Day5 extends Day {
         return source;
     }
 
+    private long getSeedFromLocation(long location) {
+        long destination = location;
+        var reversedMappingOrder = new ArrayList<>(mappingOrder);
+        Collections.reverse(reversedMappingOrder);
+        for (String map : reversedMappingOrder) {
+            List<Mapping> mappings = this.mappings.get(map);
+            for (Mapping mapping : mappings) {
+                long source = mapping.inverseDestination(destination);
+                if (source != -1) {
+                    destination = source;
+                    break;
+                }
+            }
+        }
+
+        return destination;
+    }
+
+    private boolean seedExists(long seed) {
+        return seedRanges.stream().anyMatch(mapping -> mapping.getDestination(seed) != -1);
+    }
+
     @Override
     public Object part2() {
+        seedRanges = new ArrayList<>();
+        for (int i = 0; i < seeds.size(); i+=2) {
+            var seed = seeds.get(i);
+            var size = seeds.get(i + 1);
+
+            seedRanges.add(new Mapping(seed, seed, size));
+        }
+
+        for (long i = 0; i < 1_000_000_000; i++) {
+            if (seedExists(getSeedFromLocation(i))) {
+                return i;
+            }
+        }
+
         return null;
     }
 
@@ -74,6 +111,11 @@ public class Day5 extends Day {
     @Override
     public String partOneSolution() {
         return "340994526";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "52210644";
     }
 
     record Mapping(long source, long destination, long size) {
@@ -104,6 +146,13 @@ public class Day5 extends Day {
         public long getDestination(long source) {
             if (minSource() <= source && source <= maxSource()) {
                 return source + (minDestination() - minSource());
+            }
+            return -1;
+        }
+
+        public long inverseDestination(long destination) {
+            if (minDestination() <= destination && destination <= maxDestination()) {
+                return destination + (minSource() - minDestination());
             }
             return -1;
         }
