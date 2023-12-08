@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import util.BinarySearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,41 +49,9 @@ public class Day6 extends Day {
 
         var race = new Race(time, distance);
 
-        System.out.println(race);
-
-        return lastWinBinarySearch(race) - firstWinBinarySearch(race) + 1;
-    }
-
-    private long firstWinBinarySearch(Race r) {
-        long low = 0;
-        long high = r.duration;
-
-        while (low < high) {
-            long mid = (low + high) / 2;
-            if (willWin(r, mid)) {
-                high = mid;
-            } else {
-                low = mid + 1;
-            }
-        }
-
-        return low;
-    }
-
-    private long lastWinBinarySearch(Race r) {
-        long low = 0;
-        long high = r.duration;
-
-        while (low < high) {
-            long mid = (low + high + 1) / 2;
-            if (willWin(r, mid)) {
-                low = mid;
-            } else {
-                high = mid - 1;
-            }
-        }
-
-        return low;
+        long min = BinarySearch.Long.search(0L, race.duration, l -> this.willWin(race, l));
+        long max = BinarySearch.Long.search(0L, race.duration, l -> !this.willWin(race, l));
+        return max - min;
     }
 
     @Override
@@ -93,6 +62,16 @@ public class Day6 extends Day {
     @Override
     public boolean isTest() {
         return false;
+    }
+
+    @Override
+    public String partOneSolution() {
+        return "252000";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "36992486";
     }
 
     record Race(long duration, long recordDistance) {
