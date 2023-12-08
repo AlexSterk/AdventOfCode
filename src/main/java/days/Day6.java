@@ -27,7 +27,7 @@ public class Day6 extends Day {
         return races.stream().mapToInt(this::waysToWin).mapToLong(i -> i).reduce((a, b) -> a * b).getAsLong();
     }
 
-    private boolean willWin(Race r, int time) {
+    private boolean willWin(Race r, long time) {
         return (r.duration - time) * time > r.recordDistance;
     }
 
@@ -43,7 +43,46 @@ public class Day6 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        var time = Long.parseLong(lines().get(0).split(":")[1].replaceAll("\\s+", ""));
+        var distance = Long.parseLong(lines().get(1).split(":")[1].replaceAll("\\s+", ""));
+
+        var race = new Race(time, distance);
+
+        System.out.println(race);
+
+        return lastWinBinarySearch(race) - firstWinBinarySearch(race) + 1;
+    }
+
+    private long firstWinBinarySearch(Race r) {
+        long low = 0;
+        long high = r.duration;
+
+        while (low < high) {
+            long mid = (low + high) / 2;
+            if (willWin(r, mid)) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return low;
+    }
+
+    private long lastWinBinarySearch(Race r) {
+        long low = 0;
+        long high = r.duration;
+
+        while (low < high) {
+            long mid = (low + high + 1) / 2;
+            if (willWin(r, mid)) {
+                low = mid;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return low;
     }
 
     @Override
@@ -56,6 +95,6 @@ public class Day6 extends Day {
         return false;
     }
 
-    record Race(int duration, int recordDistance) {
+    record Race(long duration, long recordDistance) {
     }
 }
