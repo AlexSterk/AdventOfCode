@@ -74,6 +74,6 @@ public class Day6 extends Day {
         return "36992486";
     }
 
-    record Race(long duration, long recordDistance) {
+    private record Race(long duration, long recordDistance) {
     }
 }

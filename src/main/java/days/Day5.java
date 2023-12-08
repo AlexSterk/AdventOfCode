@@ -118,7 +118,7 @@ public class Day5 extends Day {
         return "52210644";
     }
 
-    record Mapping(long source, long destination, long size) {
+    private record Mapping(long source, long destination, long size) {
         public static Mapping parse(String s) {
             String[] split = s.split(" ");
             long destination = Long.parseLong(split[0]);

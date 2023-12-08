@@ -64,7 +64,7 @@ public class Day2 extends Day {
         return "69110";
     }
 
-    record Game(int id, List<List<Pair<Integer, String>>> subsets) {
+    private record Game(int id, List<List<Pair<Integer, String>>> subsets) {
         public boolean isPossible(int red, int green, int blue) {
             var maxRed = this.max("red");
             var maxGreen = this.max("green");

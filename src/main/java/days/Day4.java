@@ -53,7 +53,7 @@ public class Day4 extends Day {
         return false;
     }
 
-    record Card(int id, Set<Integer> winning, Set<Integer> numbers) {
+    private record Card(int id, Set<Integer> winning, Set<Integer> numbers) {
         public static Card parse(String s) {
             var split = s.split(":");
             var id = Integer.parseInt(split[0].replaceAll("\\D", ""));
