@@ -22,10 +22,9 @@ public class RegressionTest {
     private static List<String> days;
     private static boolean CI;
 
-
     @BeforeAll
     public static void beforeAll() throws IOException {
-        days = Files.walk(Path.of("src/main/java/days"))
+        days = Files.list(Path.of("src/main/java/days"))
                 .map(Path::getFileName)
                 .map(Path::toString)
                 .filter(s -> s.endsWith(".java"))
@@ -34,17 +33,13 @@ public class RegressionTest {
         CI = System.getenv("CI") != null;
     }
 
-    public static Stream<Arguments> daysToTest() {
-        return Stream.concat(
-                days.stream().map(Arguments::of),
-                Stream.of(Arguments.of(""))
-        );
+    public static Stream<String> daysToTest() {
+        return days.stream();
     }
 
     @ParameterizedTest
     @MethodSource("daysToTest")
     public void testPartOne(String d) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        assumeFalse(d.isEmpty());
         Day day = getDay(d, 1);
         assumeTrue(day.partOneSolution() != null);
         day.processInput();
@@ -52,7 +47,7 @@ public class RegressionTest {
     }
 
     private Day getDay(String d, int part) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Class<?> C = ClassLoader.getSystemClassLoader().loadClass("days." + d);
+        Class<?> C = Class.forName("days." + d);
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
         if (CI) {
@@ -64,53 +59,12 @@ public class RegressionTest {
                 }
             }
         }
-        return new Day() {
-            @Override
-            public void processInput() {
-                day.processInput();
-            }
-
-            @Override
-            public Object part1() {
-                return day.part1();
-            }
-
-            @Override
-            public Object part2() {
-                return day.part2();
-            }
-
-            @Override
-            public int getDay() {
-                return day.getDay();
-            }
-
-            @Override
-            public boolean isTest() {
-                return false;
-            }
-
-            @Override
-            public boolean resetForPartTwo() {
-                return day.resetForPartTwo();
-            }
-
-            @Override
-            public String partOneSolution() {
-                return day.partOneSolution();
-            }
-
-            @Override
-            public String partTwoSolution() {
-                return day.partTwoSolution();
-            }
-        };
+        return day;
     }
 
     @ParameterizedTest
     @MethodSource("daysToTest")
     public void testPartTwo(String d) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        assumeFalse(d.isEmpty());
         Day day = getDay(d, 2);
         assumeTrue(day.partTwoSolution() != null);
         day.processInput();
