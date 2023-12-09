@@ -196,7 +196,9 @@ public class Day7 extends Day {
             if (highest + jokers >= 4) return 1; // Four of a kind
             if (map.size() == 2) return 2; // Full house
             if (highest + jokers >= 3) return 3; // Three of a kind
+            // Two pair is impossible with jokers
             return 5; // One pair
+            // High card is impossible with jokers
         }
     }
 }
