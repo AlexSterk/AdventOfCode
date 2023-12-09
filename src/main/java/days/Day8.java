@@ -1,9 +1,11 @@
 package days;
 
 import setup.Day;
-import util.Graph;
+import util.Maths;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -35,26 +37,78 @@ public class Day8 extends Day {
         String start = "AAA";
         String end = "ZZZ";
 
+        List<State> path = getPath(start, end);
+
+        return path.size();
+    }
+
+    private boolean reachedEnd(String start, String end) {
+        return start.endsWith(end.replaceAll("\\?", ""));
+    }
+
+    private List<State> getPath(String start, String end) {
         var chars = directions.toCharArray();
         int i = 0;
-        int steps = 0;
-        while (!start.equals(end)) {
+        List<State> path = new ArrayList<>();
+        while (!reachedEnd(start, end)) {
             var node = nodes.get(start);
-            if (chars[i] == 'L') {
-                start = node.left;
-            } else {
-                start = node.right;
-            }
+            char c = chars[i];
+            start = performMove(c, node);
             i = (i + 1) % chars.length;
-            steps++;
+            path.add(new State(start, i));
         }
-
-        return steps;
+        return path;
     }
+
+    private List<State> getLoopingPath(String start) {
+        var chars = directions.toCharArray();
+        int i = 0;
+        List<State> path = new ArrayList<>();
+        State s = new State(start, i);
+        while (!path.contains(s)) {
+            path.add(s);
+            var node = nodes.get(start);
+            char c = chars[i];
+            start = performMove(c, node);
+            i = (i + 1) % chars.length;
+            s = new State(start, i);
+        }
+        path.add(s);
+
+        return path;
+    }
+
+    private static String performMove(char c, Node node) {
+        String start;
+        if (c == 'L') {
+            start = node.left;
+        } else {
+            start = node.right;
+        }
+        return start;
+    }
+
+
 
     @Override
     public Object part2() {
-        return null;
+        var endInA = nodes.keySet().stream().filter(s -> s.endsWith("A")).toList();
+        var paths = endInA.stream().map(this::getLoopingPath).toList();
+
+        long lcm = 1;
+
+        for (List<State> path : paths) {
+            var end = path.stream().filter(s -> s.current.endsWith("Z")).findAny().get();
+            var stepsToEnd = path.indexOf(end);
+            var loopStart = path.indexOf(path.get(path.size() - 1));
+            var loopLength = path.size() - loopStart - 1;
+
+            lcm = Maths.lcm(lcm, loopLength);
+
+            System.out.printf("Steps to end: %d, loop start: %d, loop length: %d%n", stepsToEnd, loopStart, loopLength);
+        }
+
+        return lcm;
     }
 
     @Override
@@ -72,7 +126,12 @@ public class Day8 extends Day {
         return "16531";
     }
 
-    private record Node(String left, String right) {
-
+    @Override
+    public String partTwoSolution() {
+        return "24035773251517";
     }
+
+    private record Node(String left, String right) {}
+
+    private record State(String current, int i) {}
 }

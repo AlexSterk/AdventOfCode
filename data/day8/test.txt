@@ -1,5 +1,5 @@
-LLR
+LRLRLR
 
 AAA = (BBB, BBB)
-BBB = (AAA, ZZZ)
-ZZZ = (ZZZ, ZZZ)
+BBB = (ZZZ, ZZZ)
+ZZZ = (BBB, BBB)
