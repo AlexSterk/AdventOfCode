@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import util.Direction;
 import util.Graph;
 import util.Grid;
 import util.Grid.Tile;
@@ -38,8 +39,8 @@ public class Day10 extends Day {
             if (graph.containsNode(u)) continue;
             graph.addNode(u);
 
-            for (Direction dir : Direction.values()) {
-                var v = getNeighbour(u, dir);
+            for (Direction dir : Direction.CARDINAL) {
+                var v = grid.getTile(u.x() + dir.dx, u.y() + dir.dy);
                 if (v == null) continue;
                 if (v.data() == null) continue;
                 if (u.data().canGo(dir, v.data())) {
@@ -50,15 +51,6 @@ public class Day10 extends Day {
         }
 
         return Collections.max(graph.getDistance(start).values());
-    }
-
-    private static <T> Tile<T> getNeighbour(Tile<T> t, Direction d) {
-        return switch (d) {
-            case UP -> t.up();
-            case DOWN -> t.down();
-            case LEFT -> t.left();
-            case RIGHT -> t.right();
-        };
     }
 
     @Override
@@ -105,27 +97,14 @@ public class Day10 extends Day {
         return "595";
     }
 
-    private enum Direction {
-        UP,DOWN,LEFT,RIGHT;
-
-        private Direction opposite() {
-            return switch (this) {
-                case UP -> DOWN;
-                case DOWN -> UP;
-                case LEFT -> RIGHT;
-                case RIGHT -> LEFT;
-            };
-        }
-    }
-
     private enum Pipe {
-        HORIZONTAL('-', Set.of(Direction.LEFT, Direction.RIGHT)),
-        VERTICAL('|', Set.of(Direction.UP, Direction.DOWN)),
-        CORNER_NORTH_EAST('L', Set.of(Direction.UP, Direction.RIGHT)),
-        CORNER_NORTH_WEST('J', Set.of(Direction.UP, Direction.LEFT)),
-        CORNER_SOUTH_EAST('7', Set.of(Direction.DOWN, Direction.LEFT)),
-        CORNER_SOUTH_WEST('F', Set.of(Direction.DOWN, Direction.RIGHT)),
-        START('S', Set.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT));
+        HORIZONTAL('-', Set.of(Direction.W, Direction.E)),
+        VERTICAL('|', Set.of(Direction.N, Direction.S)),
+        CORNER_NORTH_EAST('L', Set.of(Direction.N, Direction.E)),
+        CORNER_NORTH_WEST('J', Set.of(Direction.N, Direction.W)),
+        CORNER_SOUTH_EAST('7', Set.of(Direction.S, Direction.W)),
+        CORNER_SOUTH_WEST('F', Set.of(Direction.S, Direction.E)),
+        START('S', Set.of(Direction.N, Direction.S, Direction.W, Direction.E));
 
         private final char c;
         private final Set<Direction> allowedDirections;
