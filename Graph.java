@@ -79,6 +79,14 @@ public final class Graph<T> {
         return dist.get(to);
     }
 
+    public Map<T, Integer> getDistance(T from) {
+        Map<T, Integer> dist = new HashMap<>();
+        Map<T, T> pred = new HashMap<>();
+        runDijkstra(from, dist, pred);
+
+        return dist;
+    }
+
     public List<T> getPath(T from, T to) {
         Map<T, Integer> dist = new HashMap<>();
         Map<T, T> pred = new HashMap<>();
