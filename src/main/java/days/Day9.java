@@ -51,6 +51,11 @@ public class Day9 extends Day {
         return "1884768153";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "1031";
+    }
+
     private static class Extrapolation {
         private final List<Integer> values;
         private Extrapolation inner;
