@@ -11,6 +11,9 @@ import java.util.Queue;
 import java.util.Set;
 
 public class Day10 extends Day {
+    private Grid<String> grid;
+    private Graph<Tile<Pipe>> graph;
+
     @Override
     public void processInput() {
 
@@ -18,33 +21,31 @@ public class Day10 extends Day {
 
     @Override
     public Object part1() {
-        var grid = Grid.parseGrid(input).map(s -> Pipe.fromChar(s.charAt(0)));
+        this.grid = Grid.parseGrid(input);
+        var grid = this.grid.map(s -> Pipe.fromChar(s.charAt(0)));
 
         var start = grid.getAll().stream().filter(p -> p.data() == Pipe.START).findAny().get();
 
         System.out.println(start);
 
-        var graph = new Graph<Tile<Pipe>>();
+        graph = new Graph<>();
 
         Queue<Tile<Pipe>> Q = new ArrayDeque<>();
         Q.offer(start);
 
         while (!Q.isEmpty()) {
             Tile<Pipe> u = Q.poll();
+            if (graph.containsNode(u)) continue;
             graph.addNode(u);
 
             for (Direction dir : Direction.values()) {
                 var v = getNeighbour(u, dir);
-                if (graph.containsNode(v)) continue;
                 if (v == null) continue;
                 if (v.data() == null) continue;
-                System.out.printf("%s %s %s ", u, dir, v);
                 if (u.data().canGo(dir, v.data())) {
-                    System.out.print("added");
                     graph.addEdge(u, v, 1, true);
                     Q.offer(v);
                 }
-                System.out.println();
             }
         }
 
@@ -62,7 +63,26 @@ public class Day10 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        graph.nodes().forEach(n -> {
+            var up = n.up();
+            if (graph.getNeighbours(n).contains(up)) grid.set(n.x(), n.y(), "!");
+            else grid.set(n.x(), n.y(), "_");
+        });
+
+        var count = 0;
+
+        String g = grid.toString();
+        var lines = g.split("\n");
+        for (String line : lines) {
+            line = line.replace("_", "").replace("!!", "");
+            var in = false;
+            for (char c : line.toCharArray()) {
+                if (c == '!') in = !in;
+                else if (in) count++;
+            }
+        }
+
+        return count;
     }
 
     @Override
@@ -78,6 +98,11 @@ public class Day10 extends Day {
     @Override
     public String partOneSolution() {
         return "6867";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "595";
     }
 
     private enum Direction {
