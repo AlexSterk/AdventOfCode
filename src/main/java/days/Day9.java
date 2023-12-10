@@ -27,7 +27,13 @@ public class Day9 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        long sum = 0;
+
+        for (Extrapolation extrapolation : extrapolations) {
+            sum += extrapolation.extrapolateBackwards();
+        }
+
+        return sum;
     }
 
     @Override
@@ -48,7 +54,6 @@ public class Day9 extends Day {
     private static class Extrapolation {
         private final List<Integer> values;
         private Extrapolation inner;
-        private Integer nextValue;
 
         private Extrapolation(List<Integer> values) {
             this.values = values;
@@ -67,10 +72,6 @@ public class Day9 extends Day {
         }
 
         private Integer extrapolate() {
-            if (nextValue != null) {
-                return nextValue;
-            }
-
             boolean allZero = values.stream().allMatch(i -> i == 0);
 
             if (allZero) return 0;
@@ -81,9 +82,21 @@ public class Day9 extends Day {
 
             Integer last = values.get(values.size() - 1);
 
-            int v = last + inner.extrapolate();
-            nextValue = v;
-            return v;
+            return last + inner.extrapolate();
+        }
+
+        private Integer extrapolateBackwards() {
+            boolean allZero = values.stream().allMatch(i -> i == 0);
+
+            if (allZero) return 0;
+
+            if (inner == null) {
+                computeInner();
+            }
+
+            Integer first = values.get(0);
+
+            return first - inner.extrapolateBackwards();
         }
 
         @Override
