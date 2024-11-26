@@ -2,7 +2,6 @@ package days;
 
 import setup.Day;
 import util.Grid;
-import util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
