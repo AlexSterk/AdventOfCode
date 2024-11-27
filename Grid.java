@@ -152,7 +152,7 @@ public class Grid<T> {
         return subgrid(minX, maxX, minY, maxY);
     }
 
-    public static <T> Collection<T> stripTileData(Collection<Tile<T>> tiles) {
+    public static <T> List<T> stripTileData(List<Tile<T>> tiles) {
         return tiles.stream().map(Tile::data).collect(Collectors.toList());
     }
 
