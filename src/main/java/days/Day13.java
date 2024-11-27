@@ -1,13 +1,19 @@
 package days;
 
 import setup.Day;
+import util.CollectionUtil;
 import util.Grid;
+import util.Line;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Day13 extends Day {
 
     private ArrayList<Grid<String>> grids;
+    private Map<Grid<String>, Integer> cache = new HashMap<>();
 
     @Override
     public void processInput() {
@@ -24,96 +30,108 @@ public class Day13 extends Day {
         long sum = 0;
 
         for (Grid<String> grid : grids) {
-            var sameColsIndices = new ArrayList<Integer>();
-            var sameRowsIndices = new ArrayList<Integer>();
+            var s = getSymmetryNumber(grid);
 
-            for (int i = 0; i < grid.width - 1; i++) {
-                int j = i + 1;
+            assert s.size() == 1;
+            sum += s.get(0);
 
-                var r1 = Grid.stripTileData(grid.getColumn(i));
-                var r2 = Grid.stripTileData(grid.getColumn(j));
-
-                if (r1.equals(r2)) {
-                    sameColsIndices.add(i);
-                }
-            }
-
-            for (int i = 0; i < grid.height - 1; i++) {
-                int j = i + 1;
-
-                var r1 = Grid.stripTileData(grid.getRow(i));
-                var r2 = Grid.stripTileData(grid.getRow(j));
-
-                if (r1.equals(r2)) {
-                    sameRowsIndices.add(i);
-                }
-            }
-
-            var validCols = new ArrayList<Integer>();
-            var validRows = new ArrayList<Integer>();
-
-            for (int sameColsIndex : sameColsIndices) {
-                if (hasColSymmetry(grid, sameColsIndex)) {
-                    validCols.add(sameColsIndex);
-                }
-            }
-            for (int sameRowsIndex : sameRowsIndices) {
-                if (hasRowSymmetry(grid, sameRowsIndex)) {
-                    validRows.add(sameRowsIndex);
-                }
-            }
-
-            if (validRows.size() + validCols.size() != 1) {
-                throw new RuntimeException("Invalid grid");
-            }
-
-            for (int validCol : validCols) {
-                sum += validCol+1;
-            }
-            for (int validRow : validRows) {
-                sum += (validRow+1)* 100L;
-            }
+            cache.put(grid, s.get(0));
         }
 
         return sum;
     }
 
-    private boolean hasColSymmetry(Grid<String> grid, int col) {
-        for (int i = col; i >= 0; i--) {
-            int j = col + col - i + 1;
+    private List<Integer> getSymmetryNumber(Grid<String> grid) {
+        List<Integer> ret = new ArrayList<>();
 
-            if (j >= grid.width) {
-                continue;
-            }
+        var sameColsIndices = new ArrayList<Integer>();
+        var sameRowsIndices = new ArrayList<Integer>();
 
-            var c1 = Grid.stripTileData(grid.getColumn(i));
-            var c2 = Grid.stripTileData(grid.getColumn(j));
+        for (int i = 0; i < grid.width - 1; i++) {
+            int j = i + 1;
 
-            if (!c1.equals(c2)) {
-                return false;
+            var r1 = Grid.stripTileData(grid.getColumn(i));
+            var r2 = Grid.stripTileData(grid.getColumn(j));
+
+            if (r1.equals(r2)) {
+                sameColsIndices.add(i);
             }
         }
 
-        return true;
-    }
-
-    private boolean hasRowSymmetry(Grid<String> grid, int row) {
-        for (int i = row; i >= 0; i--) {
-            int j = row + row - i + 1;
-
-            if (j >= grid.height) {
-                continue;
-            }
+        for (int i = 0; i < grid.height - 1; i++) {
+            int j = i + 1;
 
             var r1 = Grid.stripTileData(grid.getRow(i));
             var r2 = Grid.stripTileData(grid.getRow(j));
 
-            if (!r1.equals(r2)) {
-                return false;
+            if (r1.equals(r2)) {
+                sameRowsIndices.add(i);
             }
         }
 
-        return true;
+        var validCols = new ArrayList<Integer>();
+        var validRows = new ArrayList<Integer>();
+
+        for (int sameColsIndex : sameColsIndices) {
+            if (hasColSymmetry(grid, sameColsIndex)) {
+                validCols.add(sameColsIndex);
+            }
+        }
+        for (int sameRowsIndex : sameRowsIndices) {
+            if (hasRowSymmetry(grid, sameRowsIndex)) {
+                validRows.add(sameRowsIndex);
+            }
+        }
+
+        for (Integer validCol : validCols) {
+            ret.add(validCol + 1);
+        }
+        for (Integer validRow : validRows) {
+            ret.add((validRow + 1) * 100);
+        }
+
+        return ret;
+    }
+
+    private List<Line.Point> symmetryErrors(Grid<String> grid, int i, boolean horizontalAxis) {
+        List<Line.Point> errors = new ArrayList<>();
+
+        for (int j = i; j >= 0; j--) {
+            int k = i + i - j + 1;
+
+            if (horizontalAxis) {
+                if (k >= grid.height) {
+                    continue;
+                }
+            } else {
+                if (k >= grid.width) {
+                    continue;
+                }
+            }
+
+            var r1 = horizontalAxis ? Grid.stripTileData(grid.getRow(j)) : Grid.stripTileData(grid.getColumn(j));
+            var r2 = horizontalAxis ? Grid.stripTileData(grid.getRow(k)) : Grid.stripTileData(grid.getColumn(k));
+
+            var diffIndices = CollectionUtil.differenceIndices(r1, r2);
+
+            for (Integer diffIndex : diffIndices) {
+                var p1 = horizontalAxis ? new Line.Point(diffIndex, j) : new Line.Point(j, diffIndex);
+                var p2 = horizontalAxis ? new Line.Point(diffIndex, k) : new Line.Point(k, diffIndex);
+
+                errors.add(p1);
+                errors.add(p2);
+            }
+        }
+
+        return errors;
+    }
+
+    private boolean hasColSymmetry(Grid<String> grid, int col) {
+        return symmetryErrors(grid, col, false).isEmpty();
+    }
+
+    private boolean hasRowSymmetry(Grid<String> grid, int row) {
+        return symmetryErrors(grid, row, true).isEmpty();
     }
 
     @Override
@@ -123,7 +141,47 @@ public class Day13 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        long sum = 0;
+
+        for (Grid<String> grid : grids) {
+            Integer colError = null;
+            Integer rowError = null;
+
+            for (int i = 0; i < grid.width; i++) {
+                var errors = symmetryErrors(grid, i, false);
+                if (errors.size() == 2) {
+                    assert colError == null;
+                    colError = i;
+
+                    System.out.printf("Col error at %d, %s\n", i, errors.get(0));
+                    System.out.printf("Col error at %d, %s\n", i, errors.get(1));
+                }
+            }
+            for (int i = 0; i < grid.height; i++) {
+                var errors = symmetryErrors(grid, i, true);
+                if (errors.size() == 2) {
+                    assert rowError == null;
+                    rowError = i;
+
+                    System.out.printf("Row error at %d, %s\n", i, errors.get(0));
+                    System.out.printf("Row error at %d, %s\n", i, errors.get(1));
+                }
+            }
+
+
+
+
+        }
+
+        return sum;
+    }
+
+    private Grid<String> correctError(Grid<String> grid, int x, int y) {
+        var newGrid = grid.copy();
+        var cur = newGrid.getTile(x, y).data();
+
+        newGrid.set(x, y, cur.equals("#") ? "." : "#");
+        return newGrid;
     }
 
     @Override
@@ -133,6 +191,6 @@ public class Day13 extends Day {
 
     @Override
     public boolean isTest() {
-        return false;
+        return true;
     }
 }
