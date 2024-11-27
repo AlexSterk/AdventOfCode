@@ -13,6 +13,14 @@ public class Memoizer <A,V> {
     }
 
     public V apply(A arg) {
-        return cache.computeIfAbsent(arg, function);
+        if (!cache.containsKey(arg)) {
+            cache.put(arg, function.apply(arg));
+        }
+
+        return cache.get(arg);
+    }
+
+    public static <A,V> Memoizer<A,V> memoize(Function<A,V> function) {
+        return new Memoizer<>(function);
     }
 }
