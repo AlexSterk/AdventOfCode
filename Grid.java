@@ -152,6 +152,10 @@ public class Grid<T> {
         return subgrid(minX, maxX, minY, maxY);
     }
 
+    public static <T> Collection<T> stripTileData(Collection<Tile<T>> tiles) {
+        return tiles.stream().map(Tile::data).collect(Collectors.toList());
+    }
+
     public Set<Tile<T>> getAdjacent(Tile<T> tile, boolean includeDiagonals) {
         Set<Tile<T>> set = new HashSet<>();
         set.add(tile.up());
