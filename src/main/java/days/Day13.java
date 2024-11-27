@@ -144,33 +144,30 @@ public class Day13 extends Day {
         long sum = 0;
 
         for (Grid<String> grid : grids) {
-            Integer colError = null;
-            Integer rowError = null;
+            List<Line.Point> errors = new ArrayList<>();
 
             for (int i = 0; i < grid.width; i++) {
-                var errors = symmetryErrors(grid, i, false);
-                if (errors.size() == 2) {
-                    assert colError == null;
-                    colError = i;
-
-                    System.out.printf("Col error at %d, %s\n", i, errors.get(0));
-                    System.out.printf("Col error at %d, %s\n", i, errors.get(1));
+                var _errors = symmetryErrors(grid, i, false);
+                if (_errors.size() == 2) {
+                    errors.addAll(_errors);
                 }
             }
             for (int i = 0; i < grid.height; i++) {
-                var errors = symmetryErrors(grid, i, true);
-                if (errors.size() == 2) {
-                    assert rowError == null;
-                    rowError = i;
-
-                    System.out.printf("Row error at %d, %s\n", i, errors.get(0));
-                    System.out.printf("Row error at %d, %s\n", i, errors.get(1));
+                var _errors = symmetryErrors(grid, i, true);
+                if (_errors.size() == 2) {
+                    errors.addAll(_errors);
                 }
             }
 
+            var error = errors.get(0);
+            var newGrid = correctError(grid, error.x(), error.y());
 
+            var s = getSymmetryNumber(newGrid);
+            s.remove(cache.get(grid));
 
+            assert s.size() == 1;
 
+            sum += s.get(0);
         }
 
         return sum;
@@ -191,6 +188,11 @@ public class Day13 extends Day {
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "37453";
     }
 }
