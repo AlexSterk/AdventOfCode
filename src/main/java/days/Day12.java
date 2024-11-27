@@ -12,7 +12,7 @@ import static util.Memoizer.memoize;
 public class Day12 extends Day {
 
     private List<Configuration> configurations;
-    private Memoizer<Configuration, Integer> countWays;
+    private Memoizer<Configuration, Long> countWays;
 
     @Override
     public void processInput() {
@@ -20,21 +20,26 @@ public class Day12 extends Day {
         for (String line : lines()) {
             configurations.add(Configuration.fromString(line));
         }
+        countWays = memoize(this::_countWays);
     }
 
     @Override
     public Object part1() {
-        countWays = memoize(this::_countWays);
-
-        int sum = 0;
+        long sum = 0;
         for (Configuration c : configurations) {
-            sum += countWays.apply(c);
+            long apply = countWays.apply(c);
+            sum += apply;
         }
 
         return sum;
     }
 
-    private int _countWays(Configuration c) {
+    @Override
+    public String partTwoSolution() {
+        return "6792010726878";
+    }
+
+    private long _countWays(Configuration c) {
         String s = c.s;
         List<Integer> l = c.l;
 
@@ -80,7 +85,24 @@ public class Day12 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        List<Configuration> newConfigurations = new ArrayList<>();
+
+        for (Configuration c : configurations) {
+            StringBuilder sb = new StringBuilder();
+            List<Integer> nl = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                sb.append(c.s);
+                sb.append('?');
+
+                nl.addAll(c.l);
+            }
+            String ns = sb.substring(0, sb.length() - 1);
+            newConfigurations.add(new Configuration(ns, nl));
+        }
+
+        configurations = newConfigurations;
+
+        return part1();
     }
 
     @Override
