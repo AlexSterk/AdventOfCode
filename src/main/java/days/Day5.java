@@ -12,7 +12,7 @@ public class Day5 extends Day {
 
     @Override
     public void processInput() {
-        List<String> split = Arrays.asList(input.split("\n\n"));
+        List<String> split = Arrays.asList(input.split("(\r?\n){2}"));
         String seeds = split.get(0).replace("seeds: ", "");
         this.seeds = Arrays.stream(seeds.split(" "))
                 .map(Long::parseLong)
@@ -22,7 +22,7 @@ public class Day5 extends Day {
         mappings = new HashMap<>();
         mappingOrder = new ArrayList<>();
         for (String map : maps) {
-            String[] splitMap = map.split("\n");
+            String[] splitMap = map.split("\r?\n");
             String name = splitMap[0].replace(" map:", "");
             mappingOrder.add(name);
             List<Mapping> mappingList = Arrays.stream(splitMap)
