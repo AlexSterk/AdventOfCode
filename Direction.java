@@ -44,4 +44,34 @@ public enum Direction {
             case SW -> NE;
         };
     }
+
+    public Direction turnRight() {
+        var dx = -this.dy;
+        var dy = this.dx;
+
+        return Direction.ALL.stream()
+            .filter(d -> d.dx == dx && d.dy == dy)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    public Direction turnLeft() {
+        var dx = this.dy;
+        var dy = -this.dx;
+
+        return Direction.ALL.stream()
+            .filter(d -> d.dx == dx && d.dy == dy)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    public static void main(String[] args) {
+        for (var dir : Direction.ALL) {
+            System.out.println(dir);
+            System.out.println(dir.opposite());
+            System.out.println(dir.turnRight());
+            System.out.println(dir.turnLeft());
+            System.out.println();
+        }
+    }
 }

@@ -117,6 +117,10 @@ public class Grid<T> {
         return tTile;
     }
 
+    public Tile<T> getTile(Line.Point point) {
+        return getTile(point.x(), point.y());
+    }
+
     private Tile<T> _getTile(int x, int y) {
         return grid.get(y).get(x);
     }
@@ -301,6 +305,10 @@ public class Grid<T> {
 
         public int manhattanDistance(Tile<T> other) {
             return Math.abs(x - other.x) + Math.abs(y - other.y);
+        }
+
+        public Line.Point asPoint() {
+            return new Line.Point(x, y);
         }
     }
 
