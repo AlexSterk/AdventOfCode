@@ -69,12 +69,13 @@ public class Grid<T> {
         return newGrid;
     }
 
-    public void init(Supplier<T> data, boolean overwrite) {
+    public Grid<T> init(Supplier<T> data, boolean overwrite) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (_getTile(x, y) == null || overwrite) set(x, y, data.get());
             }
         }
+        return this;
     }
 
     public void fill(T data) {
@@ -98,12 +99,14 @@ public class Grid<T> {
         return grid.hashCode();
     }
 
-    public void set(int x, int y, T data) {
-        grid.get(y).put(x, new Tile<>(x, y, data, this));
+    public Tile<T> set(int x, int y, T data) {
+        Tile<T> value = new Tile<>(x, y, data, this);
+        grid.get(y).put(x, value);
+        return value;
     }
 
-    public void set(Tile<T> tile, T data) {
-        set(tile.x, tile.y, data);
+    public Tile<T> set(Tile<?> tile, T data) {
+        return set(tile.x, tile.y, data);
     }
 
     public Tile<T> getTile(int x, int y) {
@@ -223,6 +226,13 @@ public class Grid<T> {
         }).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
+    public String toString(Function<Tile<T>, String> mapper) {
+        return grid.values().stream().map(l -> l.values().stream().map(t -> {
+            if (t == null) return "\033[31m□\033[0m";
+            return mapper.apply(t);
+        }).collect(Collectors.joining())).collect(Collectors.joining("\n"));
+    }
+
     /**
      * Rotates the grid 90 degrees clockwise
      */
@@ -326,8 +336,10 @@ public class Grid<T> {
         }
 
         @Override
-        public void set(int x, int y, T data) {
-            grid.computeIfAbsent(y, (k) -> new TreeMap<>()).put(x, new Tile<>(x, y, data, this));
+        public Tile<T> set(int x, int y, T data) {
+            Tile<T> value = new Tile<>(x, y, data, this);
+            grid.computeIfAbsent(y, (k) -> new TreeMap<>()).put(x, value);
+            return value;
         }
 
         @Override
@@ -369,6 +381,20 @@ public class Grid<T> {
             getAll().forEach(t -> g.set(t, t.data));
             return g;
         }
+
+        public Grid<T> toFinite() {
+            var width = maxX() - minX() + 1;
+            var height = maxY() - minY() + 1;
+
+            var offsetX = minX();
+            var offsetY = minY();
+
+            var finite = new Grid<>(width, height, empty);
+            for (var tile : getAll()) {
+                finite.set(tile.x - offsetX, tile.y - offsetY, tile.data);
+            }
+            return finite;
+        }
     }
 
     public static class NonEuclidianGrid<T> extends Grid<T> {
@@ -388,10 +414,10 @@ public class Grid<T> {
         }
 
         @Override
-        public void set(int x, int y, T data) {
+        public Tile<T> set(int x, int y, T data) {
             x = x % width;
             y = y % height;
-            super.set(x, y, data);
+            return super.set(x, y, data);
         }
 
         public void shiftRowRight(int y, int n) {

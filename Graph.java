@@ -39,6 +39,13 @@ public final class Graph<T> {
         if (!directional) removeEdge(to, from, true);
     }
 
+    public void removeNode(T node) {
+        nodes.remove(node);
+        for (Map<T, Integer> value : nodes.values()) {
+            value.remove(node);
+        }
+    }
+
     public void addEdge(T from, T to, int weight) {
         addEdge(from, to, weight, false);
     }
