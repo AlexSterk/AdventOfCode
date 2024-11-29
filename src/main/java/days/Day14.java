@@ -73,6 +73,11 @@ public class Day14 extends Day {
         return "109939";
     }
 
+    @Override
+    public String partTwoSolution() {
+        return "101010";
+    }
+
     private void rollGrid(Direction dir) {
         var movables = movables(dir);
         while (!movables.isEmpty()) {

@@ -70,6 +70,11 @@ public class Day18 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "70026";
+    }
+
     private record Instruction(Direction dir, int amount, int hex) {
         public static Instruction fromString(String s) {
             var split = s.split(" ");

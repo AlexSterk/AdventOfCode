@@ -65,6 +65,16 @@ public class Day15 extends Day {
         return false;
     }
 
+    @Override
+    public String partOneSolution() {
+        return "517315";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "247763";
+    }
+
     private int hash(String s) {
         int cur = 0;
 
