@@ -28,22 +28,28 @@ public class Day17 extends Day {
         var end = grid.getTile(grid.width - 1, grid.height - 1);
 
         var d = Dijkstra.shortestPath(
-                new State(start, Direction.E, 0, null),
+                new CrucibleState(start, Direction.E, 0, null),
                 s -> s.position().equals(end),
-                State::neighbors,
+                CrucibleState::neighbors,
                 (c, s) -> Integer.parseInt(s.position.data())
         );
-
-        for (State state : d.end().path()) {
-            System.out.println(state);
-        }
 
         return d.get();
     }
 
     @Override
     public Object part2() {
-        return null;
+        var start = grid.getTile(0, 0);
+        var end = grid.getTile(grid.width - 1, grid.height - 1);
+
+        var d = Dijkstra.shortestPath(
+                new UltraCrucibleState(start, Direction.E, 0, null),
+                s -> s.position().equals(end),
+                CrucibleState::neighbors,
+                (c, s) -> Integer.parseInt(s.position.data())
+        );
+
+        return d.get();
     }
 
     @Override
@@ -61,25 +67,44 @@ public class Day17 extends Day {
         return "1238";
     }
 
-    private record State(Grid.Tile<String> position, Direction dir, int stepsTakenInDir, State prevState) {
-        public State move(Direction nDir) {
-            return new State(position.add(nDir.asPoint()), nDir,   dir == nDir ? stepsTakenInDir + 1 : 1, this);
+    @Override
+    public String partTwoSolution() {
+        return "1362";
+    }
+
+    private static class CrucibleState {
+        protected final Grid.Tile<String> position;
+        protected final Direction dir;
+        protected final int stepsTakenInDir;
+        protected final CrucibleState prevState;
+
+        private CrucibleState(Grid.Tile<String> position, Direction dir, int stepsTakenInDir, CrucibleState prevState) {
+            this.position = position;
+            this.dir = dir;
+            this.stepsTakenInDir = stepsTakenInDir;
+            this.prevState = prevState;
         }
 
-        public boolean isValid() {
-            return position != null && stepsTakenInDir <= 3;
+        public CrucibleState move(Direction nDir) {
+            return new CrucibleState(position.add(nDir.asPoint()), nDir, dir == nDir ? stepsTakenInDir + 1 : 1, this);
         }
 
-        public List<State> neighbors() {
-            return Stream.of(
-                    move(dir),
-                    move(dir.left()),
-                    move(dir.right())
-            ).filter(State::isValid).toList();
+        public List<CrucibleState> neighbors() {
+            var list = new ArrayList<CrucibleState>();
+
+            if (stepsTakenInDir < 3) {
+                list.add(move(dir));
+            }
+            list.add(move(dir.left()));
+            list.add(move(dir.right()));
+
+            list.removeIf(s -> s.position == null);
+
+            return list;
         }
 
-        public List<State> path() {
-            var result = new ArrayList<State>();
+        public List<CrucibleState> path() {
+            var result = new ArrayList<CrucibleState>();
             var current = this;
             while (current != null) {
                 result.add(current);
@@ -92,7 +117,7 @@ public class Day17 extends Day {
         @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
-            State state = (State) o;
+            CrucibleState state = (CrucibleState) o;
             return stepsTakenInDir == state.stepsTakenInDir && dir == state.dir && Objects.equals(position, state.position);
         }
 
@@ -108,6 +133,38 @@ public class Day17 extends Day {
                     ", dir=" + dir +
                     ", stepsTakenInDir=" + stepsTakenInDir +
                     '}';
+        }
+
+        public Grid.Tile<String> position() {
+            return position;
+        }
+    }
+
+    private static class UltraCrucibleState extends CrucibleState {
+        private UltraCrucibleState(Grid.Tile<String> position, Direction dir, int stepsTakenInDir, UltraCrucibleState prevState) {
+            super(position, dir, stepsTakenInDir, prevState);
+        }
+
+        @Override
+        public CrucibleState move(Direction nDir) {
+            return new UltraCrucibleState(position.add(nDir.asPoint()), nDir, dir == nDir ? stepsTakenInDir + 1 : 1, this);
+        }
+
+        @Override
+        public List<CrucibleState> neighbors() {
+            var list = new ArrayList<CrucibleState>();
+
+            if (stepsTakenInDir < 10) {
+                list.add(move(dir));
+            }
+
+            if (stepsTakenInDir >= 4 || stepsTakenInDir == 0) {
+                list.add(move(dir.left()));
+                list.add(move(dir.right()));
+            }
+
+            list.removeIf(s -> s.position == null);
+            return list;
         }
     }
 }
