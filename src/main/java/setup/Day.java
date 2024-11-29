@@ -3,8 +3,7 @@ package setup;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -43,6 +42,15 @@ public abstract class Day {
             System.exit(1);
         }
         input = i;
+    }
+
+    public void write(String fileName, String content) {
+        try {
+            Files.createDirectories(Path.of("data/day%d/output".formatted(getDay())));
+            Files.write(Path.of("data/day%d/output/%s".formatted(getDay(), fileName)), content.getBytes(), StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
