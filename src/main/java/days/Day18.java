@@ -3,6 +3,8 @@ package days;
 import setup.Day;
 import util.Direction;
 import util.Grid;
+import util.Line;
+import util.Maths;
 
 import java.util.*;
 
@@ -57,7 +59,29 @@ public class Day18 extends Day {
 
     @Override
     public Object part2() {
-        return null;
+        // im so over this shit...
+
+        var instructions = lines().stream().map(Instruction2::fromString).toList();
+        List<Line.Point> vertices = new ArrayList<>();
+        Line.Point current = new Line.Point(0,0);
+
+        vertices.add(current);
+
+        for (Instruction2 instruction : instructions) {
+            var d = instruction.dir.asPoint().multiply(instruction.amount);
+            current = current.add(d);
+            vertices.add(current);
+        }
+
+        var overallArea = Maths.shoelaceArea(vertices);
+        long perimeterArea = 0;
+        for (int i = 0; i < vertices.size(); i++) {
+            var p1 = vertices.get(i);
+            var p2 = vertices.get((i+1) % vertices.size());
+            perimeterArea += p1.manhattanDistance(p2);
+        }
+
+        return Maths.PicksTheorem.interiorArea(overallArea, perimeterArea) + perimeterArea;
     }
 
     @Override
@@ -94,15 +118,21 @@ public class Day18 extends Day {
         }
     }
 
-    private record Trench(Integer color) implements Grid.Weighted {
-        @Override
-        public String toString() {
-            return color == null ? "." : "#";
-        }
+    private record Instruction2(Direction dir, int amount) {
+        public static Instruction2 fromString(String s) {
+            var split = s.split(" ");
+            var hex = split[2].replaceAll("[()#]", "");
+            var amount = Integer.parseInt(hex.substring(0,5), 16);
 
-        @Override
-        public Integer getWeight() {
-            return 1;
+            var mapDir = switch (hex.substring(5)) {
+                case "0" -> Direction.E;
+                case "1" -> Direction.S;
+                case "2" -> Direction.W;
+                case "3" -> Direction.N;
+                default -> throw new IllegalArgumentException("Invalid direction: " + hex);
+            };
+
+            return new Instruction2(mapDir, amount);
         }
     }
 }
