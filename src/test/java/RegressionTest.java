@@ -1,9 +1,8 @@
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import setup.Day;
-import util.SkipCI;
+import util.Annotations.SkipCI;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -51,6 +50,7 @@ public class RegressionTest {
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
         if (part == 2) day.setPart2();
+
         if (CI) {
             SkipCI annotation = C.getAnnotation(SkipCI.class);
             if (annotation != null) {

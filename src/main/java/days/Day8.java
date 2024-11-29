@@ -13,11 +13,20 @@ public class Day8 extends Day {
     private Map<String, Node> nodes;
     private String directions;
 
+    private static String performMove(char c, Node node) {
+        String start;
+        if (c == 'L') {
+            start = node.left;
+        } else {
+            start = node.right;
+        }
+        return start;
+    }
 
     @Override
     public void processInput() {
         directions = lines().get(0);
-        nodes  = new HashMap<>();
+        nodes = new HashMap<>();
 
         Pattern p = Pattern.compile("\\w{3}");
         for (String s : lines().subList(2, lines().size())) {
@@ -78,18 +87,6 @@ public class Day8 extends Day {
         return path;
     }
 
-    private static String performMove(char c, Node node) {
-        String start;
-        if (c == 'L') {
-            start = node.left;
-        } else {
-            start = node.right;
-        }
-        return start;
-    }
-
-
-
     @Override
     public Object part2() {
         var endInA = nodes.keySet().stream().filter(s -> s.endsWith("A")).toList();
@@ -116,10 +113,6 @@ public class Day8 extends Day {
         return 8;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {
@@ -131,7 +124,9 @@ public class Day8 extends Day {
         return "24035773251517";
     }
 
-    private record Node(String left, String right) {}
+    private record Node(String left, String right) {
+    }
 
-    private record State(String current, int i) {}
+    private record State(String current, int i) {
+    }
 }

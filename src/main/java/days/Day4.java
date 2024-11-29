@@ -49,8 +49,13 @@ public class Day4 extends Day {
     }
 
     @Override
-    public boolean isTest() {
-        return false;
+    public String partOneSolution() {
+        return "20407";
+    }
+
+    @Override
+    public String partTwoSolution() {
+        return "23806951";
     }
 
     private record Card(int id, Set<Integer> winning, Set<Integer> numbers) {
@@ -75,15 +80,5 @@ public class Day4 extends Day {
             var intersection = winning.stream().filter(numbers::contains).collect(Collectors.toSet());
             return intersection.size();
         }
-    }
-
-    @Override
-    public String partOneSolution() {
-        return "20407";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "23806951";
     }
 }

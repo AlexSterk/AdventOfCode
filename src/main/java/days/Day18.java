@@ -2,12 +2,15 @@ package days;
 
 import setup.Day;
 import util.Direction;
-import util.Grid;
 import util.Line;
 import util.Maths;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static util.Annotations.TestInput;
+
+@TestInput
 public class Day18 extends Day {
 
     private List<Instruction> instructions;
@@ -20,7 +23,7 @@ public class Day18 extends Day {
     @Override
     public Object part1() {
         List<Line.Point> vertices = new ArrayList<>();
-        Line.Point current = new Line.Point(0,0);
+        Line.Point current = new Line.Point(0, 0);
 
         vertices.add(current);
 
@@ -34,7 +37,7 @@ public class Day18 extends Day {
         long perimeterArea = 0;
         for (int i = 0; i < vertices.size(); i++) {
             var p1 = vertices.get(i);
-            var p2 = vertices.get((i+1) % vertices.size());
+            var p2 = vertices.get((i + 1) % vertices.size());
             perimeterArea += p1.manhattanDistance(p2);
         }
 
@@ -49,11 +52,6 @@ public class Day18 extends Day {
     @Override
     public int getDay() {
         return 18;
-    }
-
-    @Override
-    public boolean isTest() {
-        return false;
     }
 
     @Override
@@ -91,7 +89,7 @@ public class Day18 extends Day {
         public static Instruction fromStringP2(String s) {
             var split = s.split(" ");
             var hex = split[2].replaceAll("[()#]", "");
-            var amount = Integer.parseInt(hex.substring(0,5), 16);
+            var amount = Integer.parseInt(hex.substring(0, 5), 16);
 
             var mapDir = switch (hex.substring(5)) {
                 case "0" -> Direction.E;

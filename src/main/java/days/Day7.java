@@ -42,10 +42,6 @@ public class Day7 extends Day {
         return 7;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {

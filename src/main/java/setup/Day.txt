@@ -2,6 +2,9 @@ package days;
 
 import setup.Day;
 
+import static util.Annotations.*;
+
+// @TestInput
 public class Day%Day% extends Day {
     @Override
     public void processInput() {
@@ -21,10 +24,5 @@ public class Day%Day% extends Day {
     @Override
     public int getDay() {
         return %Day%;
-    }
-
-    @Override
-    public boolean isTest() {
-        return false;
     }
 }

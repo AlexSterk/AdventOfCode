@@ -1,5 +1,7 @@
 package setup;
 
+import util.Annotations.TestInput;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +24,13 @@ public abstract class Day {
      * Make sure to implement {@link Day#getDay()}
      */
     public Day() {
-        boolean test = this.isTest();
+        boolean test = false;
+
+        TestInput annotation = this.getClass().getAnnotation(TestInput.class);
+        if (annotation != null) {
+            test = true;
+        }
+
         String i;
         try {
             i = Files.readString(Paths.get(String.format("data/day%d/%s.txt", getDay(), test ? "test" : "input")));
@@ -83,13 +91,6 @@ public abstract class Day {
      * @return the day of the puzzle you are solving
      */
     public abstract int getDay();
-
-    /**
-     * @return Whether to use test input (test.txt) instead of regular input (input.txt)
-     */
-    public boolean isTest() {
-        return false;
-    }
 
     /**
      * @return Whether input should be parsed again for Part 2

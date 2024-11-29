@@ -7,8 +7,8 @@ import util.Grid;
 import java.util.*;
 
 public class Day16 extends Day {
-    private Grid<String> grid;
     private final Queue<Beam> beams = new ArrayDeque<>();
+    private Grid<String> grid;
 
     @Override
     public void processInput() {
@@ -106,10 +106,6 @@ public class Day16 extends Day {
         return 16;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {

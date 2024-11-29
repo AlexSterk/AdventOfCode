@@ -14,40 +14,6 @@ public class Day11 extends Day {
     private ArrayList<Integer> emptyCols;
     private List<Grid.Tile<String>> galaxies;
 
-    @Override
-    public void processInput() {
-        var image = Grid.parseGrid(input);
-        emptyRows = new ArrayList<>();
-        emptyCols = new ArrayList<>();
-
-        for (int i = 0; i < image.height; i++) {
-            if (image.getRow(i).stream().allMatch(c -> c.data().equals("."))) {
-                emptyRows.add(i);
-            }
-        }
-
-        for (int i = 0; i < image.width; i++) {
-            if (image.getColumn(i).stream().allMatch(c -> c.data().equals("."))) {
-                emptyCols.add(i);
-            }
-        }
-
-        galaxies = image.getAll().stream().filter(c -> c.data().equals("#")).toList();
-    }
-
-    @Override
-    public Object part1() {
-        long d = 2 - 1;
-        Map<String, Long> distances = getDistances(galaxies, emptyRows, emptyCols, d);
-
-        long sum = 0;
-        for (long value : distances.values()) {
-            sum += value;
-        }
-
-        return sum;
-    }
-
     private static Map<String, Long> getDistances(List<Grid.Tile<String>> galaxies, ArrayList<Integer> emptyRows, ArrayList<Integer> emptyCols, long d) {
         Map<String, Long> distances = new HashMap<>();
 
@@ -82,6 +48,40 @@ public class Day11 extends Day {
     }
 
     @Override
+    public void processInput() {
+        var image = Grid.parseGrid(input);
+        emptyRows = new ArrayList<>();
+        emptyCols = new ArrayList<>();
+
+        for (int i = 0; i < image.height; i++) {
+            if (image.getRow(i).stream().allMatch(c -> c.data().equals("."))) {
+                emptyRows.add(i);
+            }
+        }
+
+        for (int i = 0; i < image.width; i++) {
+            if (image.getColumn(i).stream().allMatch(c -> c.data().equals("."))) {
+                emptyCols.add(i);
+            }
+        }
+
+        galaxies = image.getAll().stream().filter(c -> c.data().equals("#")).toList();
+    }
+
+    @Override
+    public Object part1() {
+        long d = 2 - 1;
+        Map<String, Long> distances = getDistances(galaxies, emptyRows, emptyCols, d);
+
+        long sum = 0;
+        for (long value : distances.values()) {
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    @Override
     public Object part2() {
         long d = 1_000_000 - 1;
         Map<String, Long> distances = getDistances(galaxies, emptyRows, emptyCols, d);
@@ -99,10 +99,6 @@ public class Day11 extends Day {
         return 11;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {

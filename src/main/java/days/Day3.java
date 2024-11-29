@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class Day3 extends Day {
     private Grid<String> grid;
     private Set<String> symbols;
-    private HashMap<Grid.Tile<String>, Set<Integer>> potentialGears = new HashMap<>();
+    private final HashMap<Grid.Tile<String>, Set<Integer>> potentialGears = new HashMap<>();
 
     @Override
     public void processInput() {
@@ -82,10 +82,6 @@ public class Day3 extends Day {
         return 3;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {

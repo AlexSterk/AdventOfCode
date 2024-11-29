@@ -82,7 +82,7 @@ public class Day5 extends Day {
     @Override
     public Object part2() {
         seedRanges = new ArrayList<>();
-        for (int i = 0; i < seeds.size(); i+=2) {
+        for (int i = 0; i < seeds.size(); i += 2) {
             var seed = seeds.get(i);
             var size = seeds.get(i + 1);
 
@@ -103,10 +103,6 @@ public class Day5 extends Day {
         return 5;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {

@@ -6,8 +6,9 @@ import util.Grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import static util.CollectionUtil.*;
-import static util.Grid.*;
+import static util.CollectionUtil.differenceIndices;
+import static util.Grid.parseGrid;
+import static util.Grid.stripTileData;
 
 public class Day13 extends Day {
 
@@ -41,7 +42,7 @@ public class Day13 extends Day {
         List<Integer> ret = new ArrayList<>();
 
         for (int i = 0; i < grid.width - 1; i++) {
-            if (symmetryErrors(grid, i , false) == allowedErrors) {
+            if (symmetryErrors(grid, i, false) == allowedErrors) {
                 ret.add(i + 1);
             }
         }
@@ -104,10 +105,6 @@ public class Day13 extends Day {
         return 13;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partTwoSolution() {

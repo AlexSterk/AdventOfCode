@@ -70,11 +70,11 @@ public class Day12 extends Day {
                     return 0;
                 }
             }
-            if (s.length() >= r+1 && s.charAt(r) == '#') {
+            if (s.length() >= r + 1 && s.charAt(r) == '#') {
                 return 0;
             }
 
-            return countWays.apply(new Configuration(s.length() >= r+1 ?  s.substring(r + 1) : "", remaining));
+            return countWays.apply(new Configuration(s.length() >= r + 1 ? s.substring(r + 1) : "", remaining));
         }
 
         var c1 = new Configuration('#' + s.substring(1), l);
@@ -110,10 +110,6 @@ public class Day12 extends Day {
         return 12;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {
@@ -121,11 +117,6 @@ public class Day12 extends Day {
     }
 
     private record Configuration(String s, List<Integer> l) {
-
-        @Override
-        public String toString() {
-            return "%s %s".formatted(s, l);
-        }
 
         public static Configuration fromString(String s) {
             String[] parts = s.split(" ");
@@ -140,6 +131,11 @@ public class Day12 extends Day {
             }
 
             return new Configuration(s1, List.copyOf(l1));
+        }
+
+        @Override
+        public String toString() {
+            return "%s %s".formatted(s, l);
         }
     }
 }

@@ -2,7 +2,10 @@ package days;
 
 import setup.Day;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Day15 extends Day {
 
@@ -60,10 +63,6 @@ public class Day15 extends Day {
         return 15;
     }
 
-    @Override
-    public boolean isTest() {
-        return false;
-    }
 
     @Override
     public String partOneSolution() {
