@@ -50,6 +50,7 @@ public class RegressionTest {
         Class<?> C = Class.forName("days." + d);
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
+        if (part == 2) day.setPart2();
         if (CI) {
             SkipCI annotation = C.getAnnotation(SkipCI.class);
             if (annotation != null) {

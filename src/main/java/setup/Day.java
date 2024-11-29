@@ -15,6 +15,8 @@ public abstract class Day {
      */
     public final String input;
 
+    private boolean part2 = false;
+
     /**
      * Reads the input into a single String and calls {@link Day#processInput()} to process the input.
      * Make sure to implement {@link Day#getDay()}
@@ -51,6 +53,14 @@ public abstract class Day {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isPart2() {
+        return part2;
+    }
+
+    public void setPart2() {
+        this.part2 = true;
     }
 
     /**
@@ -113,6 +123,7 @@ public abstract class Day {
         Object part1 = day.part1();
         Duration partOneTime = Duration.between(now, Instant.now());
 
+        day.part2 = true;
         if (day.resetForPartTwo()) day.processInput();
         System.out.println("================ PART 2 ================");
         now = Instant.now();
