@@ -5,7 +5,10 @@ import util.Dijkstra;
 import util.Direction;
 import util.Grid;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Day17 extends Day {
@@ -25,11 +28,15 @@ public class Day17 extends Day {
         var end = grid.getTile(grid.width - 1, grid.height - 1);
 
         var d = Dijkstra.shortestPath(
-                new State(start, Direction.E, 0),
+                new State(start, Direction.E, 0, null),
                 s -> s.position().equals(end),
                 State::neighbors,
                 (c, s) -> Integer.parseInt(s.position.data())
         );
+
+        for (State state : d.end().path()) {
+            System.out.println(state);
+        }
 
         return d.get();
     }
@@ -46,63 +53,61 @@ public class Day17 extends Day {
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
-    private record State(Grid.Tile<String> position, Direction dir, int stepsTakenInDir) {
-        public State(Grid.Tile<String> position, Direction dir, int stepsTakenInDir) {
-            this.position = position;
-            this.dir = dir;
-            this.stepsTakenInDir = stepsTakenInDir;
-        }
+    @Override
+    public String partOneSolution() {
+        return "1238";
+    }
 
-        public State move() {
-            return new State(position.add(dir.asPoint()), dir, stepsTakenInDir + 1);
-        }
-
-        public State turn(Direction dir) {
-            return new State(position, dir, 0);
-        }
-
-        public State turnAndMove(Direction newDir) {
-            return turn(newDir).move();
+    private record State(Grid.Tile<String> position, Direction dir, int stepsTakenInDir, State prevState) {
+        public State move(Direction nDir) {
+            return new State(position.add(nDir.asPoint()), nDir,   dir == nDir ? stepsTakenInDir + 1 : 1, this);
         }
 
         public boolean isValid() {
-            return position != null && stepsTakenInDir < 3;
+            return position != null && stepsTakenInDir <= 3;
         }
 
         public List<State> neighbors() {
             return Stream.of(
-                    move(),
-                    turnAndMove(dir.left()),
-                    turnAndMove(dir.right())
+                    move(dir),
+                    move(dir.left()),
+                    move(dir.right())
             ).filter(State::isValid).toList();
         }
-    }
 
-//    private record Num(int n) implements Grid.Weighted {
-//
-//        @Override
-//        public Integer getWeight() {
-//            return n;
-//        }
-//    }
-//
-//    private record Configuration(List<Grid.Tile<Num>> path, Direction direction) {
-//        public boolean isValid() {
-//            if (path.size() < 3) return true;
-//            var last = path.subList(path.size() - 3, path.size());
-//
-//            // invalid if they all have the same X or same Y coordinate
-//            var x = last.stream().map(Grid.Tile::x).distinct().count();
-//            var y = last.stream().map(Grid.Tile::y).distinct().count();
-//
-//            return x != 1 && y != 1;
-//        }
-//
-//        public int getWeight() {
-//            return path.stream().skip(1).mapToInt(t -> t.data().n).sum();
-//        }
-//    }
+        public List<State> path() {
+            var result = new ArrayList<State>();
+            var current = this;
+            while (current != null) {
+                result.add(current);
+                current = current.prevState;
+            }
+            Collections.reverse(result);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            State state = (State) o;
+            return stepsTakenInDir == state.stepsTakenInDir && dir == state.dir && Objects.equals(position, state.position);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(position, dir, stepsTakenInDir);
+        }
+
+        @Override
+        public String toString() {
+            return "State{" +
+                    "position=" + position +
+                    ", dir=" + dir +
+                    ", stepsTakenInDir=" + stepsTakenInDir +
+                    '}';
+        }
+    }
 }
