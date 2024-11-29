@@ -123,5 +123,9 @@ public record Line(Point a, Point b) {
         public int manhattanDistance(Point o) {
             return Math.abs(x() - o.x()) + Math.abs(y() - o.y());
         }
+
+        public Point multiply(int n) {
+            return new Point(x() * n, y() * n);
+        }
     }
 }
