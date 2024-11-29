@@ -310,6 +310,14 @@ public class Grid<T> {
         public Line.Point asPoint() {
             return new Line.Point(x, y);
         }
+
+        public Tile<T> add(int x, int y) {
+            return grid.getTile(this.x + x, this.y + y);
+        }
+
+        public Tile<T> add(Line.Point point) {
+            return add(point.x(), point.y());
+        }
     }
 
     public static class InfiniteGrid<T> extends Grid<T> {

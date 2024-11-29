@@ -45,7 +45,7 @@ public enum Direction {
         };
     }
 
-    public Direction turnRight() {
+    public Direction right() {
         var dx = -this.dy;
         var dy = this.dx;
 
@@ -55,7 +55,7 @@ public enum Direction {
             .orElseThrow();
     }
 
-    public Direction turnLeft() {
+    public Direction left() {
         var dx = this.dy;
         var dy = -this.dx;
 
@@ -69,8 +69,8 @@ public enum Direction {
         for (var dir : Direction.ALL) {
             System.out.println(dir);
             System.out.println(dir.opposite());
-            System.out.println(dir.turnRight());
-            System.out.println(dir.turnLeft());
+            System.out.println(dir.right());
+            System.out.println(dir.left());
             System.out.println();
         }
     }
