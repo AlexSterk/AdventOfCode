@@ -79,7 +79,11 @@ public class Grid<T> {
     }
 
     public void fill(T data) {
-        init(() -> data, true);
+        fill(data, true);
+    }
+
+    public void fill(T data, boolean overwrite) {
+        init(() -> data, overwrite);
     }
 
     public void print() {
