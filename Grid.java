@@ -1,6 +1,7 @@
 package util;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -46,6 +47,10 @@ public class Grid<T> {
     }
 
     public static <T extends Weighted> Graph<Tile<T>> gridToGraph(Grid<T> grid) {
+        return gridToGraph(grid, (a, b) -> b.getWeight());
+    }
+
+    public static <T> Graph<Tile<T>> gridToGraph(Grid<T> grid, BiFunction<T, T, Integer> weight) {
         Graph<Tile<T>> graph = new Graph<>();
 
         for (Tile<T> tTile : grid.getAll()) {
@@ -54,7 +59,7 @@ public class Grid<T> {
 
         for (Tile<T> tTile : grid.getAll()) {
             for (Tile<T> tile : grid.getAdjacent(tTile, false)) {
-                graph.addEdge(tTile, tile, tile.data.getWeight(), true);
+                graph.addEdge(tTile, tile, weight.apply(tTile.data, tile.data), true);
             }
         }
 

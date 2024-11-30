@@ -1,6 +1,7 @@
 package util;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public final class Graph<T> {
     private final Map<T, Map<T, Integer>> nodes;
@@ -46,12 +47,20 @@ public final class Graph<T> {
         }
     }
 
+    public void removeNodeIf(Predicate<T> predicate) {
+        nodes.keySet().removeIf(predicate);
+        for (Map<T, Integer> value : nodes.values()) {
+            value.keySet().removeIf(predicate);
+        }
+    }
+
     public void addEdge(T from, T to, int weight) {
         addEdge(from, to, weight, false);
     }
 
     public int getWeight(T from, T to) {
-        return nodes.get(from).get(to);
+        Map<T, Integer> tIntegerMap = nodes.get(from);
+        return tIntegerMap.get(to);
     }
 
     private void runDijkstra(T start, Map<T, Integer> dist, Map<T, T> pred) {
