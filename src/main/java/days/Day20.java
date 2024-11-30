@@ -1,11 +1,12 @@
 package days;
 
 import setup.Day;
+import util.Maths;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static util.Annotations.Solution;
-import static util.Annotations.TestInput;
 
 //@TestInput("test2")
 public class Day20 extends Day {
@@ -30,10 +31,10 @@ public class Day20 extends Day {
             var source = modules.get(split[0].replaceAll("[%&]", ""));
             split = split[1].split(", ");
             for (String destination : split) {
-                var dest = modules.getOrDefault(destination, new TestModule(destination));
+                var dest = modules.computeIfAbsent(destination, TestModule::new);
 
                 if (dest instanceof ConjunctionModule conjunction) {
-                    conjunction.lastPulseReceivedFrom.put(source, false);
+                    conjunction.inputs.put(source, false);
                 }
 
                 source.addDestination(dest);
@@ -52,7 +53,7 @@ public class Day20 extends Day {
         lowSent = 0;
         highSent = 0;
         for (int i = 0; i < 1000; i++) {
-            pushButton();
+            pushButton(i);
         }
         System.out.println("Low sent: " + lowSent);
         System.out.println("High sent: " + highSent);
@@ -60,8 +61,8 @@ public class Day20 extends Day {
         return (long) lowSent * highSent;
     }
 
-    private void pushButton() {
-        var pulse = new Pulse(button, false, modules.get("broadcaster"));
+    private void pushButton(int i) {
+        var pulse = new Pulse(button, false, modules.get("broadcaster"), i);
         var queue = new LinkedList<Pulse>();
         queue.add(pulse);
 
@@ -77,20 +78,38 @@ public class Day20 extends Day {
             }
 
             destination.receivePulse(current);
-            Boolean p = destination.nextPulse();
-            if (p != null) {
-                for (Module dest : destination.destinations) {
-                    queue.add(new Pulse(destination, p, dest));
+            for (Module d : destination.destinations) {
+                var p = destination.nextPulse(current, d);
+                if (p != null) {
+                    queue.add(p);
                 }
             }
         }
     }
 
-    @Solution("")
+    @Solution("238420328103151")
     @Override
     public Object part2() {
+        // Find all modules that have rx as destination
+        var ms = new ArrayList<>(List.of(modules.get("rx")));
+        while (ms.size() == 1) {
+            var c = ms.getFirst();
+            ms = modules.values().stream()
+                    .filter(m -> m.destinations.contains(c))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
 
-        return null;
+        int i = 1; // Start at 1 because we count button presses
+        while (ms.stream().anyMatch(m -> m instanceof ConjunctionModule c && c.pressed_needed_for_high == null)) {
+            pushButton(i++);
+        }
+
+        long lcm = 1;
+        for (ConjunctionModule m : ms.stream().map(m -> (ConjunctionModule) m).toList()) {
+            lcm = Maths.lcm(lcm, m.pressed_needed_for_high);
+        }
+
+        return lcm;
     }
 
     @Override
@@ -106,8 +125,6 @@ public class Day20 extends Day {
     private static abstract class Module {
         public final String name;
         private final Set<Module> destinations = new HashSet<>();
-
-        protected Pulse lastReceivedPulse;
 
         private Module(String name) {
             this.name = name;
@@ -143,7 +160,7 @@ public class Day20 extends Day {
 
         public abstract void receivePulse(Pulse pulse);
 
-        public abstract Boolean nextPulse();
+        public abstract Pulse nextPulse(Pulse pulse, Module destination);
     }
 
     private static class FlipFlopModule extends Module {
@@ -155,22 +172,22 @@ public class Day20 extends Day {
 
         @Override
         public void receivePulse(Pulse pulse) {
-            lastReceivedPulse = pulse;
-
             if (!pulse.high) {
                 on = !on;
             }
         }
 
         @Override
-        public Boolean nextPulse() {
-            if (lastReceivedPulse.high) return null;
-            return on;
+        public Pulse nextPulse(Pulse pulse, Module destination) {
+            if (pulse.high) return null;
+            return new Pulse(this, on, destination, pulse.button_presses);
         }
     }
 
     private static class ConjunctionModule extends Module {
-        private final Map<Module, Boolean> lastPulseReceivedFrom = new HashMap<>();
+        private final Map<Module, Boolean> inputs = new HashMap<>();
+
+        private Integer pressed_needed_for_high = null;
 
         private ConjunctionModule(String name) {
             super(name);
@@ -178,13 +195,16 @@ public class Day20 extends Day {
 
         @Override
         public void receivePulse(Pulse pulse) {
-            lastReceivedPulse = pulse;
-            lastPulseReceivedFrom.put(pulse.source, pulse.high);
+            inputs.put(pulse.source, pulse.high);
         }
 
         @Override
-        public Boolean nextPulse() {
-            return !lastPulseReceivedFrom.values().stream().allMatch(p -> p);
+        public Pulse nextPulse(Pulse pulse, Module destination) {
+            Pulse pl = new Pulse(this, !inputs.values().stream().allMatch(p -> p), destination, pulse.button_presses);
+            if (pl.high && pressed_needed_for_high == null) {
+                pressed_needed_for_high = pulse.button_presses;
+            }
+            return pl;
         }
     }
 
@@ -195,12 +215,12 @@ public class Day20 extends Day {
 
         @Override
         public void receivePulse(Pulse pulse) {
-            lastReceivedPulse = pulse;
+
         }
 
         @Override
-        public Boolean nextPulse() {
-            return lastReceivedPulse.high;
+        public Pulse nextPulse(Pulse pulse, Module destination) {
+            return new Pulse(this, pulse.high, destination, pulse.button_presses);
         }
     }
 
@@ -215,12 +235,12 @@ public class Day20 extends Day {
         }
 
         @Override
-        public Boolean nextPulse() {
+        public Pulse nextPulse(Pulse pulse, Module destination) {
             return null;
         }
     }
 
-    private record Pulse(Module source, boolean high, Module destination) {
+    private record Pulse(Module source, boolean high, Module destination, int button_presses) {
         @Override
         public String toString() {
             return "%s -%s-> %s".formatted(source.name, high ? "high" : "low", destination.name);
