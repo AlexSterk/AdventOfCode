@@ -18,4 +18,10 @@ public class Annotations {
     public @interface TestInput {
 
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface Solution {
+        String value();
+    }
 }
