@@ -16,7 +16,7 @@ public class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     public @interface TestInput {
-
+        String value() default "test";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
