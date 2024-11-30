@@ -8,7 +8,7 @@ public class Dijkstra {
     public static <T> SearchResult<T> shortestPath(
             T start,
             Function<T, Boolean> endCondition,
-            Function<T, List<T>> neighbors,
+            Function<T, Collection<T>> neighbors,
             BiFunction<T, T, Integer> cost
     ) {
         var distances = new HashMap<>(Map.of(start, 0));
@@ -27,7 +27,7 @@ public class Dijkstra {
 
             end = endCondition.apply(current) ? current : null;
 
-            List<T> neighbourTs = neighbors.apply(current);
+            Collection<T> neighbourTs = neighbors.apply(current);
             neighbourTs.stream()
                     .filter(n -> !distances.containsKey(n)).toList()
                     .forEach(n -> {
@@ -38,6 +38,14 @@ public class Dijkstra {
         }
 
         return new SearchResult<>(start, end, distances);
+    }
+
+    public static <T> SearchResult<T> shortestPath(
+            T start,
+            Function<T, Collection<T>> neighbors,
+            BiFunction<T, T, Integer> cost
+    ) {
+        return shortestPath(start, _ -> false, neighbors, cost);
     }
 
     public record SearchResult<T>(T start, T end, Map<T, Integer> distances) {
