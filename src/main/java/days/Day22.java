@@ -14,6 +14,8 @@ import static util.Annotations.TestInput;
 public class Day22 extends Day {
 
     private List<Brick> bricks;
+    private Map<Brick, List<Brick>> supports;
+    private Map<Brick, List<Brick>> supportedBy;
 
     @Override
     public void processInput() {
@@ -48,19 +50,13 @@ public class Day22 extends Day {
         return brick.z1 > 1 && noneBelow(brick);
     }
 
-    private List<Brick> unstableBricks() {
-        return bricks.stream().filter(this::canMove).toList();
-    }
-
     @Solution("424")
     @Override
     public Object part1() {
         simulateFalling();
 
-        Map<Integer, List<Brick>> bricksByZ = new HashMap<>();
-
-        Map<Brick, List<Brick>> supports = new HashMap<>();
-        Map<Brick, List<Brick>> supportedBy = new HashMap<>();
+        supports = new HashMap<>();
+        supportedBy = new HashMap<>();
 
         for (Brick brick : bricks) {
             supports.put(brick, new ArrayList<>());
@@ -93,10 +89,53 @@ public class Day22 extends Day {
         return supports.get(brick).isEmpty() || supports.get(brick).stream().allMatch(b -> supportedBy.get(b).size() > 1);
     }
 
-    @Solution("")
+    /**
+     * For every brick: How many bricks would fall IF this brick was removed?
+     *
+     * for each brick:
+     * - find all bricks that are supported by this brick and this brick only
+     * - these bricks will fall
+     * - process them in a queue
+     * - add them to a set of falling bricks
+     * - for the queue:
+     * - get the next falling brick
+     * - get the bricks that are supported by this brick
+     * - if all the supports of that brick are falling, then that brick will fall too
+     * - add it to the queue
+     * - add it to the set of falling bricks
+     * - repeat until the queue is empty
+     * - count the number of falling bricks (but exclude the brick that would actually be removed)
+     * @return
+     */
+    @Solution("55483")
     @Override
     public Object part2() {
-        return null;
+        long total = 0;
+        for (Brick brick : bricks) {
+            var dependents = supports.get(brick);
+            dependents.removeIf(b -> supportedBy.get(b).size() != 1); // remove bricks that are supported by more than just this brick
+
+            var Q = new LinkedList<>(dependents); // these will fall
+            var falling = new HashSet<Brick>(dependents); // these are falling
+            falling.add(brick);
+
+            while (!Q.isEmpty()) {
+                var b = Q.poll();
+
+                for (Brick d : supports.get(b)) {
+                    if (falling.contains(d)) continue;
+                    List<Brick> bases = supportedBy.get(d);
+                    if (falling.containsAll(bases)) {
+                        Q.add(d);
+                        falling.add(d);
+                    }
+                }
+            }
+
+            total += falling.size() - 1;
+        }
+
+        return total;
     }
 
     @Override
