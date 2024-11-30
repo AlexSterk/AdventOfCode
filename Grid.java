@@ -120,6 +120,14 @@ public class Grid<T> {
         return tTile;
     }
 
+    public Tile<T> getWrappedTile(int x, int y) {
+        x = x % width;
+        y = y % height;
+        if (x < 0) x += width;
+        if (y < 0) y += height;
+        return getTile(x, y);
+    }
+
     public Tile<T> getTile(Line.Point point) {
         return getTile(point.x(), point.y());
     }
