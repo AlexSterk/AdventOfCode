@@ -26,16 +26,11 @@ public abstract class Day {
      * Make sure to implement {@link Day#getDay()}
      */
     public Day() {
-        boolean test = false;
-
         TestInput annotation = this.getClass().getAnnotation(TestInput.class);
-        if (annotation != null && !testEnvironment) {
-            test = true;
-        }
 
         String i;
         try {
-            i = Files.readString(Path.of("data/day%d/%s.txt".formatted(getDay(), test ? "test" : "input")));
+            i = Files.readString(Path.of("data/day%d/%s.txt".formatted(getDay(), annotation != null && !testEnvironment ? annotation.value() : "input")));
         } catch (IOException e) {
             i = "";
             e.printStackTrace();
