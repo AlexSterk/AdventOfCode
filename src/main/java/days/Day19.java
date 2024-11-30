@@ -1,16 +1,14 @@
 package days;
 
 import setup.Day;
+import util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static util.Annotations.Solution;
-import static util.Annotations.TestInput;
 
 //@TestInput
 public class Day19 extends Day {
@@ -60,10 +58,67 @@ public class Day19 extends Day {
         return accepted.stream().mapToLong(Part::sum).sum();
     }
 
-    @Solution("")
+    @Solution("122112157518711")
     @Override
     public Object part2() {
-        return null;
+        var ranges = new HashMap<String, Pair<Integer, Integer>>();
+        for (String l : new String[]{"x", "m", "a", "s"}) {
+            ranges.put(l, new Pair<>(1, 4000));
+        }
+
+        return count(ranges, "in");
+    }
+
+    private long count(Map<String, Pair<Integer, Integer>> ranges, String wf) {
+        System.out.println(wf);
+
+        if (wf.equals("R")) {
+            return 0;
+        }
+
+        if (wf.equals("A")) {
+            // get the length of the ranges, multiply them all
+            long prod = 1;
+            for (Pair<Integer, Integer> range : ranges.values()) {
+                prod *= range.b() - range.a() + 1;
+            }
+            return prod;
+        }
+
+        Workflow workflow = workflows.get(wf);
+        long total = 0;
+
+        for (Rule rule : workflow.rules) {
+            if (!rule.variable.isEmpty()) {
+                var cat = rule.variable;
+                var op = rule.operator;
+                var val = rule.value;
+
+                var low = ranges.get(cat).a();
+                var high = ranges.get(cat).b();
+
+                var trueRange = op.equals("<") ? new Pair<>(low, val - 1) : new Pair<>(val + 1, high);
+                var falseRange = op.equals("<") ? new Pair<>(val, high) : new Pair<>(low, val);
+
+                if (trueRange.a() <= trueRange.b()) {
+                    var rangesCopy = new HashMap<>(ranges);
+                    rangesCopy.put(cat, trueRange);
+                    total += count(rangesCopy, rule.workflow);
+                }
+
+                if (falseRange.a() <= falseRange.b()) {
+                    ranges = new HashMap<>(ranges);
+                    ranges.put(cat, falseRange);
+                } else {
+                    break;
+                }
+
+            } else {
+                total += count(ranges, rule.workflow);
+            }
+        }
+
+        return total;
     }
 
     @Override
@@ -128,7 +183,7 @@ public class Day19 extends Day {
         }
     }
 
-    private record Part(int x, int m, int a, int s) {
+    private record Part(Integer x, Integer m, Integer a, Integer s) {
         public static Part fromString(String input) {
             // possible input: {x=787,m=2655,a=1222,s=2876}
             Pattern pattern = Pattern.compile("\\{x=(\\d+),m=(\\d+),a=(\\d+),s=(\\d+)}");
