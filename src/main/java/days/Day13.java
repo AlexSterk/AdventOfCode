@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Grid;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class Day13 extends Day {
         }
     }
 
+    @Solution("29213")
     @Override
     public Object part1() {
         long sum = 0;
@@ -81,11 +83,7 @@ public class Day13 extends Day {
         return errors;
     }
 
-    @Override
-    public String partOneSolution() {
-        return "29213";
-    }
-
+    @Solution("37453")
     @Override
     public Object part2() {
         long sum = 0;
@@ -103,11 +101,5 @@ public class Day13 extends Day {
     @Override
     public int getDay() {
         return 13;
-    }
-
-
-    @Override
-    public String partTwoSolution() {
-        return "37453";
     }
 }

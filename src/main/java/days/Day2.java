@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Pair;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class Day2 extends Day {
         }).toList();
     }
 
+    @Solution("2810")
     @Override
     public Object part1() {
         var possible = this.games.stream().filter(g -> g.isPossible(12, 13, 14)).toList();
@@ -39,6 +41,7 @@ public class Day2 extends Day {
         return possible.stream().mapToInt(Game::id).sum();
     }
 
+    @Solution("69110")
     @Override
     public Object part2() {
         return this.games.stream().mapToInt(Game::power).sum();
@@ -47,16 +50,6 @@ public class Day2 extends Day {
     @Override
     public int getDay() {
         return 2;
-    }
-
-    @Override
-    public String partOneSolution() {
-        return "2810";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "69110";
     }
 
     private record Game(int id, List<List<Pair<Integer, String>>> subsets) {

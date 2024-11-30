@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Direction;
 import util.Graph;
 import util.Grid;
@@ -20,6 +21,7 @@ public class Day10 extends Day {
 
     }
 
+    @Solution("6867")
     @Override
     public Object part1() {
         this.grid = Grid.parseGrid(input);
@@ -53,6 +55,7 @@ public class Day10 extends Day {
         return Collections.max(graph.getDistance(start).values());
     }
 
+    @Solution("595")
     @Override
     public Object part2() {
         graph.nodes().forEach(n -> {
@@ -80,17 +83,6 @@ public class Day10 extends Day {
     @Override
     public int getDay() {
         return 10;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "6867";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "595";
     }
 
     private enum Pipe {

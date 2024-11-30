@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class Day {
+    public static boolean testEnvironment = false;
+
     /**
      * Input
      */
@@ -27,13 +29,13 @@ public abstract class Day {
         boolean test = false;
 
         TestInput annotation = this.getClass().getAnnotation(TestInput.class);
-        if (annotation != null) {
+        if (annotation != null && !testEnvironment) {
             test = true;
         }
 
         String i;
         try {
-            i = Files.readString(Paths.get(String.format("data/day%d/%s.txt", getDay(), test ? "test" : "input")));
+            i = Files.readString(Path.of("data/day%d/%s.txt".formatted(getDay(), test ? "test" : "input")));
         } catch (IOException e) {
             i = "";
             e.printStackTrace();
@@ -45,7 +47,7 @@ public abstract class Day {
     public Day(String in) {
         String i;
         try {
-            i = Files.readString(Paths.get(in));
+            i = Files.readString(Path.of(in));
         } catch (IOException e) {
             i = "";
             e.printStackTrace();
@@ -97,14 +99,6 @@ public abstract class Day {
      */
     public boolean resetForPartTwo() {
         return false;
-    }
-
-    public String partOneSolution() {
-        return null;
-    }
-
-    public String partTwoSolution() {
-        return null;
     }
 
     /**

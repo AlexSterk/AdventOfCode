@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Dijkstra;
 import util.Direction;
 import util.Grid;
@@ -21,6 +22,7 @@ public class Day17 extends Day {
 //        graph = Grid.gridToGraph(grid);
     }
 
+    @Solution("1238")
     @Override
     public Object part1() {
         var start = grid.getTile(0, 0);
@@ -36,6 +38,7 @@ public class Day17 extends Day {
         return d.get();
     }
 
+    @Solution("1362")
     @Override
     public Object part2() {
         var start = grid.getTile(0, 0);
@@ -54,17 +57,6 @@ public class Day17 extends Day {
     @Override
     public int getDay() {
         return 17;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "1238";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "1362";
     }
 
     private static class CrucibleState {

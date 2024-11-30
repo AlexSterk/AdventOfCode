@@ -4,6 +4,8 @@ import setup.Day;
 
 import java.util.*;
 
+import static util.Annotations.Solution;
+
 public class Day5 extends Day {
     private Map<String, List<Mapping>> mappings;
     private List<Long> seeds;
@@ -33,6 +35,7 @@ public class Day5 extends Day {
         }
     }
 
+    @Solution("340994526")
     @Override
     public Object part1() {
         var locations = seeds.stream().map(this::getLocation).toList();
@@ -79,6 +82,7 @@ public class Day5 extends Day {
         return seedRanges.stream().anyMatch(mapping -> mapping.getDestination(seed) != -1);
     }
 
+    @Solution("52210644")
     @Override
     public Object part2() {
         seedRanges = new ArrayList<>();
@@ -101,17 +105,6 @@ public class Day5 extends Day {
     @Override
     public int getDay() {
         return 5;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "340994526";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "52210644";
     }
 
     private record Mapping(long source, long destination, long size) {

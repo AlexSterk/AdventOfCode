@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Maths;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class Day8 extends Day {
         }
     }
 
+    @Solution("16531")
     @Override
     public Object part1() {
         String start = "AAA";
@@ -87,6 +89,7 @@ public class Day8 extends Day {
         return path;
     }
 
+    @Solution("24035773251517")
     @Override
     public Object part2() {
         var endInA = nodes.keySet().stream().filter(s -> s.endsWith("A")).toList();
@@ -111,17 +114,6 @@ public class Day8 extends Day {
     @Override
     public int getDay() {
         return 8;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "16531";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "24035773251517";
     }
 
     private record Node(String left, String right) {

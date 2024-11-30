@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,11 +17,13 @@ public class Day4 extends Day {
         cardsMap = cards.stream().collect(Collectors.toMap(Card::id, c -> c));
     }
 
+    @Solution("20407")
     @Override
     public Object part1() {
         return cards.stream().mapToLong(Card::value).sum();
     }
 
+    @Solution("23806951")
     @Override
     public Object part2() {
         var dp = new HashMap<Integer, Long>();
@@ -46,16 +49,6 @@ public class Day4 extends Day {
     @Override
     public int getDay() {
         return 4;
-    }
-
-    @Override
-    public String partOneSolution() {
-        return "20407";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "23806951";
     }
 
     private record Card(int id, Set<Integer> winning, Set<Integer> numbers) {

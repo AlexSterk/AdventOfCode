@@ -2,7 +2,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import setup.Day;
-import util.Annotations.SkipCI;
+import static util.Annotations.*;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class RegressionTest {
 
@@ -30,19 +29,11 @@ public class RegressionTest {
                 .map(s -> s.replaceFirst("\\.java", ""))
                 .toList();
         CI = System.getenv("CI") != null;
+        Day.testEnvironment = true;
     }
 
     public static Stream<String> daysToTest() {
         return days.stream();
-    }
-
-    @ParameterizedTest
-    @MethodSource("daysToTest")
-    public void testPartOne(String d) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Day day = getDay(d, 1);
-        assumeTrue(day.partOneSolution() != null);
-        day.processInput();
-        assertEquals(day.partOneSolution(), day.part1().toString());
     }
 
     private Day getDay(String d, int part) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -65,11 +56,26 @@ public class RegressionTest {
 
     @ParameterizedTest
     @MethodSource("daysToTest")
+    public void testPartOne(String d) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Day day = getDay(d, 1);
+
+        Solution annotation = day.getClass().getDeclaredMethod("part1").getDeclaredAnnotation(Solution.class);
+        if (annotation != null && !annotation.value().isEmpty()) {
+            day.processInput();
+            assertEquals(annotation.value(), day.part1().toString());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("daysToTest")
     public void testPartTwo(String d) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Day day = getDay(d, 2);
-        assumeTrue(day.partTwoSolution() != null);
-        day.processInput();
-        if (!day.resetForPartTwo()) day.part1();
-        assertEquals(day.partTwoSolution(), day.part2().toString());
+
+        Solution annotation = day.getClass().getDeclaredMethod("part2").getDeclaredAnnotation(Solution.class);
+        if (annotation != null && !annotation.value().isEmpty()) {
+            day.processInput();
+            if (!day.resetForPartTwo()) day.part1();
+            assertEquals(annotation.value(), day.part2().toString());
+        }
     }
 }

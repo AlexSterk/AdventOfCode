@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Grid;
 
 import java.util.*;
@@ -17,6 +18,7 @@ public class Day3 extends Day {
         symbols = this.grid.getAll().stream().map(Grid.Tile::data).filter(s -> s.matches("\\D")).filter(s -> !s.matches("\\.")).collect(Collectors.toSet());
     }
 
+    @Solution("530495")
     @Override
     public Object part1() {
         List<Integer> connectedParts = new ArrayList<>();
@@ -65,6 +67,7 @@ public class Day3 extends Day {
                 .count() > 0;
     }
 
+    @Solution("80253814")
     @Override
     public Object part2() {
         var gears = potentialGears.values().stream().filter(integers -> integers.size() == 2).map(s -> s.stream().toList()).toList();
@@ -80,16 +83,5 @@ public class Day3 extends Day {
     @Override
     public int getDay() {
         return 3;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "530495";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "80253814";
     }
 }

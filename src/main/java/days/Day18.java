@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Direction;
 import util.Line;
 import util.Maths;
@@ -8,9 +9,7 @@ import util.Maths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static util.Annotations.TestInput;
-
-@TestInput
+//@TestInput
 public class Day18 extends Day {
 
     private List<Instruction> instructions;
@@ -20,6 +19,7 @@ public class Day18 extends Day {
         instructions = isPart2() ? lines().stream().map(Instruction::fromStringP2).toList() : lines().stream().map(Instruction::fromStringP1).toList();
     }
 
+    @Solution("70026")
     @Override
     public Object part1() {
         List<Line.Point> vertices = new ArrayList<>();
@@ -44,6 +44,7 @@ public class Day18 extends Day {
         return Maths.PicksTheorem.interiorArea(overallArea, perimeterArea) + perimeterArea;
     }
 
+    @Solution("68548301037382")
     @Override
     public Object part2() {
         return part1();
@@ -52,16 +53,6 @@ public class Day18 extends Day {
     @Override
     public int getDay() {
         return 18;
-    }
-
-    @Override
-    public String partOneSolution() {
-        return "70026";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "68548301037382";
     }
 
     @Override

@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.BinarySearch;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class Day6 extends Day {
         }
     }
 
+    @Solution("252000")
     @Override
     public Object part1() {
         return races.stream().mapToInt(this::waysToWin).mapToLong(i -> i).reduce((a, b) -> a * b).getAsLong();
@@ -42,6 +44,7 @@ public class Day6 extends Day {
         return ways;
     }
 
+    @Solution("36992486")
     @Override
     public Object part2() {
         var time = Long.parseLong(lines().get(0).split(":")[1].replaceAll("\\s+", ""));
@@ -57,17 +60,6 @@ public class Day6 extends Day {
     @Override
     public int getDay() {
         return 6;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "252000";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "36992486";
     }
 
     private record Race(long duration, long recordDistance) {

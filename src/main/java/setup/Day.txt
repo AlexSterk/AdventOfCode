@@ -1,7 +1,6 @@
 package days;
 
 import setup.Day;
-
 import static util.Annotations.*;
 
 // @TestInput
@@ -11,11 +10,13 @@ public class Day%Day% extends Day {
 
     }
 
+    @Solution("")
     @Override
     public Object part1() {
         return null;
     }
 
+    @Solution("")
     @Override
     public Object part2() {
         return null;

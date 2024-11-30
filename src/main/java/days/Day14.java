@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Direction;
 import util.Grid;
 
@@ -15,6 +16,7 @@ public class Day14 extends Day {
         grid = Grid.parseGrid(input);
     }
 
+    @Solution("109939")
     @Override
     public Object part1() {
         rollGrid(Direction.N);
@@ -26,6 +28,7 @@ public class Day14 extends Day {
         return grid.getAll().stream().filter(t -> t.data().equals("O")).mapToInt(t -> grid.height - t.y()).sum();
     }
 
+    @Solution("101010")
     @Override
     public Object part2() {
         List<Grid<String>> grids = new ArrayList<>();
@@ -61,17 +64,6 @@ public class Day14 extends Day {
     @Override
     public boolean resetForPartTwo() {
         return true;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "109939";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "101010";
     }
 
     private void rollGrid(Direction dir) {

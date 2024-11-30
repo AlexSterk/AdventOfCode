@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.CollectionUtil;
 import util.Memoizer;
 
@@ -23,6 +24,7 @@ public class Day12 extends Day {
         countWays = memoize(this::_countWays);
     }
 
+    @Solution("7090")
     @Override
     public Object part1() {
         long sum = 0;
@@ -32,11 +34,6 @@ public class Day12 extends Day {
         }
 
         return sum;
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "6792010726878";
     }
 
     private long _countWays(Configuration c) {
@@ -62,7 +59,7 @@ public class Day12 extends Day {
         }
 
         if (ch == '#') {
-            var r = l.get(0);
+            var r = l.getFirst();
             var remaining = l.subList(1, l.size());
 
             for (int i = 0; i < r; i++) {
@@ -83,6 +80,7 @@ public class Day12 extends Day {
         return countWays.apply(c1) + countWays.apply(c2);
     }
 
+    @Solution("6792010726878")
     @Override
     public Object part2() {
         List<Configuration> newConfigurations = new ArrayList<>();
@@ -108,12 +106,6 @@ public class Day12 extends Day {
     @Override
     public int getDay() {
         return 12;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "7090";
     }
 
     private record Configuration(String s, List<Integer> l) {

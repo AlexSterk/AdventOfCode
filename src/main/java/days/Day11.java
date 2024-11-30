@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Grid;
 
 import java.util.ArrayList;
@@ -68,6 +69,7 @@ public class Day11 extends Day {
         galaxies = image.getAll().stream().filter(c -> c.data().equals("#")).toList();
     }
 
+    @Solution("9214785")
     @Override
     public Object part1() {
         long d = 2 - 1;
@@ -81,6 +83,7 @@ public class Day11 extends Day {
         return sum;
     }
 
+    @Solution("613686987427")
     @Override
     public Object part2() {
         long d = 1_000_000 - 1;
@@ -97,16 +100,5 @@ public class Day11 extends Day {
     @Override
     public int getDay() {
         return 11;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "9214785";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "613686987427";
     }
 }

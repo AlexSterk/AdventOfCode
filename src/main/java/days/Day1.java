@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Pair;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class Day1 extends Day {
 
     }
 
+    @Solution("55386")
     @Override
     public Object part1() {
         var lines = this.lines().stream().map(s -> s.replaceAll("[a-z]", "")).toList();
@@ -23,6 +25,7 @@ public class Day1 extends Day {
         return toAdd.stream().mapToInt(Integer::intValue).sum();
     }
 
+    @Solution("54824")
     @Override
     public Object part2() {
         var nums = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "\\d");
@@ -60,15 +63,5 @@ public class Day1 extends Day {
     @Override
     public int getDay() {
         return 1;
-    }
-
-    @Override
-    public String partOneSolution() {
-        return "55386";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "54824";
     }
 }

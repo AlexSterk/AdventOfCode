@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 import util.Direction;
 import util.Grid;
 
@@ -15,6 +16,7 @@ public class Day16 extends Day {
         grid = Grid.parseGrid(input);
     }
 
+    @Solution("7632")
     @Override
     public Object part1() {
         Beam beam = new Beam(Direction.E, grid.getTile(0, 0));
@@ -25,6 +27,7 @@ public class Day16 extends Day {
         return beam.visited.size();
     }
 
+    @Solution("8023")
     @Override
     public Object part2() {
         List<Beam> toTry = new ArrayList<>();
@@ -104,17 +107,6 @@ public class Day16 extends Day {
     @Override
     public int getDay() {
         return 16;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "7632";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "8023";
     }
 
     private record Beam(Direction dir, Grid.Tile<String> position, Set<Grid.Tile<String>> visited) {

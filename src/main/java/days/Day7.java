@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ public class Day7 extends Day {
         hands = lines().stream().map(Hand::parse).collect(Collectors.toList());
     }
 
+    @Solution("248422077")
     @Override
     public Object part1() {
         var sorted = hands.stream().sorted().toList();
@@ -30,6 +32,7 @@ public class Day7 extends Day {
         return sum;
     }
 
+    @Solution("249817836")
     @Override
     public Object part2() {
         hands = hands.stream().map(JokerHand::fromHand).toList();
@@ -40,17 +43,6 @@ public class Day7 extends Day {
     @Override
     public int getDay() {
         return 7;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "248422077";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "249817836";
     }
 
     private static class Card implements Comparable<Card> {

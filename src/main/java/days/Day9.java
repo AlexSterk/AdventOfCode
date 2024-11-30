@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ public class Day9 extends Day {
         extrapolations = lines().stream().map(Extrapolation::parse).toList();
     }
 
+    @Solution("1884768153")
     @Override
     public Object part1() {
         long sum = 0;
@@ -25,6 +27,7 @@ public class Day9 extends Day {
         return sum;
     }
 
+    @Solution("1031")
     @Override
     public Object part2() {
         long sum = 0;
@@ -39,17 +42,6 @@ public class Day9 extends Day {
     @Override
     public int getDay() {
         return 9;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "1884768153";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "1031";
     }
 
     private static class Extrapolation {

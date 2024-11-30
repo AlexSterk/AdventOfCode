@@ -1,6 +1,7 @@
 package days;
 
 import setup.Day;
+import static util.Annotations.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,11 +19,13 @@ public class Day15 extends Day {
                 .toList();
     }
 
+    @Solution("517315")
     @Override
     public Object part1() {
         return steps.stream().map(Step::toString).mapToLong(this::hash).sum();
     }
 
+    @Solution("247763")
     @Override
     public Object part2() {
         var map = new HashMap<Integer, LinkedHashMap<String, Integer>>();
@@ -61,17 +64,6 @@ public class Day15 extends Day {
     @Override
     public int getDay() {
         return 15;
-    }
-
-
-    @Override
-    public String partOneSolution() {
-        return "517315";
-    }
-
-    @Override
-    public String partTwoSolution() {
-        return "247763";
     }
 
     private int hash(String s) {
