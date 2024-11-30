@@ -2,6 +2,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import setup.Day;
+
 import static util.Annotations.*;
 
 import java.io.IOException;
@@ -60,10 +61,10 @@ public class RegressionTest {
         Day day = getDay(d, 1);
 
         Solution annotation = day.getClass().getDeclaredMethod("part1").getDeclaredAnnotation(Solution.class);
-        if (annotation != null && !annotation.value().isEmpty()) {
-            day.processInput();
-            assertEquals(annotation.value(), day.part1().toString());
-        }
+        assumeFalse(annotation == null);
+        assumeFalse(annotation.value().isEmpty());
+        day.processInput();
+        assertEquals(annotation.value(), day.part1().toString());
     }
 
     @ParameterizedTest
@@ -72,10 +73,10 @@ public class RegressionTest {
         Day day = getDay(d, 2);
 
         Solution annotation = day.getClass().getDeclaredMethod("part2").getDeclaredAnnotation(Solution.class);
-        if (annotation != null && !annotation.value().isEmpty()) {
-            day.processInput();
-            if (!day.resetForPartTwo()) day.part1();
-            assertEquals(annotation.value(), day.part2().toString());
-        }
+        assumeFalse(annotation == null);
+        assumeFalse(annotation.value().isEmpty());
+        day.processInput();
+        if (!day.resetForPartTwo()) day.part1();
+        assertEquals(annotation.value(), day.part2().toString());
     }
 }
