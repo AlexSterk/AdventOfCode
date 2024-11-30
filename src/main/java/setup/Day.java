@@ -96,6 +96,10 @@ public abstract class Day {
         return false;
     }
 
+    public boolean isTest() {
+        return this.getClass().getAnnotation(TestInput.class) != null && !testEnvironment;
+    }
+
     /**
      * Main method to dynamically run each problem class.
      */
