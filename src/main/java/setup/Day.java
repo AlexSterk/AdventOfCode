@@ -108,14 +108,17 @@ public abstract class Day {
         Class<?> C = ClassLoader.getSystemClassLoader().loadClass(c);
         Constructor<?> constructor = C.getConstructor();
         Day day = (Day) constructor.newInstance();
+        System.out.printf("============== RUNNING %02d ==============%n", day.getDay());
 
         Instant now = Instant.now();
         day.processInput();
         Duration processTime = Duration.between(now, Instant.now());
+        System.out.format("Processing input: (%02d.%04ds)%n%n", processTime.getSeconds(), processTime.toMillis());
         System.out.println("================ PART 1 ================");
         now = Instant.now();
         Object part1 = day.part1();
         Duration partOneTime = Duration.between(now, Instant.now());
+        System.out.format("Solution to part 1: %s (%02d.%04ds)%n%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());
 
         day.part2 = true;
         if (day.resetForPartTwo()) day.processInput();
@@ -123,6 +126,9 @@ public abstract class Day {
         now = Instant.now();
         Object part2 = day.part2();
         Duration partTwoTime = Duration.between(now, Instant.now());
+        System.out.format("Solution to part 2: %s (%02d.%04ds)%n%n", part2, partTwoTime.getSeconds(), partTwoTime.toMillis());
+
+        System.out.println("=============== SOLUTIONS ==============");
 
         System.out.format("Processing input: (%02d.%04ds)%n", processTime.getSeconds(), processTime.toMillis());
         System.out.format("Solution to part 1: %s (%02d.%04ds)%n", part1, partOneTime.getSeconds(), partOneTime.toMillis());

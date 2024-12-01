@@ -5,103 +5,60 @@ import util.Graph;
 import util.Grid;
 
 import java.util.*;
+import java.util.function.Function;
 
-import static util.Annotations.*;
+import static util.Annotations.Solution;
+import static util.Annotations.TestInput;
 
 //@TestInput
 public class Day23 extends Day {
 
     private Grid<String> grid;
+    private Graph<Grid.Tile<String>> graph;
 
     @Override
     public void processInput() {
         grid = Grid.parseGrid(input);
+        graph = Grid.gridToGraph(grid, (_, _) -> 1);
     }
 
     @Solution("2278")
     @Override
     public Object part1() {
-        var start = grid.getTile(1,0);
+        var start = grid.getTile(1, 0);
         var end = grid.getTile(grid.width - 2, grid.height - 1);
 
-        var paths = getAllPaths(start, end);
+        graph.removeNodeIf(t -> t.data().equals("#"));
 
-        // get max length path
-        var maxPath = paths.stream().max(Comparator.comparingInt(Path::length)).orElseThrow();
+        // contract edges in nodes with only 2 neighbors
+        contractEdges(!isPart2());
 
-        return maxPath.length();
-    }
-
-    private List<Path> getAllPaths(Grid.Tile<String> start, Grid.Tile<String> end) {
-        List<Path> paths = new ArrayList<>();
-
-        var Q = new LinkedList<Path>();
-        Q.add(new Path(List.of(start)));
-
-        while (!Q.isEmpty()) {
-            var path = Q.poll();
-            var current = path.end();
-
-            if (current == end) {
-                paths.add(path);
-                continue;
-            }
-
-            Set<Grid.Tile<String>> neighbors = neighbors(current, path);
-            for (var neighbor : neighbors) {
-                var newPath = new Path(new ArrayList<>(path.path));
-                newPath.path.add(neighbor);
-                Q.add(newPath);
-            }
-        }
-
-        return paths;
-    }
-
-    private Set<Grid.Tile<String>> neighbors(Grid.Tile<String> tile, Path visited) {
-        Set<Grid.Tile<String>> ret = new HashSet<>();
-
-        switch (tile.data()) {
-            case "v":
-                ret.add(grid.getTile(tile.x(), tile.y() + 1));
-                break;
-            case "^":
-                ret.add(grid.getTile(tile.x(), tile.y() - 1));
-                break;
-            case ">":
-                ret.add(grid.getTile(tile.x() + 1, tile.y()));
-                break;
-            case "<":
-                ret.add(grid.getTile(tile.x() - 1, tile.y()));
-                break;
-            case ".":
-                ret.add(grid.getTile(tile.x(), tile.y() + 1));
-                ret.add(grid.getTile(tile.x(), tile.y() - 1));
-                ret.add(grid.getTile(tile.x() + 1, tile.y()));
-                ret.add(grid.getTile(tile.x() - 1, tile.y()));
-                break;
-        }
-
-        ret.removeIf(t -> t == null || t.data().equals("#") || visited.path.contains(t));
-        return ret;
+        var path = longestPath(start, end, (tile) -> this.neighbors(tile, !isPart2()));
+        return path.length() - 1;
     }
 
     @Solution("6734")
     @Override
     public Object part2() {
-        Graph<Grid.Tile<String>> graph = Grid.gridToGraph(grid, (_, _) -> 1);
-        graph.removeNodeIf(t -> t.data().equals("#"));
+        return part1();
+    }
 
+    private void contractEdges(boolean keepSlopes) {
         System.out.printf("Nodes before contraction: %d\n", graph.nodes().size());
 
-        // contract edges in nodes with only 2 neighbors
         while (true) {
             boolean changed = false;
             for (var node : graph.nodes()) {
                 if (graph.getNeighbours(node).size() == 2) {
+
                     var neighbors = new ArrayList<>(graph.getNeighbours(node));
                     var n1 = neighbors.get(0);
                     var n2 = neighbors.get(1);
+
+                    // Keep nodes surrounding slopes intact
+                    if (keepSlopes && !node.data().equals(".") || !n1.data().equals(".") || !n2.data().equals(".")) {
+                        continue;
+                    }
 
                     graph.addEdge(n1, n2, graph.getWeight(n1, node) + graph.getWeight(node, n2));
                     graph.removeNode(node);
@@ -112,19 +69,12 @@ public class Day23 extends Day {
 
             if (!changed) break;
         }
-
         System.out.printf("Nodes after contraction: %d\n", graph.nodes().size());
 
-        var start = grid.getTile(1,0);
-        var end = grid.getTile(grid.width - 2, grid.height - 1);
-
-        var paths = getAllPaths(graph, start, end);
-
-        return paths.stream().mapToInt(Path::length).max().orElseThrow() - 1;
     }
 
-    private static List<Path> getAllPaths(Graph<Grid.Tile<String>> graph, Grid.Tile<String> start, Grid.Tile<String> end) {
-        List<Path> paths = new ArrayList<>();
+    private Path longestPath(Grid.Tile<String> start, Grid.Tile<String> end, Function<Grid.Tile<String>, Set<Grid.Tile<String>>> neighbors) {
+        Path longestPath = new Path(List.of(start));
 
         var Q = new LinkedList<Path>();
         Q.add(new Path(List.of(start)));
@@ -134,12 +84,14 @@ public class Day23 extends Day {
             var current = path.end();
 
             if (current == end) {
-                paths.add(path);
+                if (path.length() > longestPath.length()) {
+                    longestPath = path;
+                }
                 continue;
             }
 
-            Set<Grid.Tile<String>> neighbors = graph.getNeighbours(current);
-            for (var neighbor : neighbors) {
+            Set<Grid.Tile<String>> _neighbors = neighbors.apply(current);
+            for (var neighbor : _neighbors) {
                 if (path.path.contains(neighbor)) continue;
                 var newPath = new Path(new ArrayList<>(path.path), path.length + graph.getWeight(current, neighbor));
                 newPath.path.add(neighbor);
@@ -147,7 +99,36 @@ public class Day23 extends Day {
             }
         }
 
-        return paths;
+        return longestPath;
+    }
+
+    private Set<Grid.Tile<String>> neighbors(Grid.Tile<String> tile, boolean followSlope) {
+        Set<Grid.Tile<String>> ret = new HashSet<>();
+
+        if (followSlope) {
+            switch (tile.data()) {
+                case "v":
+                    ret.add(grid.getTile(tile.x(), tile.y() + 1));
+                    break;
+                case "^":
+                    ret.add(grid.getTile(tile.x(), tile.y() - 1));
+                    break;
+                case ">":
+                    ret.add(grid.getTile(tile.x() + 1, tile.y()));
+                    break;
+                case "<":
+                    ret.add(grid.getTile(tile.x() - 1, tile.y()));
+                    break;
+                case ".":
+                    ret.addAll(graph.getNeighbours(tile));
+                    break;
+            }
+        } else {
+            ret.addAll(graph.getNeighbours(tile));
+        }
+
+        ret.removeIf(t -> t == null || t.data().equals("#"));
+        return ret;
     }
 
     @Override
