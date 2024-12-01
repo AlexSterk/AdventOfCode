@@ -1,20 +1,11 @@
 package days;
 
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Solver;
-import org.apache.commons.math3.linear.*;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.linear.*;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import setup.Day;
 import util.Annotations.TestInput;
 import util.Pair;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static util.Annotations.Solution;
