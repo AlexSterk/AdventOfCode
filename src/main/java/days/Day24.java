@@ -1,5 +1,7 @@
 package days;
 
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Solver;
 import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
@@ -8,6 +10,9 @@ import setup.Day;
 import util.Annotations.TestInput;
 import util.Pair;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +43,7 @@ public class Day24 extends Day {
                 var intersection = h1.intersectsWithXY(h2);
                 if (intersection != null) {
                     double xi = intersection.a(), yi = intersection.b();
+                    // print time at position
                     if (xi >= testArea.a() && xi <= testArea.b()
                             && yi >= testArea.a() && yi <= testArea.b()
                             && h1.timeAtPosition(xi) >= 0 && h2.timeAtPosition(xi) >= 0) {
@@ -50,9 +56,33 @@ public class Day24 extends Day {
         return intersections;
     }
 
-    @Solution("")
     @Override
     public Object part2() {
+        // z3 in python
+        try {
+            // Command to execute the Python script
+            String[] command = {"python", "src/main/java/days/Day24.py"};
+
+            // Create a ProcessBuilder
+            ProcessBuilder pb = new ProcessBuilder(command);
+
+            // Start the process
+            Process process = pb.start();
+
+            // Read the output from the Python script
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                return line;
+            }
+
+            // Wait for the process to complete
+            int exitCode = process.waitFor();
+            System.out.println("Exited with code: " + exitCode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
