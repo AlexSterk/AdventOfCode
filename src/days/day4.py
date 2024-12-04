@@ -11,7 +11,6 @@ class Day4(Day):
     @solution("2654")
     def part1(self) -> object:
         grid = [list(l.strip()) for l in self.input]
-        print(grid)
 
         dirs = [(x, y) for x in range(-1, 2) for y in range(-1, 2) if x !=0 or y != 0]
         queue = deque()
@@ -41,9 +40,26 @@ class Day4(Day):
 
         return total
 
-    @solution("")
+    @solution("1990")
     def part2(self) -> object:
-        return None
+        grid = {(x, y): cell for y, row in enumerate(self.input) for x, cell in enumerate(row)}
+
+        total = 0
+        for x,y in grid:
+            if grid.get((x,y)) == "A":
+                if grid.get((x-1, y-1)) == "M" and grid.get((x+1, y+1)) == "S":
+                    if grid.get((x-1, y+1)) == "M" and grid.get((x+1, y-1)) == "S":
+                        total += 1
+                if grid.get((x-1, y-1)) == "M" and grid.get((x+1, y+1)) == "S":
+                    if grid.get((x-1, y+1)) == "S" and grid.get((x+1, y-1)) == "M":
+                        total += 1
+                if grid.get((x-1, y-1)) == "S" and grid.get((x+1, y+1)) == "M":
+                    if grid.get((x-1, y+1)) == "M" and grid.get((x+1, y-1)) == "S":
+                        total += 1
+                if grid.get((x-1, y-1)) == "S" and grid.get((x+1, y+1)) == "M":
+                    if grid.get((x-1, y+1)) == "S" and grid.get((x+1, y-1)) == "M":
+                        total += 1
+        return total
 
 # Day4("test").run()
 Day4().run()
