@@ -1,6 +1,12 @@
+from collections import deque
 
 from src.setup.day import Day
 from src.util.solution import solution
+
+
+def swap_nums(l, i, j):
+    l[i], l[j] = l[j], l[i]
+
 
 class Day5(Day):
     @property
@@ -10,18 +16,18 @@ class Day5(Day):
     @solution("6949")
     def part1(self) -> object:
         rules, pages = self.raw_input.split("\n\n")
-        rules = rules.split("\n")
-        pages = pages.strip().split("\n")
 
-        rules = set((int(x),int(y)) for x,y in (rule.split("|") for rule in rules))
+        rules = set((int(x), int(y)) for x, y in (rule.split("|") for rule in rules.split("\n")))
+        pages = [[int(n) for n in row.split(",")] for row in pages.strip().split("\n")]
 
         total = 0
         for page in pages:
-            l = [int(n) for n in page.split(",")]
-            correct = self.check_pages(l, rules)
+            correct = self.check_pages(page, rules)
+            if correct is True:
+                total += page[len(page) // 2]
 
-            if correct:
-                total += l[len(l)//2]
+        self.rules = rules
+        self.pages = pages
         return total
 
     def check_pages(self, l, rules):
@@ -32,13 +38,28 @@ class Day5(Day):
                 x, y = l[i], l[j]
                 if (x, y) in rules:
                     if i > j:
-                        print(f"Found {l[i]} and {l[j]} in {l}")
-                        return False
+                        return i, j
         return True
 
-    @solution("")
+    @solution("4145")
     def part2(self) -> object:
-        return None
+        rules = self.rules
+        pages = self.pages
+
+        total = 0
+        q = deque([(p, 0) for p in pages])
+        while q:
+            page, z = q.popleft()
+            correct = self.check_pages(page, rules)
+            if correct is True:
+                if z == 1:
+                    total += page[len(page) // 2]
+            else:
+                i, j = correct
+                swap_nums(page, i, j)
+                q.append((page, 1))
+        return total
+
 
 # Day5("test").run()
 Day5().run()
