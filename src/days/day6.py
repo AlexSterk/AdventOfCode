@@ -1,6 +1,27 @@
 from src.setup.day import Day
 from src.util.solution import solution
 
+
+def simulate_guard(dir, g, total, visited, x, y):
+    while True:
+        if (x, y, dir) in visited:
+            total += 1
+            break
+        visited.add((x, y, dir))
+        while True:
+            nx, ny = x + dir[0], y + dir[1]
+            cell = g.get((nx, ny))
+            if cell == "#":
+                # turn 90deg right
+                dir = (-dir[1], dir[0])
+            else:
+                x, y = nx, ny
+                break
+        if cell is None:
+            break
+    return total
+
+
 class Day6(Day):
     @property
     def day(self):
@@ -16,21 +37,9 @@ class Day6(Day):
         visited = set()
 
         x, y = start
-        dir = (0, -1) # up
-        while True:
-            visited.add((x,y))
-            while True:
-                nx, ny = x + dir[0], y + dir[1]
-                cell = grid.get((nx, ny))
-                if cell == "#":
-                    # turn 90deg right
-                    dir = (-dir[1], dir[0])
-                else:
-                    x, y = nx, ny
-                    break
-            if cell is None:
-                break
-
+        dir = (0, -1)  # up
+        simulate_guard(dir, grid, 0, visited, x, y)
+        visited = set([(x, y) for x, y, _ in visited])
         self.grid = grid
         self.possible_objects = visited
         self.start = start
@@ -43,29 +52,15 @@ class Day6(Day):
         total = 0
         for x, y in possible_objects:
             g = grid.copy()
-            g[(x,y)] = "#"
+            g[(x, y)] = "#"
 
             visited = set()
             x, y = start
-            dir = (0, -1) # up
+            dir = (0, -1)  # up
 
-            while True:
-                if (x,y, dir) in visited:
-                    total += 1
-                    break
-                visited.add((x,y, dir))
-                while True:
-                    nx, ny = x + dir[0], y + dir[1]
-                    cell = g.get((nx, ny))
-                    if cell == "#":
-                        # turn 90deg right
-                        dir = (-dir[1], dir[0])
-                    else:
-                        x, y = nx, ny
-                        break
-                if cell is None:
-                    break
+            total = simulate_guard(dir, g, total, visited, x, y)
         return total
+
 
 # Day6("test").run()
 Day6().run()
