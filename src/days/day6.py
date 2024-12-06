@@ -30,11 +30,42 @@ class Day6(Day):
                     break
             if cell is None:
                 break
+
+        self.grid = grid
+        self.possible_objects = visited
+        self.start = start
         return len(visited)
 
-    @solution("")
+    @solution("1670")
     def part2(self) -> object:
-        return None
+        grid, possible_objects, start = self.grid, self.possible_objects, self.start
+
+        total = 0
+        for x, y in possible_objects:
+            g = grid.copy()
+            g[(x,y)] = "#"
+
+            visited = set()
+            x, y = start
+            dir = (0, -1) # up
+
+            while True:
+                if (x,y, dir) in visited:
+                    total += 1
+                    break
+                visited.add((x,y, dir))
+                while True:
+                    nx, ny = x + dir[0], y + dir[1]
+                    cell = g.get((nx, ny))
+                    if cell == "#":
+                        # turn 90deg right
+                        dir = (-dir[1], dir[0])
+                    else:
+                        x, y = nx, ny
+                        break
+                if cell is None:
+                    break
+        return total
 
 # Day6("test").run()
 Day6().run()
