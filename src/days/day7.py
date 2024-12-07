@@ -5,7 +5,8 @@ from collections import deque
 from src.setup.day import Day
 from src.util.solution import solution
 
-@functools.cache
+
+# @functools.cache # cache makes it slower?!
 def perform_operation(op, a, b):
     if op == "+":
         return a + b
@@ -16,6 +17,24 @@ def perform_operation(op, a, b):
 
     raise ValueError(f"Invalid operation: {op}")
 
+
+def try_equations(equations, ops):
+    q = deque(equations)
+    total = set()
+    while q:
+        test, *nums = q.popleft()
+
+        if len(nums) == 1:
+            if test == nums[0]:
+                total.add(test)
+            continue
+
+        n1, n2, *rest = nums
+        for op in ops:
+            q.append((test, perform_operation(op, n1, n2), *rest))
+    return total
+
+
 class Day7(Day):
     @property
     def day(self):
@@ -23,52 +42,25 @@ class Day7(Day):
 
     @solution("14711933466277")
     def part1(self) -> object:
-        equations = [tuple(map(int, re.split(r"\D+", line.strip() ))) for line in self.input]
+        equations = [tuple(map(int, re.split(r"\D+", line.strip()))) for line in self.input]
 
         tests_only = [eq[0] for eq in equations]
         assert len(tests_only) == len(set(tests_only)), "Duplicate tests"
 
-        q = deque(equations)
+        ops = ["+", "*"]
+        total = try_equations(equations, ops)
 
-        total = set()
-        while q:
-            test, *nums = q.popleft()
-
-            if len(nums) == 1:
-                if test == nums[0]:
-                    total.add(test)
-                continue
-
-            n1, n2, *rest = nums
-            q.appendleft((test, perform_operation("+", n1, n2), *rest))
-            q.appendleft((test, perform_operation("*", n1, n2), *rest))
-
+        self.equations = equations
         return sum(total)
 
     @solution("286580387663654")
     def part2(self) -> object:
-        equations = [tuple(map(int, re.split(r"\D+", line.strip() ))) for line in self.input]
+        equations = self.equations
 
-        tests_only = [eq[0] for eq in equations]
-        assert len(tests_only) == len(set(tests_only)), "Duplicate tests"
-
-        q = deque(equations)
-
-        total = set()
-        while q:
-            test, *nums = q.popleft()
-
-            if len(nums) == 1:
-                if test == nums[0]:
-                    total.add(test)
-                continue
-
-            n1, n2, *rest = nums
-            q.appendleft((test, perform_operation("+", n1, n2), *rest))
-            q.appendleft((test, perform_operation("*", n1, n2), *rest))
-            q.appendleft((test, perform_operation("||", n1, n2), *rest))
+        total = try_equations(equations, ["+", "||", "*"])
 
         return sum(total)
+
 
 # Day7("test").run()
 Day7().run()
