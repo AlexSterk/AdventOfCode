@@ -1,6 +1,4 @@
-import functools
 import re
-from collections import deque
 
 from src.setup.day import Day
 from src.util.solution import solution
@@ -19,20 +17,27 @@ def perform_operation(op, a, b):
 
 
 def try_equations(equations, ops):
-    q = deque(equations)
     total = set()
-    while q:
-        test, *nums = q.popleft()
-
-        if len(nums) == 1:
-            if test == nums[0]:
-                total.add(test)
-            continue
-
-        n1, n2, *rest = nums
-        for op in ops:
-            q.append((test, perform_operation(op, n1, n2), *rest))
+    for equation in equations:
+        if try_equation(equation, ops):
+            total.add(equation[0])
     return total
+
+def try_equation(equation, ops):
+    test, *nums = equation
+
+    if len(nums) == 1:
+        return test == nums[0]
+
+    n1, n2, *rest = nums
+
+    if n1 > test:
+        return False
+
+    for op in ops:
+        if try_equation((test, perform_operation(op, n1, n2), *rest), ops):
+            return True
+    return False
 
 
 class Day7(Day):
@@ -57,7 +62,7 @@ class Day7(Day):
     def part2(self) -> object:
         equations = self.equations
 
-        total = try_equations(equations, ["+", "||", "*"])
+        total = try_equations(equations, ["*", "||", "+"])
 
         return sum(total)
 
