@@ -9,50 +9,40 @@ class Day9(Day):
     def day(self):
         return 9
 
-    @solution("")
+    @solution("6353658451014")
     def part1(self) -> object:
         s = self.raw_input
 
-        o = ""
-        file = True
         id = 0
-        for d in s:
-            d = int(d)
-            if file:
-                o += str(id) * d
+        disk = []
+        for i, d in enumerate(s):
+            if i % 2 == 0:
+                for j in range(int(d)):
+                    disk.append(id)
                 id += 1
             else:
-                o += str(".") * d
-            file = not file
+                for j in range(int(d)):
+                    disk.append(None)
 
-        print(o)
-
-        o = list(o)
-
-
-        print(len(o))
-
-        for i in range(len(o) - 1, -1, -1):
-            print(i)
-            d = o[i]
-            if d == ".":
+        i = 0
+        l = len(disk) - 1
+        while i < l:
+            if disk[i] is not None:
+                i+=1
                 continue
-            else:
-                j = o.index(".")
-                if j < i:
-                    o[i] = "."
-                    o[j] = d
-        o = "".join(o)
-        print(o)
+            if disk[l] is None:
+                l -= 1
+                continue
+            disk[i], disk[l] = disk[l], disk[i]
+            i += 1
+            l -= 1
 
         total = 0
-        for i, d in enumerate(o):
-            if d == ".":
-                continue
-            else:
-                n = int(d)
-                total += n * i
+        disk = disk[0:disk.index(None)]
+        for i, n in enumerate(disk):
+            total += n * i
         return total
+
 
     @solution("")
     def part2(self) -> object:
