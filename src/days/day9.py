@@ -5,26 +5,29 @@ from src.util.solution import solution
 
 
 def calc_checksum(empty, files):
+    total = 0
+
     for (file_id, file_start, file_length) in files[::-1]:
         empty_available = min((k for k, v in empty.items() if k >= file_length and len(v) > 0), default=None,
                               key=lambda x: empty.get(x)[0])
         if empty_available is None:
+            for k in range(file_length):
+                total += file_id * (file_start + k)
             continue
         i = empty.get(empty_available)[0]
         if i >= file_start:
+            for k in range(file_length):
+                total += file_id * (file_start + k)
             continue
         i = heappop(empty.get(empty_available))
-        files.remove((file_id, file_start, file_length))
-        files.append((file_id, i, file_length))
+        for k in range(file_length):
+            total += file_id * (i + k)
         remaining = empty_available - file_length
         if remaining > 0:
             if empty.get(remaining) is None:
                 empty[remaining] = []
             heappush(empty.get(remaining), i + file_length)
-    total = 0
-    for file_id, file_start, file_length in files:
-        for i in range(file_length):
-            total += file_id * (file_start + i)
+
     return total
 
 
