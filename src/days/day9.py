@@ -1,8 +1,54 @@
-import re
 from heapq import heappush, heappop
 
 from src.setup.day import Day
 from src.util.solution import solution
+
+
+def calc_checksum(empty, files):
+    for (file_id, file_start, file_length) in files[::-1]:
+        empty_available = min((k for k, v in empty.items() if k >= file_length and len(v) > 0), default=None,
+                              key=lambda x: empty.get(x)[0])
+        if empty_available is None:
+            continue
+        i = empty.get(empty_available)[0]
+        if i >= file_start:
+            continue
+        i = heappop(empty.get(empty_available))
+        files.remove((file_id, file_start, file_length))
+        files.append((file_id, i, file_length))
+        remaining = empty_available - file_length
+        if remaining > 0:
+            if empty.get(remaining) is None:
+                empty[remaining] = []
+            heappush(empty.get(remaining), i + file_length)
+    total = 0
+    for file_id, file_start, file_length in files:
+        for i in range(file_length):
+            total += file_id * (file_start + i)
+    return total
+
+
+def blocks_and_files(disk, max_length=None):
+    disk.append(None)
+    files = []
+    empty = {}
+    start_i = 0
+    length = 0
+    cur = disk[0]
+    for i, file_id in enumerate(disk):
+        if file_id == cur and (max_length is None or length < max_length):
+            length += 1
+        else:
+            if cur is not None:
+                files.append((cur, start_i, length))
+            else:
+                if empty.get(length) is None:
+                    empty[length] = []
+                heappush(empty.get(length), start_i)
+            start_i = i
+            length = 1
+            cur = file_id
+    return empty, files
 
 
 class Day9(Day):
@@ -14,82 +60,28 @@ class Day9(Day):
     def part1(self) -> object:
         s = self.raw_input
 
-        id = 0
+        file_id = 0
         disk = []
         for i, d in enumerate(s):
             if i % 2 == 0:
                 for j in range(int(d)):
-                    disk.append(id)
-                id += 1
+                    disk.append(file_id)
+                file_id += 1
             else:
                 for j in range(int(d)):
                     disk.append(None)
         self.disk = disk.copy()
 
-        disk.append(None)
-        blocks = []
-        empty = []
-        for i, d in enumerate(disk):
-            if d is not None:
-                blocks.append((d, i))
-            else:
-                empty.append(i)
-        for id, start_i in blocks[::-1]:
-            if len(empty) > 0 and empty[0] < start_i:
-                empty_start = empty.pop(0)
-                blocks.remove((id, start_i))
-                blocks.append((id, empty_start))
-        total = 0
-        for id, start_i in blocks:
-            total += id * start_i
-        return total
+        empty, files = blocks_and_files(disk, 1)
+
+        return calc_checksum(empty, files)
 
     @solution("6382582136592")
     def part2(self) -> object:
         disk = self.disk.copy()
-        disk.append(None)
-        files = []
-        empty = {}
+        empty, files = blocks_and_files(disk)
 
-        start_i = 0
-        length = 0
-        cur = disk[0]
-
-        for empty_start, id in enumerate(disk):
-            if id == cur:
-                length += 1
-            else:
-                if cur is not None:
-                    files.append((cur, start_i, length))
-                else:
-                    if empty.get(length) is None:
-                        empty[length] = []
-                    heappush(empty.get(length), start_i)
-                start_i = empty_start
-                length = 1
-                cur = id
-
-        for (id, start_i, length) in files[::-1]:
-            empty_available = min((k for k, v in empty.items() if k >= length and len(v) > 0), default=None, key=lambda x: empty.get(x)[0])
-            if empty_available is None:
-                continue
-            empty_start = empty.get(empty_available)[0]
-            if empty_start >= start_i:
-                continue
-            empty_start = heappop(empty.get(empty_available))
-            files.remove((id, start_i, length))
-            files.append((id, empty_start, length))
-            remaining = empty_available - length
-            if remaining > 0:
-                if empty.get(remaining) is None:
-                    empty[remaining] = []
-                heappush(empty.get(remaining), empty_start + length)
-        total = 0
-        for id, start_i, length in files:
-            for i in range(length):
-                total += id * (start_i + i)
-
-        return total
+        return calc_checksum(empty, files)
 
 
 # Day9("test").run()
