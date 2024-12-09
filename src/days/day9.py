@@ -26,26 +26,25 @@ class Day9(Day):
                     disk.append(None)
         self.disk = disk.copy()
 
-        i = 0
-        l = len(disk) - 1
-        while i < l:
-            if disk[i] is not None:
-                i += 1
-                continue
-            if disk[l] is None:
-                l -= 1
-                continue
-            disk[i], disk[l] = disk[l], disk[i]
-            i += 1
-            l -= 1
-
+        disk.append(None)
+        blocks = []
+        empty = []
+        for i, d in enumerate(disk):
+            if d is not None:
+                blocks.append((d, i))
+            else:
+                empty.append(i)
+        for id, start_i in blocks[::-1]:
+            if len(empty) > 0 and empty[0] < start_i:
+                empty_start = empty.pop(0)
+                blocks.remove((id, start_i))
+                blocks.append((id, empty_start))
         total = 0
-        disk = disk[0:disk.index(None)]
-        for i, n in enumerate(disk):
-            total += n * i
+        for id, start_i in blocks:
+            total += id * start_i
         return total
 
-    @solution("")
+    @solution("6382582136592")
     def part2(self) -> object:
         disk = self.disk.copy()
         disk.append(None)
@@ -69,12 +68,9 @@ class Day9(Day):
                 start_i = empty_start
                 length = 1
                 cur = id
-        # print(disk)
-        # print(files)
-        # print(empty)
 
         for (id, start_i, length) in files[::-1]:
-            empty_available = min((k for k, v in empty.items() if k >= length and len(v) > 0), default=None)
+            empty_available = min((k for k, v in empty.items() if k >= length and len(v) > 0), default=None, key=lambda x: empty.get(x)[0])
             if empty_available is None:
                 continue
             empty_start = empty.get(empty_available)[0]
