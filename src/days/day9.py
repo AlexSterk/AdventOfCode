@@ -1,4 +1,5 @@
 import re
+from heapq import heappush, heappop
 
 from src.setup.day import Day
 from src.util.solution import solution
@@ -23,12 +24,13 @@ class Day9(Day):
             else:
                 for j in range(int(d)):
                     disk.append(None)
+        self.disk = disk.copy()
 
         i = 0
         l = len(disk) - 1
         while i < l:
             if disk[i] is not None:
-                i+=1
+                i += 1
                 continue
             if disk[l] is None:
                 l -= 1
@@ -43,10 +45,55 @@ class Day9(Day):
             total += n * i
         return total
 
-
     @solution("")
     def part2(self) -> object:
-        return None
+        disk = self.disk.copy()
+        disk.append(None)
+        files = []
+        empty = {}
+
+        start_i = 0
+        length = 0
+        cur = disk[0]
+
+        for empty_start, id in enumerate(disk):
+            if id == cur:
+                length += 1
+            else:
+                if cur is not None:
+                    files.append((cur, start_i, length))
+                else:
+                    if empty.get(length) is None:
+                        empty[length] = []
+                    heappush(empty.get(length), start_i)
+                start_i = empty_start
+                length = 1
+                cur = id
+        # print(disk)
+        # print(files)
+        # print(empty)
+
+        for (id, start_i, length) in files[::-1]:
+            empty_available = min((k for k, v in empty.items() if k >= length and len(v) > 0), default=None)
+            if empty_available is None:
+                continue
+            empty_start = empty.get(empty_available)[0]
+            if empty_start >= start_i:
+                continue
+            empty_start = heappop(empty.get(empty_available))
+            files.remove((id, start_i, length))
+            files.append((id, empty_start, length))
+            remaining = empty_available - length
+            if remaining > 0:
+                if empty.get(remaining) is None:
+                    empty[remaining] = []
+                heappush(empty.get(remaining), empty_start + length)
+        total = 0
+        for id, start_i, length in files:
+            for i in range(length):
+                total += id * (start_i + i)
+
+        return total
 
 
 # Day9("test").run()
