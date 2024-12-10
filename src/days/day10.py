@@ -20,7 +20,7 @@ class Day10(Day):
             ns = [(x, y, c, node) for x, y, c in ns if c == C + 1]
             return ns
 
-        starts = [(*k, v, ()) for k, v in grid.items() if v == 0]
+        starts = [(k[0], k[1], v, ()) for k, v in grid.items() if v == 0]
         ends = []
         for start in starts:
             dist, _, _ = shortest_paths(start, neighbours, lambda a, b: 1)
