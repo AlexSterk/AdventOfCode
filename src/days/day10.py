@@ -1,6 +1,8 @@
 from src.setup.day import Day
-from src.util.dijkstra import shortest_path
+from src.util.dijkstra import shortest_paths
 from src.util.solution import solution
+
+DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
 
 class Day10(Day):
@@ -15,8 +17,7 @@ class Day10(Day):
 
         def neighbours(node):
             X, Y, C = node
-            dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-            ns = [(X + dx, Y + dy) for dx, dy in dirs]
+            ns = [(X + dx, Y + dy) for dx, dy in DIRS]
             ns = [(x, y, grid.get((x, y))) for x, y in ns if (x, y) in grid]
             ns = [(x, y, c) for x, y, c in ns if c == C + 1]
             return ns
@@ -24,7 +25,7 @@ class Day10(Day):
         starts = [(*k, v) for k, v in grid.items() if v == 0]
         total = 0
         for start in starts:
-            dist, _, _ = shortest_path(start, lambda _: False, neighbours, lambda a, b: 1)
+            dist, _, _ = shortest_paths(start, neighbours, lambda a, b: 1)
             total += sum(1 for x, y, c in dist if c == 9)
 
         return total
@@ -35,8 +36,7 @@ class Day10(Day):
 
         def neighbours(node):
             X, Y, C, _ = node
-            dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-            ns = [(X + dx, Y + dy) for dx, dy in dirs]
+            ns = [(X + dx, Y + dy) for dx, dy in DIRS]
             ns = [(x, y, grid.get((x, y))) for x, y in ns if (x, y) in grid]
             ns = [(x, y, c, node) for x, y, c in ns if c == C + 1]
             return ns
@@ -44,7 +44,7 @@ class Day10(Day):
         starts = [(*k, v, ()) for k, v in grid.items() if v == 0]
         total = 0
         for start in starts:
-            dist, _, _ = shortest_path(start, lambda _: False, neighbours, lambda a, b: 1)
+            dist, _, _ = shortest_paths(start, neighbours, lambda a, b: 1)
             total += sum(1 for x, y, c, _ in dist if c == 9)
 
         return total
