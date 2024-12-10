@@ -13,27 +13,6 @@ class Day10(Day):
     @solution("430")
     def part1(self) -> object:
         grid = {(x, y): int(c) for y, row in enumerate(self.input) for x, c in enumerate(row)}
-        self.grid = grid
-
-        def neighbours(node):
-            X, Y, C = node
-            ns = [(X + dx, Y + dy) for dx, dy in DIRS]
-            ns = [(x, y, grid.get((x, y))) for x, y in ns if (x, y) in grid]
-            ns = [(x, y, c) for x, y, c in ns if c == C + 1]
-            return ns
-
-        starts = [(*k, v) for k, v in grid.items() if v == 0]
-        total = 0
-        for start in starts:
-            dist, _, _ = shortest_paths(start, neighbours, lambda a, b: 1)
-            total += sum(1 for x, y, c in dist if c == 9)
-
-        return total
-
-    @solution("928")
-    def part2(self) -> object:
-        grid = self.grid
-
         def neighbours(node):
             X, Y, C, _ = node
             ns = [(X + dx, Y + dy) for dx, dy in DIRS]
@@ -42,12 +21,17 @@ class Day10(Day):
             return ns
 
         starts = [(*k, v, ()) for k, v in grid.items() if v == 0]
-        total = 0
+        ends = []
         for start in starts:
             dist, _, _ = shortest_paths(start, neighbours, lambda a, b: 1)
-            total += sum(1 for x, y, c, _ in dist if c == 9)
+            ends += [(start, x,y,c) for x, y, c, end in dist if c == 9]
+        self.ends = ends
 
-        return total
+        return len(set(ends))
+
+    @solution("928")
+    def part2(self) -> object:
+        return len(self.ends)
 
 
 # Day10("test").run()
