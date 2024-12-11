@@ -3,8 +3,6 @@ import functools
 from src.setup.day import Day
 from src.util.solution import solution
 
-N = 7
-
 @functools.cache
 def process_stone(stone):
     if stone == 0:
