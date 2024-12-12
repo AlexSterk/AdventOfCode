@@ -20,7 +20,7 @@ class Day12(Day):
     def day(self):
         return 12
 
-    @solution("")
+    @solution("1377008")
     def part1(self) -> object:
         graph = nx.Graph()
         grid = {(x, y): c for y, line in enumerate(self.input) for x, c in enumerate(line)}
