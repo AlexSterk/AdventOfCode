@@ -4,6 +4,7 @@ import numpy as np
 from src.setup.day import Day
 from src.util.solution import solution
 
+
 def is_integer(n):
     if abs(n - round(n)) < 1e-9:
         return True
@@ -46,9 +47,27 @@ class Day13(Day):
             total += a * 3 + b
         return total
 
-    @solution("")
+    @solution("99423413811305")
     def part2(self) -> object:
-        return None
+        config = self.raw_input.split("\n\n")
+        total = 0
+        for c in config:
+            p = r"\d+"
+            matches = re.findall(p, c)
+            a_dx = int(matches[0])
+            a_dy = int(matches[1])
+            b_dx = int(matches[2])
+            b_dy = int(matches[3])
+            g_x = int(matches[4])
+            g_y = int(matches[5])
+
+            M = np.array([[a_dx, b_dx], [a_dy, b_dy]])
+            P = np.array([g_x, g_y]) + 10000000000000
+            R = np.round(np.linalg.solve(M, P))
+            if (P==R@M.T).all():
+                total += R@(3,1)
+
+        return round(total)
 
 
 # Day13("test").run()
