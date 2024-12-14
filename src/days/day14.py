@@ -73,6 +73,11 @@ class Day14(Day):
                 robot["x"] = (robot["x"] + robot["dx"]) % w
                 robot["y"] = (robot["y"] + robot["dy"]) % h
             if len(robots) == len(set(get_state())):
+                grid = [["." for _ in range(w)] for _ in range(h)]
+                for robot in robots:
+                    grid[robot["y"]][robot["x"]] = "#"
+                for row in grid:
+                    print("".join(row))
                 return i
 
 
