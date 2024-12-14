@@ -8,7 +8,7 @@ def shortest_path(
         start: T,
         end: Callable[[T], bool],
         neighbours: Callable[[T], Iterable[T]],
-        cost: Callable[[T, T], int]
+        cost: Callable[[T, T], int] = lambda a, b: 1
 ):
     dist = {start: 0}
     visited = set()
@@ -34,6 +34,20 @@ def shortest_path(
 def shortest_paths(
         start: T,
         neighbours: Callable[[T], Iterable[T]],
-        cost: Callable[[T, T], int]
+        cost: Callable[[T, T], int] = lambda a, b: 1
 ):
     return shortest_path(start, lambda _: False, neighbours, cost)
+
+def all_paths(
+        start: T,
+        end: Callable[[T], bool],
+        neighbours: Callable[[T], Iterable[T]],
+        cost: Callable[[T, T], int] = lambda a, b: 1
+):
+    def ns(node):
+        if end(node):
+            return
+        for n in neighbours(node):
+            yield n
+    paths, _, _ = shortest_paths(start, ns, cost)
+    return [p for p in paths if end(p)]

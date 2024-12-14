@@ -2,7 +2,7 @@ import hashlib
 from collections import deque
 
 from src.setup.day import Day
-from src.util.dijkstra import shortest_path
+from src.util.dijkstra import shortest_path, all_paths, shortest_paths
 from src.util.solution import solution
 
 grid = """#########
@@ -44,28 +44,14 @@ class Day17(Day):
     @solution("DUDRDLRRRD")
     def part1(self) -> object:
         passcode = self.raw_input
-        _, end, _ = shortest_path((1, 1, ""), lambda x: x[0] == 7 and x[1] == 7, neighbors(passcode), lambda a, b: 1)
-
+        _, end, _ = shortest_path((1, 1, ""), lambda x: x[0] == 7 and x[1] == 7, neighbors(passcode))
         return end[2]
 
     @solution("502")
     def part2(self) -> object:
         passcode = self.raw_input
-
-        _neighbors = neighbors(passcode)
-
-        q = deque([(1, 1, "")])
-        longest = 0
-        while q:
-            x, y, path = q.popleft()
-            if x == 7 and y == 7:
-                longest = max(longest, len(path))
-                continue
-            for n in _neighbors((x, y, path)):
-                q.append(n)
-
-        return longest
-
+        paths = all_paths((1, 1, ""), lambda x: x[0] == 7 and x[1] == 7, neighbors(passcode))
+        return max(len(path) for x,y,path in paths)
 
 # Day17("test").run()
 Day17().run()
