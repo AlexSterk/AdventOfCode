@@ -12,7 +12,7 @@ def shortest_path(
 ):
     dist = {start: 0}
     visited = set()
-    queue = PriorityQueue()
+    queue: PriorityQueue[tuple[int, T]] = PriorityQueue()
     queue.put((0, start))
     while not queue.empty():
         d, node = queue.get()
