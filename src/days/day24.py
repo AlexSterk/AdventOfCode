@@ -20,7 +20,8 @@ class Day24(Day):
             (x, y), visited = p
             for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 if grid.get((x + dx, y + dy)) == ".":
-                    yield (x + dx, y + dy), frozenset.union(*[visited, [(x + dx, y + dy)]]) if (x + dx, y + dy) in to_visit else visited
+                    yield (x + dx, y + dy), frozenset.union(*[visited, [(x + dx, y + dy)]]) if (x + dx,
+                                                                                                y + dy) in to_visit else visited
 
         s = (start, frozenset())
 
@@ -30,10 +31,28 @@ class Day24(Day):
 
         return shortest_path(s, goal, ns)[2]
 
-
-    @solution("")
+    @solution("804")
     def part2(self) -> object:
-        return None
+        grid = {(x, y): c for y, row in enumerate(self.input) for x, c in enumerate(row)}
+        to_visit = set(p for p, c in grid.items() if c.isdigit() and c != "0")
+        start = next(p for p, c in grid.items() if c == "0")
+
+        grid = {p: "." for p, c in grid.items() if c != "#"}
+
+        def ns(p):
+            (x, y), visited = p
+            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                if grid.get((x + dx, y + dy)) == ".":
+                    yield (x + dx, y + dy), frozenset.union(*[visited, [(x + dx, y + dy)]]) if (x + dx,
+                                                                                                y + dy) in to_visit else visited
+
+        s = (start, frozenset())
+
+        def goal(s):
+            p, visited = s
+            return visited == to_visit and p == start
+
+        return shortest_path(s, goal, ns)[2]
 
 
 # Day24("test").run()
