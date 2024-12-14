@@ -28,10 +28,9 @@ class Day14(Day):
         w = 11 if self.test else 101
         h = 7 if self.test else 103
 
-        for i in range(100):
-            for robot in robots:
-                robot["x"] = (robot["x"] + robot["dx"]) % w
-                robot["y"] = (robot["y"] + robot["dy"]) % h
+        for robot in robots:
+            robot["x"] = (robot["x"] + robot["dx"] * 100) % w
+            robot["y"] = (robot["y"] + robot["dy"] * 100) % h
 
         middle_x = w // 2
         middle_y = h // 2
@@ -53,7 +52,7 @@ class Day14(Day):
 
         return q1 * q2 * q3 * q4
 
-    @solution("")
+    @solution("8149")
     def part2(self) -> object:
         robots = []
         for line in self.input:
