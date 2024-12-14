@@ -1,8 +1,7 @@
-from distutils.command.register import register
-
 from src.setup.day import Day
 from src.util.solution import solution
 
+import multiprocessing
 
 def run_cpu(instructions, registers):
     pc = 0
@@ -50,6 +49,23 @@ def run_cpu(instructions, registers):
     return registers["a"]
 
 
+def loops_forever(instructions, i):
+    i.value = 0
+    while True:
+        registers = {"a": i.value}
+        cpu = run_cpu(instructions, registers)
+        c = next(cpu)
+        if c == 1:
+            i.value += 1
+            continue
+        while True:
+            n = next(cpu)
+            if c == n:
+                break
+            c = n
+        i.value += 1
+
+
 class Day25(Day):
     @property
     def day(self):
@@ -59,55 +75,17 @@ class Day25(Day):
     def part1(self) -> object:
         instructions = [line.split() for line in self.input]
 
-        i = 0
-        while True:
-            print(i)
-            registers = {"a": i}
-            i += 1
-            cpu = run_cpu(instructions, registers)
-            c = next(cpu)
-            if c == 1:
-                continue
-            while True:
-                n = next(cpu)
-                if c == n:
-                    break
-                c = n
+        i = multiprocessing.Value('i', 0)
+        p = multiprocessing.Process(target=loops_forever, args=(instructions,i))
+        p.start()
+        p.join(10)
+        p.terminate()
 
-
-
-
-        # outputs = []
-        #
-        # def check_output(output):
-        #     evens_are_0 = output[::2] == [0] * len(output[::2])
-        #     odds_are_1 = output[1::2] == [1] * len(output[1::2])
-        #     return evens_are_0 and odds_are_1
-        #
-        # for i in range(10):
-        #     registers = {"a": i}
-        #     output = []
-        #     states = set()
-        #     state = (0, frozenset(registers.items()))
-        #     while state not in states:
-        #         states.add(state)
-        #         output.append(str(next(run_cpu(instructions, registers))))
-        #         state = (registers["a"], frozenset(registers.items()))
-        #     # print(i, output)
-        #     # if check_output(output):
-        #     #     return i
-        #     outputs.append(output[::-1])
-        #
-        # for i, o in enumerate(outputs):
-        #     print(i, int("".join(o), 2))
-
-
-        return None
+        return i.value
 
     @solution("")
     def part2(self) -> object:
         return None
 
-
-# Day25("test").run()
-Day25().run()
+if __name__ == '__main__':
+    Day25().run()
