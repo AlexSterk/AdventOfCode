@@ -59,16 +59,48 @@ class Day25(Day):
     def part1(self) -> object:
         instructions = [line.split() for line in self.input]
 
-        for i in range(10):
+        i = 0
+        while True:
+            print(i)
             registers = {"a": i}
-            output = []
-            states = set()
-            state = (0, frozenset(registers.items()))
-            while state not in states:
-                states.add(state)
-                output.append(next(run_cpu(instructions, registers)))
-                state = (registers["a"], frozenset(registers.items()))
-            print(i, output)
+            i += 1
+            cpu = run_cpu(instructions, registers)
+            c = next(cpu)
+            if c == 1:
+                continue
+            while True:
+                n = next(cpu)
+                if c == n:
+                    break
+                c = n
+
+
+
+
+        # outputs = []
+        #
+        # def check_output(output):
+        #     evens_are_0 = output[::2] == [0] * len(output[::2])
+        #     odds_are_1 = output[1::2] == [1] * len(output[1::2])
+        #     return evens_are_0 and odds_are_1
+        #
+        # for i in range(10):
+        #     registers = {"a": i}
+        #     output = []
+        #     states = set()
+        #     state = (0, frozenset(registers.items()))
+        #     while state not in states:
+        #         states.add(state)
+        #         output.append(str(next(run_cpu(instructions, registers))))
+        #         state = (registers["a"], frozenset(registers.items()))
+        #     # print(i, output)
+        #     # if check_output(output):
+        #     #     return i
+        #     outputs.append(output[::-1])
+        #
+        # for i, o in enumerate(outputs):
+        #     print(i, int("".join(o), 2))
+
 
         return None
 
