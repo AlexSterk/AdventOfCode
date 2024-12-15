@@ -117,11 +117,11 @@ class Day15(Day):
             if len(to_move) == 2:  # We are moving a full box
                 l, r = to_move
                 if dx == -1:  # When we move left/right, we can move as normal, recursively checking for free spaces
-                    if (t := move([l], d)) != l:
-                        return [t, move([r], d)]
+                    if (t := move([l], d)) != l: # If we move left, try if we can move the left half first
+                        return [t, move([r], d)] # Move the right half
                 if dx == 1:
-                    if (t := move([r], d)) != r:
-                        return [move([l], d), t]
+                    if (t := move([r], d)) != r: # If we move right, try if we can move the right half first
+                        return [move([l], d), t] # Move the left half
                 if dy != 0:
                     # When we move up/down, we need to check two spaces before we can move
                     # Because move() only moves one space at a time,
