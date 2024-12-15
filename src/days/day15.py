@@ -29,13 +29,11 @@ class Day15(Day):
             n = (x + dx, y + dy)
             o = grid.get(n, "#")
             if o == ".":
-                grid[n] = grid[p]
-                grid[p] = "."
+                grid[n], grid[p] = grid[p], grid[n]
                 return n
             if o == "O":
                 if move(n, v) != n:
-                    grid[n] = grid[p]
-                    grid[p] = "."
+                    grid[n], grid[p] = grid[p], grid[n]
                     return n
                 return p
             return p
@@ -96,29 +94,25 @@ class Day15(Day):
             dx, dy = d
 
             if len(to_move) == 1:  # We are moving the robot, or 1/2 a box
-                to_move = to_move[0]
-                x, y = to_move
+                p = to_move[0]
+                x, y = p
                 n = (x + dx, y + dy)
                 o = grid.get(n, "#")
 
                 if o == ".":  # We can move
-                    grid[n] = grid[to_move]
-                    grid[to_move] = "."
+                    grid[n], grid[p] = grid[p], grid[n]
                     return n
                 if o == "[":
                     n_to_move = [n, (n[0] + 1, n[1])]
-                    i = 0
                 if o == "]":
                     n_to_move = [(n[0] - 1, n[1]), n]
-                    i = 1
                 if o in "[]":  # We ran into a box, we must move it
                     if move(n_to_move, d) != n_to_move:
                         # now that the box is moved, we can move whatever we were moving
-                        grid[n] = grid[to_move]
-                        grid[to_move] = "."
+                        grid[n], grid[p] = grid[p], grid[n]
                         return n
                 # we can't move, keep the current position
-                return to_move
+                return p
 
             if len(to_move) == 2:  # We are moving a full box
                 l, r = to_move
@@ -133,7 +127,6 @@ class Day15(Day):
                     # Because move() only moves one space at a time,
                     # we need to make sure that it is safe to perform that move.
                     if can_move_box(to_move, d):  # We determined that moving is safe, move each half separately
-                        # (which we already determined is safe to do)
                         return [move([l], d), move([r], d)]
                 # We can't move, keep the current position
                 return to_move
