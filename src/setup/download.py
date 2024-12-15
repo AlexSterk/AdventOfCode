@@ -18,8 +18,10 @@ print(f"Saving input to data/day{day}/input.txt")
 os.makedirs(f"data/day{day}", exist_ok=True)
 with open(f"data/day{day}/input.txt", "w") as f:
     f.write(response.text)
-with open(f"data/day{day}/test.txt", "w") as f:
-    f.write("")
+# create test.txt if it doesn't exist
+if not os.path.exists(f"data/day{day}/test.txt"):
+    with open(f"data/day{day}/test.txt", "w") as f:
+        f.write("")
 
 # check if there is a script file, if not, generate it
 try:
