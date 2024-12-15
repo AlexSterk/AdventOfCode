@@ -6,6 +6,7 @@ class Day:
 
     def __init__(self, input_file = "input"):
         self.input_file = input_file
+        self.test = input_file != "input"
 
     def part1(self) -> object:
         pass
