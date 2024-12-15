@@ -90,7 +90,7 @@ class Day15(Day):
             return all(
                 can_move_box(b, d) for b in n_boxes)  # We need to move both boxes, before we can move the current box
 
-        def move(to_move, d):
+        def move(to_move: list[tuple[int, int]], d: tuple[int, int]):
             dx, dy = d
 
             if len(to_move) == 1:  # We are moving the robot, or 1/2 a box
@@ -102,9 +102,9 @@ class Day15(Day):
                 if o == ".":  # We can move
                     grid[n], grid[p] = grid[p], grid[n]
                     return n
-                if o == "[":
+                if o == "[": # Found a box
                     n_to_move = [n, (n[0] + 1, n[1])]
-                if o == "]":
+                if o == "]": # Found a box
                     n_to_move = [(n[0] - 1, n[1]), n]
                 if o in "[]":  # We ran into a box, we must move it
                     if move(n_to_move, d) != n_to_move:
@@ -125,7 +125,8 @@ class Day15(Day):
                 if dy != 0:
                     # When we move up/down, we need to check two spaces before we can move
                     # Because move() only moves one space at a time,
-                    # we need to make sure that it is safe to perform that move.
+                    # we need to avoid situations where we can move one half of the box, but not the other.
+                    # So: we need to make sure that it is safe to perform the move for the entire box, before moving.
                     if can_move_box(to_move, d):  # We determined that moving is safe, move each half separately
                         return [move([l], d), move([r], d)]
                 # We can't move, keep the current position
