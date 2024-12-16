@@ -1,5 +1,7 @@
+from turtledemo.penrose import start
+
 from src.setup.day import Day
-from src.util.dijkstra import shortest_path, shortest_paths
+from src.util.dijkstra import shortest_path, shortest_paths, all_paths
 from src.util.directions import cardinal
 from src.util.solution import solution
 
@@ -11,7 +13,7 @@ class Day16(Day):
 
     @solution("105508")
     def part1(self) -> object:
-        grid = {(x, y): c for y, row in enumerate(self.input) for x, c in enumerate(row)}
+        self.grid = grid = {(x, y): c for y, row in enumerate(self.input) for x, c in enumerate(row)}
         start = next(k for k, v in grid.items() if v == 'S')
         end = next(k for k, v in grid.items() if v == 'E')
 
@@ -27,40 +29,55 @@ class Day16(Day):
             for d in cardinal.values():
                 if d == (dx, dy) or d == (-dx, -dy):
                     continue
-                n = (x + d[0], y + d[1])
-                if n in grid and grid[n] != '#':
-                    yield n, d
+                yield p,d
 
         def cost(state, n_state):
-            return 1 if state[1] == n_state[1] else 1001
+            return 1 if state[1] == n_state[1] else 1000
 
-        dist, _, _, prev = shortest_paths(start_state, ns, cost)
-        self.prev = prev
+        _, e, d, _ = self.shortest_path = shortest_path(start_state, is_end, ns, cost)
         self.start = start_state
-        self.end = end
-        return min(v for k, v in dist.items() if is_end(k))
+        self.end = e
 
-    @solution("")
+        return d
+
+    @solution("548")
     def part2(self) -> object:
+        grid = self.grid
+        dist, _,_,_ = self.shortest_path
         start = self.start
         end = self.end
-        prev = self.prev
 
-        spots = set()
+        def cost(state, n_state):
+            return 1 if state[1] == n_state[1] else 1000
 
-        spots.add(end)
-        spots.add(start[0])
+        def backwards_ns(state):
+            (x, y), (dx, dy) = p, d = state
+            if (n := (x - dx, y - dy)) in grid and grid[n] != '#':
+                yield n, d
+            for d in cardinal.values():
+                if d == (dx, dy) or d == (-dx, -dy):
+                    continue
+                yield p,d
 
-        for k in prev:
-            if k[0] == end:
-                c = k
-                while c != start:
-                    spots.add(c[0])
-                    c = prev[c]
+        q = [end]
+        visited = {end}
 
-        print(spots)
-        return len(spots)
+        while q:
+            c = q.pop()
+            if c == start:
+                continue
+            for n in backwards_ns(c):
+                # Is this neighbor accessible from start,
+                # with a cost equal to the cost to current MINUS the cost between current and neighbour?
+                co = cost(c, n)
+                if n in dist and dist[n] == dist[c] - co:
+                    if n not in visited:
+                        q.append(n)
+                        visited.add(n)
+
+        return len(set(s[0] for s in visited))
 
 
-Day16("test").run()
-# Day16().run()
+
+# Day16("test").run()
+Day16().run()

@@ -51,5 +51,5 @@ def all_paths(
             return
         for n in neighbours(node):
             yield n
-    paths, _, _ = shortest_paths(start, ns, cost)
+    paths, _, _, _ = shortest_paths(start, ns, cost)
     return [p for p in paths if end(p)]
