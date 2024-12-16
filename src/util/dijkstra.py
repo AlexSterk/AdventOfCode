@@ -12,12 +12,13 @@ def shortest_path(
 ):
     dist = {start: 0}
     visited = set()
+    prev = {}
     queue: PriorityQueue[tuple[int, T]] = PriorityQueue()
     queue.put((0, start))
     while not queue.empty():
         d, node = queue.get()
         if end(node):
-            return dist, node, d
+            return dist, node, d, prev
         if node in visited:
             continue
         visited.add(node)
@@ -25,10 +26,11 @@ def shortest_path(
             if neighbour in visited:
                 continue
             new_dist = d + cost(node, neighbour)
-            if neighbour not in dist or new_dist < dist[neighbour]:
+            if new_dist < dist.get(neighbour, float('inf')):
                 dist[neighbour] = new_dist
                 queue.put((new_dist, neighbour))
-    return dist, None, None
+                prev[neighbour] = node
+    return dist, None, None, prev
 
 
 def shortest_paths(
