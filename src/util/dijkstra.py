@@ -18,7 +18,7 @@ def shortest_path(
     while not queue.empty():
         d, node = queue.get()
         if end(node):
-            return dist, node, d, prev
+            return dist, node, d
         if node in visited:
             continue
         visited.add(node)
@@ -30,7 +30,7 @@ def shortest_path(
                 dist[neighbour] = new_dist
                 queue.put((new_dist, neighbour))
                 prev[neighbour] = node
-    return dist, None, None, prev
+    return dist, None, None
 
 
 def shortest_paths(
@@ -51,5 +51,5 @@ def all_paths(
             return
         for n in neighbours(node):
             yield n
-    paths, _, _, _ = shortest_paths(start, ns, cost)
+    paths, _, _ = shortest_paths(start, ns, cost)
     return [p for p in paths if end(p)]

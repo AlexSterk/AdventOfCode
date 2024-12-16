@@ -29,12 +29,12 @@ class Day16(Day):
             for d in cardinal.values():
                 if d == (dx, dy) or d == (-dx, -dy):
                     continue
-                yield p,d
+                yield p, d
 
         def cost(state, n_state):
             return 1 if state[1] == n_state[1] else 1000
 
-        _, e, d, _ = self.shortest_path = shortest_path(start_state, is_end, ns, cost)
+        _, e, d = self.shortest_path = shortest_path(start_state, is_end, ns, cost)
         self.start = start_state
         self.end = e
 
@@ -43,7 +43,7 @@ class Day16(Day):
     @solution("548")
     def part2(self) -> object:
         grid = self.grid
-        dist, _,_,_ = self.shortest_path
+        dist, _, _ = self.shortest_path
         start = self.start
         end = self.end
 
@@ -57,7 +57,7 @@ class Day16(Day):
             for d in cardinal.values():
                 if d == (dx, dy) or d == (-dx, -dy):
                     continue
-                yield p,d
+                yield p, d
 
         q = [end]
         visited = {end}
@@ -76,7 +76,6 @@ class Day16(Day):
                         visited.add(n)
 
         return len(set(s[0] for s in visited))
-
 
 
 # Day16("test").run()
