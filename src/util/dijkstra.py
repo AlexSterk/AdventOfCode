@@ -8,11 +8,11 @@ def shortest_path(
         start: T,
         end: Callable[[T], bool],
         neighbours: Callable[[T], Iterable[T]],
-        cost: Callable[[T, T], int] = lambda a, b: 1
+        cost: Callable[[T, T], int] = lambda a, b: 1,
+        prev={}
 ):
     dist = {start: 0}
     visited = set()
-    prev = {}
     queue: PriorityQueue[tuple[int, T]] = PriorityQueue()
     queue.put((0, start))
     while not queue.empty():
@@ -40,6 +40,7 @@ def shortest_paths(
 ):
     return shortest_path(start, lambda _: False, neighbours, cost)
 
+
 def all_paths(
         start: T,
         end: Callable[[T], bool],
@@ -51,5 +52,24 @@ def all_paths(
             return
         for n in neighbours(node):
             yield n
+
     paths, _, _ = shortest_paths(start, ns, cost)
     return [p for p in paths if end(p)]
+
+
+def reconstruct_path(
+        start: T,
+        end: Callable[[T], bool],
+        neighbours: Callable[[T], Iterable[T]],
+        cost: Callable[[T, T], int] = lambda a, b: 1,
+):
+    prev = {}
+    dist, end, d = shortest_path(start, end, neighbours, cost, prev)
+    path = []
+    cur = end
+    while cur != start:
+        path.append(cur)
+        cur = prev[cur]
+    path.append(start)
+    path.reverse()
+    return dist, end, d, path
