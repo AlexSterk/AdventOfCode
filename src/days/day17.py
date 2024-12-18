@@ -56,7 +56,7 @@ class Day17(Day):
             c = a / (1 << b)
             b = b ^ c
             b = b ^ 6
-            a = a / (1 << 3)
+            a = a / 8
             solver.add((b % 8) == x)
         solver.add(a == 0)
 
