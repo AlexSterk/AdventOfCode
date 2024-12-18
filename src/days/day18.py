@@ -1,8 +1,6 @@
-from dataclasses import dataclass
-
 from src.setup.day import Day
 from src.util import directions
-from src.util.dijkstra import shortest_path, reconstruct_path
+from src.util.dijkstra import shortest_path
 from src.util.solution import solution
 
 class Day18(Day):
