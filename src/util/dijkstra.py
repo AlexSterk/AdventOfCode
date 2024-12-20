@@ -90,3 +90,13 @@ class Dijkstra:
                     dist[neighbour] = new_dist
                     queue.put((new_dist, neighbour))
                     prev[neighbour] = node
+
+    def get_shortest_path(self):
+        path = []
+        cur = self.end
+        while cur in self.prev:
+            path.append(cur)
+            cur = self.prev[cur]
+        path.append(cur)
+        path.reverse()
+        return path

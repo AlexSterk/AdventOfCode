@@ -2,7 +2,7 @@ from functools import cache
 
 from src.setup.day import Day
 from src.util import directions
-from src.util.dijkstra import shortest_path
+from src.util.dijkstra import shortest_path, reconstruct_path, Dijkstra
 from src.util.solution import solution
 
 class Day20(Day):
@@ -14,7 +14,7 @@ class Day20(Day):
     def part1(self) -> object:
         grid = {(x,y): c for y, row in enumerate(self.input) for x, c in enumerate(row)}
         start = next(k for k, v in grid.items() if v == "S")
-        ee = end = next(k for k, v in grid.items() if v == "E")
+        end = next(k for k, v in grid.items() if v == "E")
 
         def ns(n):
             x,y = n
@@ -22,74 +22,43 @@ class Day20(Day):
                 if grid.get((x+dx, y+dy), '#') != "#":
                     yield x+dx, y+dy
 
-        _,_,without_cheats = shortest_path(start, lambda n: n == end, ns)
-        print(without_cheats)
+        D = Dijkstra()
 
-        # start = start,2
-        #
-        # def ns(n):
-        #     (x,y),c = n
-        #     for dx, dy in directions.cardinal.values():
-        #         v = grid.get((x+dx, y+dy), '#')
-        #         if v == '#' and c > 0:
-        #             yield (x+dx, y+dy), c-1
-        #         elif v != "#":
-        #             yield (x+dx, y+dy), c-1 if c == 1 else c
-        #
-        # _,_,with_cheats = shortest_path(start, lambda n: n[0] == end, ns)
-        # print(with_cheats)
-        # print(without_cheats - with_cheats)
-
-        start = start,None,None
+        D.shortest_path(start, lambda n: n == end, ns)
+        no_cheats = D.d
+        path = D.get_shortest_path()
 
         @cache
-        def ns(n):
-            (x,y),c1,c2 = n
-            for dx, dy in directions.cardinal.values():
-                N = (x+dx, y+dy)
-                v = grid.get(N, '#')
-                if v == "#":
-                    if c1 is None:
-                        yield N, N, None
-                    elif c2 is None:
-                        yield N, c1, N
-                else:
-                    if c1 is not None and c2 is None:
-                        yield N, c1, N
-                    else:
-                        yield N, c1, c2
+        def cached_shortest_path(n):
+            return shortest_path(n, lambda n: n == end, ns)
 
-        # dfs to find all paths
         cheats = {}
+        for i, (x,y) in enumerate(path):
+            for (dx,dy) in directions.cardinal.values():
+                ch_start = (x + dx, y + dy)
+                ch_end = (x + dx * 2, y + dy * 2)
+                if grid.get(ch_end, "#") != "#":
+                    _,_,d = cached_shortest_path(ch_end)
+                    if d:
+                        # print(f"When cheating from path position {i} ({x},{y}), we cheat from {ch_start} to {ch_end} and from there it takes {d} steps to reach the end")
+                        to_i = i
+                        from_i_to_ch = 2
+                        from_ch_to_end = d
+                        length = to_i + from_i_to_ch + from_ch_to_end
+                        saved = no_cheats - length
+                        # print(f"We save {saved} steps")
+                        assert (ch_start, ch_end) not in cheats
+                        cheats[(ch_start, ch_end)] = saved
+        # count all cheats that save more than 100 steps
+        return sum(1 for v in cheats.values() if v > 100)
 
-        q = [(start, [start[0]])]
+        # count values of saved_list
+        # saved_list = [v for v in cheats.values()]
+        # saved_list.sort()
+        # for v in set(saved_list):
+        #     print(f"Value {v} occurs {saved_list.count(v)} times")
 
-        # def dfs(n, path):
-        #     if n[0] == end:
-        #         return path
-        #     for nn in ns(n):
-        #         if nn[0] not in path:
-        #             p = dfs(nn, path + [nn[0]])
-        #             if p:
-        #                 ch = nn[1], nn[2]
-        #                 d = len(p) - 1
-        #                 cheats[d] = cheats.get(d, []) + [ch]
 
-        while q:
-            n, path = q.pop()
-            if n[0] == end:
-                d = len(path) - 1
-                ch = n[1], n[2]
-                cheats[d] = cheats.get(d, []) + [ch]
-                continue
-            for nn in ns(n):
-                if nn[0] not in path:
-                    q.append((nn, path + [nn[0]]))
-
-        # dfs(start, [start[0]])
-        cheats = {k: set(v) for k,v in cheats.items()}
-
-        return sum(len(v) for k, v in cheats.items() if without_cheats - k >= 100)
 
     @solution("")
     def part2(self) -> object:
