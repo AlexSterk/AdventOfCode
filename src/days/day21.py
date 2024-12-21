@@ -1,186 +1,88 @@
-import re
-from collections import deque
+from dataclasses import dataclass
+from functools import cache
+from itertools import permutations
 
 from src.setup.day import Day
-from src.util import directions
-from src.util.dijkstra import shortest_path
 from src.util.solution import solution
 
-KEYPAD = {(x, y): c for y, row in enumerate("789\n546\n123\n 0A".splitlines()) for x, c in enumerate(row)}
-DIRPAD = {(x, y): c for y, row in enumerate(" ^A\n<v>".splitlines()) for x, c in enumerate(row)}
+@dataclass(frozen=True)
+class Pos:
+    i: int
+    j: int
+    def __add__(self, other):
+        return Pos(self.i + other.i, self.j + other.j)
+    def __sub__(self, other):
+        return Pos(self.i - other.i, self.j - other.j)
+    def __eq__(self, other):
+        return isinstance(other, Pos) and (self.i, self.j) == (other.i, other.j)
 
-# remove " "
-KEYPAD = {k: v for k, v in KEYPAD.items() if v != " "}
-DIRPAD = {k: v for k, v in DIRPAD.items() if v != " "}
+numpad = {'7': Pos(0, 0), '8': Pos(0, 1), '9': Pos(0, 2),
+          '4': Pos(1, 0), '5': Pos(1, 1), '6': Pos(1, 2),
+          '1': Pos(2, 0), '2': Pos(2, 1), '3': Pos(2, 2),
+          '0': Pos(3, 1), 'A': Pos(3, 2)}
+numpad_inv = {v: k for k,v in numpad.items()}
+dirpad = {'^': Pos(0, 1), 'A': Pos(0, 2),
+          '<': Pos(1, 0), 'v': Pos(1, 1), '>': Pos(1, 2)}
+dirpad_inv = {v: k for k,v in dirpad.items()}
+dirs = {'^': Pos(-1, 0), 'v': Pos(1, 0), '<': Pos(0, -1), '>': Pos(0, 1)}
 
-actions = {
-    "<": (-1, 0),
-    ">": (1, 0),
-    "^": (0, -1),
-    "v": (0, 1),
-    "A": (0, 0)
-}
-
-opposite = {
-    "<": ">",
-    ">": "<",
-    "^": "v",
-    "v": "^",
-}
-
-def get_complexity(code: str, depth: int = 2) -> int:
-    num = int(code.replace('A', ''))
-    return num * find_best_length(code, depth)
-
-def find_paths(start: str, end: str):
-    if start == end:
-        return []
-
-    result = []
-    keypad = (start.isdigit() or end.isdigit())
-    pad = KEYPAD if keypad else DIRPAD
-
-    position = next(k for k, v in pad.items() if v == start)
-    target = (next(k for k, v in pad.items() if v == end))
-    q = deque()
-    q.append((position,))
-    distance = abs(position[0] - target[0]) + abs(position[1] - target[1])
-
-    def adjacent(p, path):
-        x, y = p
-        for a, (dx, dy) in actions.items():
-            n = (x + dx, y + dy)
-            if n in pad and n not in path:
-                yield n
-
-    while q:
-        path = q.popleft()
-        p = path[-1]
-        if p == target:
-            result.append(path)
-        if len(path) > distance:
-            continue
-        for n in adjacent(p, path):
-            q.append(path + (n,))
-    return result
-
-
-def path_to_dpad(path):
-    result = []
-    for i in range(1, len(path)):
-        ax, ay = path[i - 1]
-        bx, by = path[i]
-        d = (
-            '>' if bx > ax else
-            '<' if bx < ax else
-            '^' if by < ay else
-            'v')
-        result.append(d)
-    result.append('A')
-    return ''.join(result)
-
-
-def find_best_length(sequence, level):
-    result = 0
-    for i in range(len(sequence)):
-        start = 'A' if i == 0 else sequence[i - 1]
-        end = sequence[i]
-
-        paths = find_paths(start, end)
-
-        if level == 0:
-            length = min(len(x) for x in paths) if paths else 1
-            result += length
-            continue
-
-        if not paths:
-            result += 1
-            continue
-
-        lengths = set()
-        for path in paths:
-            dpad = path_to_dpad(path)
-            lengths.add(find_best_length(dpad, level - 1))
-        result += min(lengths)
-    return result
-
+@cache
+def func(robot_id, current_key, dest_key, total_robots):
+    pad, pad_inv = (numpad, numpad_inv) if robot_id == 0 else (dirpad, dirpad_inv)
+    current_pos = pad[current_key]
+    dest_pos = pad[dest_key]
+    delta = dest_pos - current_pos
+    if robot_id == total_robots-1:
+        return abs(delta.i) + abs(delta.j) + 1
+    seq = []
+    for _ in range(abs(delta.i)):
+        seq.append('^' if delta.i < 0 else 'v')
+    for _ in range(abs(delta.j)):
+        seq.append('<' if delta.j < 0 else '>')
+    candidates = []
+    if not seq:
+        return 1
+    for r in set(permutations(seq)):
+        pos = current_pos
+        steps = 0
+        for i, dir_key in enumerate(r):
+            steps += func(robot_id+1, 'A' if i == 0 else r[i-1], dir_key, total_robots)
+            pos += dirs[dir_key]
+            if pos not in pad_inv:
+                break
+        else:
+            steps += func(robot_id + 1, r[-1], 'A', total_robots)
+            candidates.append(steps)
+    return min(candidates)
 
 class Day21(Day):
     @property
     def day(self):
         return 21
 
-    @solution("")
+    @solution("222670")
     def part1(self) -> object:
-        return sum(get_complexity(line) for line in self.input)
+        total_complexity = 0
+        num_robots = 3
+        for code in self.input:
+            complexity = func(0, 'A', code[0], num_robots)
+            for i in range(1, len(code)):
+                complexity += func(0, code[i-1], code[i], num_robots)
+            total_complexity += complexity * int(code[:-1])
+        return total_complexity
 
-    @solution("")
+    @solution("271397390297138")
     def part2(self) -> object:
-        return None
+        total_complexity = 0
+        num_robots = 26
+        for code in self.input:
+            complexity = func(0, 'A', code[0], num_robots)
+            for i in range(1, len(code)):
+                complexity += func(0, code[i-1], code[i], num_robots)
+            total_complexity += complexity * int(code[:-1])
+        return total_complexity
 
 # Day21("test").run()
 Day21().run()
-
-from functools import lru_cache
-from itertools import permutations
-
-pad = ["789", "456", "123", " 0A"]
-pad2 = [" ^A", "<v>"]
-drdc = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-drDcToDir = dict(zip(drdc, "^v<>"))
-
-
-def getAllEncodings(code, pad, sr, sc):
-    R = len(pad)
-    C = len(pad[0])
-    for perm in permutations(drdc):
-        ret = []
-        r, c = sr, sc
-        for x in code:
-            for rr in range(R):
-                for cc in range(C):
-                    if pad[rr][cc] == x:
-                        while True:
-                            for dr, dc in perm:
-                                if (
-                                        0 <= r + dr < R
-                                        and 0 <= c + dc < C
-                                        and pad[r + dr][c + dc] != " "
-                                        and abs(rr - r) + abs(cc - c)
-                                        > abs(rr - (r + dr)) + abs(cc - (c + dc))
-                                ):
-                                    ret.append(drDcToDir[dr, dc])
-                                    r += dr
-                                    c += dc
-                                    break
-                            else:
-                                ret.append("A")
-                                break
-        yield "".join(ret)
-
-
-lines = open("data/day21/input.txt").read().strip().split("\n")
-for part, DEPTH in enumerate([2, 25], start=1):
-
-    @lru_cache(maxsize=None)
-    def dp(code, depth=0):
-        if depth == DEPTH:
-            return len(code)
-        return sum(
-            min(
-                dp(code2, depth + 1)
-                for code2 in getAllEncodings(chunk + "A", pad2, 0, 2)
-            )
-            for chunk in code[:-1].split("A")
-        )
-
-    print(
-        f"Part{part}",
-        sum(
-            min(dp(code) for code in getAllEncodings(line, pad, 3, 2))
-            * int("".join(x for x in line if x.isdigit()))
-            for line in lines
-        ),
-    )
 
 
