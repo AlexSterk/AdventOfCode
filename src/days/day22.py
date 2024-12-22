@@ -4,6 +4,7 @@ from itertools import pairwise
 from src.setup.day import Day
 from src.util.solution import solution
 
+
 def next_number(n):
     r = n
     a = r * 64
@@ -15,13 +16,16 @@ def next_number(n):
 
     return r
 
+
 def last_digit(n):
     return n % 10
+
 
 def next_number_repeat(n, i):
     for i in range(i):
         n = next_number(n)
         yield n
+
 
 class Day22(Day):
     @property
@@ -38,15 +42,16 @@ class Day22(Day):
 
         for n in map(int, self.input):
             nums = list(next_number_repeat(n, 2000))
-            diffs = [b%10 - a%10 for a, b in pairwise(nums)]
+            diffs = [b % 10 - a % 10 for a, b in pairwise(nums)]
             seen = set()
-            for i in range(len(nums)-4):
-                window = tuple(diffs[i:i+4])
+            for i in range(len(nums) - 4):
+                window = tuple(diffs[i:i + 4])
                 if window not in seen:
                     seen.add(window)
-                    ans[window] += nums[i+4] % 10
+                    ans[window] += nums[i + 4] % 10
 
         return max(ans.values())
+
 
 if __name__ == '__main__':
     # Day22("test").run()
