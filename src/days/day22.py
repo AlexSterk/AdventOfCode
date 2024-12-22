@@ -13,12 +13,7 @@ def next_number(n):
     r = (r ^ b) % 16777216
     c = r * 2048
     r = (r ^ c) % 16777216
-
     return r
-
-
-def last_digit(n):
-    return n % 10
 
 
 def next_number_repeat(n, i):
