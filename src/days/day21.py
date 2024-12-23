@@ -28,6 +28,8 @@ dirs = {'^': Pos(-1, 0), 'v': Pos(1, 0), '<': Pos(0, -1), '>': Pos(0, 1)}
 
 @cache
 def func(robot_id, current_key, dest_key, total_robots):
+    if current_key == dest_key:
+        return 1
     pad, pad_inv = (numpad, numpad_inv) if robot_id == 0 else (dirpad, dirpad_inv)
     current_pos = pad[current_key]
     dest_pos = pad[dest_key]
@@ -40,8 +42,6 @@ def func(robot_id, current_key, dest_key, total_robots):
     for _ in range(abs(delta.j)):
         seq.append('<' if delta.j < 0 else '>')
     candidates = []
-    if not seq:
-        return 1
     for r in set(permutations(seq)):
         pos = current_pos
         steps = 0
