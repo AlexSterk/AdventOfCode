@@ -22,7 +22,7 @@ class Day25(Day):
 
         def get_heights_lock(lock):
             lines = lock.splitlines()
-            heights = [None] * len(lines[0])
+            heights: list[int|None] = [None] * len(lines[0])
             for y, line in enumerate(lines):
                 for x, char in enumerate(line):
                     if char == "#":
@@ -39,16 +39,7 @@ class Day25(Day):
         locks = [get_heights_lock(lock) for lock in locks]
         keys = [get_heights_key(key) for key in keys]
 
-        total = 0
-        for lock, key in product(locks, keys):
-            print(lock, key)
-            key = invert_heights(key)
-            overlaps = [x >= y for x, y in zip(lock, key)]
-            if True in overlaps:
-                continue
-            total += 1
-
-        return total
+        return sum(1 for lock, key in product(locks, keys) if not any(x >= y for x, y in zip(lock, invert_heights(key))))
 
     @solution("")
     def part2(self) -> object:
