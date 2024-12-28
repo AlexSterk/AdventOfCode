@@ -2,7 +2,7 @@ import os
 
 import requests
 
-YEAR = 2024
+YEAR = 2015
 
 print(f"Download input for day: ", end="")
 day = input()
