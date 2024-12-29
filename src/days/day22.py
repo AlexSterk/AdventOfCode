@@ -1,5 +1,3 @@
-import re
-
 from src.setup.day import Day
 from src.util.solution import solution
 
