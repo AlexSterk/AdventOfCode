@@ -1,3 +1,5 @@
+from math import floor
+
 from src.setup.day import Day
 from src.util.solution import solution
 
@@ -31,13 +33,13 @@ class Day1(Day):
             # line is a string
             dir, num = line[0], int(line[1:])
             dir = 1 if dir == "R" else -1
-            count += abs(num // N)
-            num = num % N
-            temp_dial = dial + dir * num
-            dial = temp_dial % N
-            count += abs(temp_dial // N)
-
+            while num > 0:
+                num -= 1
+                dial = (dial + dir) % N
+                if dial == 0:
+                    count += 1
         return count
 
-Day1("test2").run()
+# Day1("test").run()
 Day1().run()
+
