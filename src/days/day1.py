@@ -6,9 +6,21 @@ class Day1(Day):
     def day(self):
         return 1
 
-    @solution("")
+    @solution("1102")
     def part1(self) -> object:
-        return None
+        dial = 50
+        N = 100
+        count = 0
+
+        print(dial)
+        for line in self.read_input():
+            # line is a string
+            dir, num = line[0], int(line[1:])
+            dir = 1 if dir == "R" else -1
+            dial = (dial + dir * num) % N
+            if dial == 0:
+                count+=1
+        return count
 
     @solution("")
     def part2(self) -> object:
