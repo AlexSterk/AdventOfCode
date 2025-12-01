@@ -12,7 +12,6 @@ class Day1(Day):
         N = 100
         count = 0
 
-        print(dial)
         for line in self.read_input():
             # line is a string
             dir, num = line[0], int(line[1:])
@@ -24,7 +23,21 @@ class Day1(Day):
 
     @solution("")
     def part2(self) -> object:
-        return None
+        dial = 50
+        N = 100
+        count = 0
 
-Day1("test").run()
-# Day1().run()
+        for line in self.read_input():
+            # line is a string
+            dir, num = line[0], int(line[1:])
+            dir = 1 if dir == "R" else -1
+            count += abs(num // N)
+            num = num % N
+            temp_dial = dial + dir * num
+            dial = temp_dial % N
+            count += abs(temp_dial // N)
+
+        return count
+
+Day1("test2").run()
+Day1().run()
