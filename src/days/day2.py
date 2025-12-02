@@ -18,10 +18,8 @@ class Day2(Day):
         for x, y in ranges:
             for i in range(x,y+1):
                 s = str(i)
-                if len(s) % 2 == 0:
-                    l = len(s) // 2
-                    if s[0:l] == s[l:]:
-                        invalids.append(i)
+                if re.match(r"^(\d+)\1$", s):
+                    invalids.append(i)
 
         return sum(invalids)
 
