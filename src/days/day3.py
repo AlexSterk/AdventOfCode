@@ -19,17 +19,18 @@ class Day3(Day):
             res += m
         return res
 
-    @solution("")
+    @solution("172981362045136")
     def part2(self) -> object:
         def joltage(bank, N=12):
-            num = []
+            num = ""
             idx = 0
             L = len(bank)
             for n in range(N):
-                m = max(bank[idx:L-N+n+1])
+                sub = bank[idx:L - N + n + 1]
+                m = max(sub)
                 idx = bank.index(m, idx) + 1
-                num.append(m * 10**(N-1-n))
-            return sum(num)
+                num += str(m)
+            return int(num)
 
 
         c = 0
