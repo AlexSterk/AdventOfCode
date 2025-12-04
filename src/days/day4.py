@@ -30,9 +30,24 @@ class Day4(Day):
                     c += 1
         return c
 
-    @solution("")
+    @solution("8437")
     def part2(self) -> object:
-        return None
+        c = 0
+        grid = parse_grid(self.read_input())
+        while True:
+            n_grid = grid.copy()
+            can_be_removed = 0
+            for (x,y), v in grid.items():
+                if v == '@':
+                    ns = sum(grid.get((x + dx, y + dy)) == '@' for (dx, dy) in directions)
+                    if ns < 4:
+                        can_be_removed += 1
+                        n_grid[x, y] = None
+            if can_be_removed == 0:
+                break
+            c += can_be_removed
+            grid = n_grid
+        return c
 
 # Day4("test").run()
 Day4().run()
