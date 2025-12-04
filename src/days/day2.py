@@ -13,24 +13,24 @@ class Day2(Day):
 
     @solution("38437576669")
     def part1(self) -> object:
+        pattern = re.compile(r"^(\d+)\1$")
         ranges = self.parsed()
         invalids = []
         for x, y in ranges:
             for i in range(x,y+1):
-                s = str(i)
-                if re.match(r"^(\d+)\1$", s):
+                if re.match(pattern, str(i)):
                     invalids.append(i)
 
         return sum(invalids)
 
     @solution("49046150754")
     def part2(self) -> object:
+        pattern = re.compile(r"^(\d+)\1+$")
         ranges = self.parsed()
         invalids = []
         for x, y in ranges:
             for i in range(x,y+1):
-                s = str(i)
-                if re.match(r"^(\d+)\1+$", s):
+                if re.match(pattern, str(i)):
                     invalids.append(i)
 
         return sum(invalids)
