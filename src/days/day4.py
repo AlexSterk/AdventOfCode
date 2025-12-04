@@ -5,13 +5,13 @@ from src.util.solution import solution
 import src.util.directions as dir
 
 directions = [*dir.cardinal.values(), *dir.diagonal.values()]
-print(directions)
 
 def parse_grid(lines):
-    grid = {}
+    grid = set()
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
-            grid[x, y] = c
+            if c == '@':
+                grid.add((x, y))
     return grid
 
 class Day4(Day):
@@ -21,33 +21,29 @@ class Day4(Day):
 
     @solution("1370")
     def part1(self) -> object:
-        c = 0
         grid = parse_grid(self.read_input())
-        for (x,y), v in grid.items():
-            if v == '@':
-                ns = sum(grid.get((x+dx,y+dy)) == '@' for (dx, dy) in directions)
-                if ns < 4:
-                    c += 1
-        return c
+        removed = self.round(grid)
+        return len(removed)
 
     @solution("8437")
     def part2(self) -> object:
-        c = 0
         grid = parse_grid(self.read_input())
+        orig = len(grid)
         while True:
-            n_grid = grid.copy()
-            can_be_removed = 0
-            for (x,y), v in grid.items():
-                if v == '@':
-                    ns = sum(grid.get((x + dx, y + dy)) == '@' for (dx, dy) in directions)
-                    if ns < 4:
-                        can_be_removed += 1
-                        n_grid[x, y] = None
-            if can_be_removed == 0:
-                break
-            c += can_be_removed
-            grid = n_grid
-        return c
+            removed = self.round(grid)
+            grid = grid.difference(removed)
+            if len(removed) == 0:
+                return orig - len(grid)
+
+    @staticmethod
+    def round(grid):
+        removed = set()
+        for (x, y) in grid:
+            ns = sum((x+dx, y+dy) in grid for (dx, dy) in directions)
+            if ns < 4:
+                removed.add((x, y))
+        return removed
+
 
 # Day4("test").run()
 Day4().run()
