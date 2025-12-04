@@ -7,12 +7,12 @@ import src.util.directions as dir
 directions = [*dir.cardinal.values(), *dir.diagonal.values()]
 
 def parse_grid(lines):
-    grid = set()
+    rolls = set()
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if c == '@':
-                grid.add((x, y))
-    return grid
+                rolls.add((x, y))
+    return rolls
 
 class Day4(Day):
     @property
@@ -21,25 +21,25 @@ class Day4(Day):
 
     @solution("1370")
     def part1(self) -> object:
-        grid = parse_grid(self.read_input())
-        removed = self.round(grid)
+        rolls = parse_grid(self.read_input())
+        removed = self.round(rolls)
         return len(removed)
 
     @solution("8437")
     def part2(self) -> object:
-        grid = parse_grid(self.read_input())
-        orig = len(grid)
+        rolls = parse_grid(self.read_input())
+        orig = len(rolls)
         while True:
-            removed = self.round(grid)
-            grid = grid.difference(removed)
+            removed = self.round(rolls)
+            rolls = rolls.difference(removed)
             if len(removed) == 0:
-                return orig - len(grid)
+                return orig - len(rolls)
 
     @staticmethod
-    def round(grid):
+    def round(rolls):
         removed = set()
-        for (x, y) in grid:
-            ns = sum((x+dx, y+dy) in grid for (dx, dy) in directions)
+        for (x, y) in rolls:
+            ns = sum((x+dx, y+dy) in rolls for (dx, dy) in directions)
             if ns < 4:
                 removed.add((x, y))
         return removed
