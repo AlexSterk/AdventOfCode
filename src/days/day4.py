@@ -3,16 +3,6 @@ from src.util.point import Point
 from src.util.solution import solution
 import src.util.point.direction as directions
 
-
-def parse_grid(lines):
-    rolls = set()
-    for y, line in enumerate(lines):
-        for x, c in enumerate(line):
-            if c == '@':
-                rolls.add(Point(x, y))
-    return rolls
-
-
 class Day4(Day):
     @property
     def day(self):
@@ -20,13 +10,13 @@ class Day4(Day):
 
     @solution("1370")
     def part1(self) -> object:
-        rolls = parse_grid(self.read_input())
+        rolls = self.parse_grid(self.input)
         removed = self.round(rolls)
         return len(removed)
 
     @solution("8437")
     def part2(self) -> object:
-        rolls = parse_grid(self.read_input())
+        rolls = self.parse_grid(self.input)
         orig = len(rolls)
         while True:
             removed = self.round(rolls)
@@ -42,6 +32,15 @@ class Day4(Day):
             if ns < 4:
                 removed.add(p)
         return removed
+
+    @staticmethod
+    def parse_grid(lines):
+        rolls = set()
+        for y, line in enumerate(lines):
+            for x, c in enumerate(line):
+                if c == '@':
+                    rolls.add(Point(x, y))
+        return rolls
 
 
 # Day4("test").run()

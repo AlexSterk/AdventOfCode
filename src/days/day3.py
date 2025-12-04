@@ -9,14 +9,14 @@ class Day3(Day):
     @solution("17346")
     def part1(self) -> object:
         res = 0
-        for line in self.read_input():
+        for line in self.input:
             res += self.joltage([int(x) for x in line], 2)
         return res
 
     @solution("172981362045136")
     def part2(self) -> object:
         c = 0
-        for line in self.read_input():
+        for line in self.input:
             c += self.joltage([int(x) for x in line], 12)
         return c
 

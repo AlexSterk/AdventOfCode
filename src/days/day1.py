@@ -12,7 +12,7 @@ class Day1(Day):
         N = 100
         count = 0
 
-        for line in self.read_input():
+        for line in self.input:
             # line is a string
             dir, num = line[0], int(line[1:])
             dir = 1 if dir == "R" else -1
@@ -27,7 +27,7 @@ class Day1(Day):
         N = 100
         count = 0
 
-        for line in self.read_input():
+        for line in self.input:
             # line is a string
             dir, num = line[0], int(line[1:])
             dir = 1 if dir == "R" else -1
