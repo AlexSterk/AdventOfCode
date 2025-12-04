@@ -11,3 +11,5 @@ diagonal = {
     "SW": (-1, 1),
     "NW": (-1, -1),
 }
+
+all = {**cardinal, **diagonal}

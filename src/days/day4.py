@@ -1,18 +1,17 @@
-from collections import defaultdict
-
 from src.setup.day import Day
+from src.util.point import Point
 from src.util.solution import solution
-import src.util.directions as dir
+import src.util.point.direction as directions
 
-directions = [*dir.cardinal.values(), *dir.diagonal.values()]
 
 def parse_grid(lines):
     rolls = set()
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if c == '@':
-                rolls.add((x, y))
+                rolls.add(Point(x, y))
     return rolls
+
 
 class Day4(Day):
     @property
@@ -38,10 +37,10 @@ class Day4(Day):
     @staticmethod
     def round(rolls):
         removed = set()
-        for (x, y) in rolls:
-            ns = sum((x+dx, y+dy) in rolls for (dx, dy) in directions)
+        for p in rolls:
+            ns = sum(p + d in rolls for d in directions.all)
             if ns < 4:
-                removed.add((x, y))
+                removed.add(p)
         return removed
 
 
