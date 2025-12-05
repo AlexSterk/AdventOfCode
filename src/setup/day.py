@@ -18,9 +18,13 @@ class Day:
     def day(self):
         raise NotImplementedError
 
+    @property
+    def input_path(self):
+        return f"data/day{self.day}/{self.input_file}.txt"
+
+
     def read_input(self):
-        f = f"data/day{self.day}/{self.input_file}.txt"
-        with open(f, "r") as file:
+        with open(self.input_path, "r") as file:
             self.raw_input = file.read().strip()
             return self.raw_input.split("\n")
 
