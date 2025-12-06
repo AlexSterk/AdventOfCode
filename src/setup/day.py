@@ -25,7 +25,7 @@ class Day:
 
     def read_input(self):
         with open(self.input_path, "r") as file:
-            self.raw_input = file.read().strip()
+            self.raw_input = file.read().rstrip()
             return self.raw_input.split("\n")
 
     def run(self):

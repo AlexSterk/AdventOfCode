@@ -28,7 +28,7 @@ class Day6(Day):
 
     @solution("5595593539811")
     def part1(self) -> object:
-        data = re.split(r"\s+", self.raw_input)
+        data = re.split(r"\s+", self.raw_input.strip().removesuffix("\n"))
         for i, s in enumerate(data):
             if re.match(r"[*+]", s):
                 break
@@ -45,34 +45,33 @@ class Day6(Day):
 
     @solution("")
     def part2(self) -> object:
-        data = re.split(r"(?<=\d|\*|\+)\s", self.raw_input)
-        for i, s in enumerate(data):
-            if re.match(r"[*+]", s):
-                break
-        number_of_equations = len(data[i:])
-        terms_per_equation = i // number_of_equations
+        lines = self.input[:-1]
+        operands = self.input[-1]
+        i = 0
         equations = []
-        for i in range(number_of_equations):
-            terms = data[i:i + number_of_equations * (terms_per_equation + 1):number_of_equations]
-            operand = terms.pop().strip()
+        for operand in re.findall(r"[*+]\s*", operands):
+            i = operands.find(operand, i)
+            terms = []
+            for line in lines:
+                end = i + len(operand)
+                if len(operand) == 1:
+                    end=i + len(line)
+                term = line[i:end].removesuffix(" ")
+                terms.append(term)
+                print(term, terms)
             max_l = len(max(terms, key=len))
-            terms = [s.ljust(max_l, " ") for s in terms]
-            print(terms, operand)
-
-            t_terms = [""] * max_l
-
+            int_terms = []
             for j in range(max_l):
-                for s in terms:
-                    t_terms[j] += s[j]
+                s = [term.ljust(max_l, " ")[j] for term in terms]
+                s = str.join("", s).strip()
+                if len(s) > 0:
+                    int_terms.append(int(s))
+            e = Equation(operand.strip(), int_terms)
+            print(e)
+            equations.append(e)
 
-            print(t_terms)
+        return sum(equation.eval() for equation in equations)
 
 
-
-            equations.append(Equation(operand, terms))
-
-        return None
-
-
-Day6("test").run()
-# Day6().run()
+# Day6("test").run()
+Day6().run()
