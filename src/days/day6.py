@@ -28,15 +28,6 @@ class Day6(Day):
 
     @solution("5595593539811")
     def part1(self) -> object:
-        equations = self.parsed()
-
-        return sum(equation.eval() for equation in equations)
-
-    @solution("")
-    def part2(self) -> object:
-        return None
-
-    def parsed(self):
         data = re.split(r"\s+", self.raw_input)
         for i, s in enumerate(data):
             if re.match(r"[*+]", s):
@@ -49,8 +40,21 @@ class Day6(Day):
             operand = terms.pop()
             terms = [int(s) for s in terms]
             equations.append(Equation(operand, terms))
-        return equations
+
+        return sum(equation.eval() for equation in equations)
+
+    @solution("")
+    def part2(self) -> object:
+        grid = {}
+        operands = re.split(r"\s+", self.input[-1])
+        for y, row in enumerate(self.input[:-1]):
+            split = re.split(r"(?<=\d)\s", row)
+            for x, n in enumerate(split):
+                grid[x, y] = n
+        print(grid)
+
+        return None
 
 
-# Day6("test").run()
-Day6().run()
+Day6("test").run()
+# Day6().run()
