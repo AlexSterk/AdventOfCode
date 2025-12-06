@@ -45,13 +45,31 @@ class Day6(Day):
 
     @solution("")
     def part2(self) -> object:
-        grid = {}
-        operands = re.split(r"\s+", self.input[-1])
-        for y, row in enumerate(self.input[:-1]):
-            split = re.split(r"(?<=\d)\s", row)
-            for x, n in enumerate(split):
-                grid[x, y] = n
-        print(grid)
+        data = re.split(r"(?<=\d|\*|\+)\s", self.raw_input)
+        for i, s in enumerate(data):
+            if re.match(r"[*+]", s):
+                break
+        number_of_equations = len(data[i:])
+        terms_per_equation = i // number_of_equations
+        equations = []
+        for i in range(number_of_equations):
+            terms = data[i:i + number_of_equations * (terms_per_equation + 1):number_of_equations]
+            operand = terms.pop().strip()
+            max_l = len(max(terms, key=len))
+            terms = [s.ljust(max_l, " ") for s in terms]
+            print(terms, operand)
+
+            t_terms = [""] * max_l
+
+            for j in range(max_l):
+                for s in terms:
+                    t_terms[j] += s[j]
+
+            print(t_terms)
+
+
+
+            equations.append(Equation(operand, terms))
 
         return None
 
