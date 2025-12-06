@@ -31,7 +31,7 @@ class Day6(Day):
         # Split into list of terms, don't care about new lines for now
         tokens = re.split(r"\s+", self.raw_input.strip().removesuffix("\n"))
         # find the first index of an operand, that is where the ints end
-        first_operand_index = next(i for i,s in enumerate(tokens) if re.match(r"[*+]", s))
+        first_operand_index = next(i for i, s in enumerate(tokens) if re.match(r"[*+]", s))
         # calculate how many operands, and therefore, equations there are
         number_of_equations = len(tokens) - first_operand_index
         # calculate how many terms each equation has
@@ -57,25 +57,23 @@ class Day6(Day):
         operand_line = self.input[-1]
 
         equations = []
-        last_index = 0
-        for op_match in re.findall(r"[*+]\s*", operand_line):
-            last_index = operand_line.find(op_match, last_index)
-            terms = []
-            for line in term_lines:
-                end = last_index + len(op_match)
-                if len(op_match) == 1:
-                    end=last_index + len(line)
-                term = line[last_index:end].removesuffix(" ")
-                terms.append(term)
-            last_index += 1
+        for op_match in re.finditer(r"[*+]\s*", operand_line):
+            start = op_match.start()
+            end = op_match.end()
+            if end - start == 1: # length of group
+                # final operand has whitespaces stripped, so we match to end of line
+                end = None
+            terms = [line[start:end] for line in term_lines]
             max_l = len(max(terms, key=len))
             int_terms = []
             for j in range(max_l):
-                s = [term.ljust(max_l, " ")[j] for term in terms]
-                s = str.join("", s).strip()
-                if len(s) > 0:
-                    int_terms.append(int(s))
-            e = Equation(op_match.strip(), int_terms)
+                # extract jth digit from each term
+                chars = [term.ljust(max_l, " ")[j] for term in terms]
+                # combine into int
+                term = "".join(chars).strip()
+                if term:
+                    int_terms.append(int(term))
+            e = Equation(op_match.group().strip(), int_terms)
             equations.append(e)
 
         return sum(equation.eval() for equation in equations)
