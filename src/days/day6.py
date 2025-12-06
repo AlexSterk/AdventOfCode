@@ -43,7 +43,7 @@ class Day6(Day):
 
         return sum(equation.eval() for equation in equations)
 
-    @solution("")
+    @solution("10153315705125")
     def part2(self) -> object:
         lines = self.input[:-1]
         operands = self.input[-1]
@@ -58,7 +58,7 @@ class Day6(Day):
                     end=i + len(line)
                 term = line[i:end].removesuffix(" ")
                 terms.append(term)
-                print(term, terms)
+            i += 1
             max_l = len(max(terms, key=len))
             int_terms = []
             for j in range(max_l):
@@ -67,7 +67,6 @@ class Day6(Day):
                 if len(s) > 0:
                     int_terms.append(int(s))
             e = Equation(operand.strip(), int_terms)
-            print(e)
             equations.append(e)
 
         return sum(equation.eval() for equation in equations)
