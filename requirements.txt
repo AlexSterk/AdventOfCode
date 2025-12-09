@@ -4,3 +4,4 @@ numpy
 z3-solver
 imageio
 scipy
+shapely
