@@ -1,42 +1,45 @@
 from collections import deque
 
+import numpy as np
+
 from src.setup.day import Day
+from src.util.dijkstra import shortest_path
 from src.util.solution import solution
 
 ld = {".": 0, "#": 1}
+
+def button_to_bitstring(button: str, size: int):
+    button = button.strip("()").split(",")
+    button = [int(x) for x in button]
+    result = [False] * size
+    for b in button:
+        result[b] = True
+    return result
+
 
 class Day10(Day):
     @property
     def day(self):
         return 10
 
-    @solution("")
+    @solution("436")
     def part1(self) -> object:
         total = 0
         for line in self.input:
             end, *buttons, _ = line.split(" ")
-            end = tuple([ld[c] for c in end.strip("[]")])
-            buttons = [e if type(e) == tuple else (e,) for s in buttons if (e := eval(s))]
+            end = tuple([True if c == "#" else False for c in end.strip("[]")])
+            buttons = [button_to_bitstring(b, len(end)) for b in buttons]
+            # print(end, buttons)
 
-            state = (0,) * len(end), 0
-            visited = set()
-            q = deque([state])
-            while q:
-                state = q.popleft()
-                lights, buttons_pressed = state
-                if state in visited:
-                    continue
-                visited.add(state)
-                if lights == end:
-                    break
+            start = [False] * len(end)
+            def is_end(cur):
+                return cur == end
+            def neighbours(cur):
                 for b in buttons:
-                    n_lights = [*lights]
-                    for toggle in b:
-                        n_lights[toggle] ^= 1
-                    n_state = tuple(n_lights), buttons_pressed + 1
-                    q.append(n_state)
-            total += buttons_pressed
+                    yield tuple((np.array(cur) ^ np.array(b)).tolist())
+            total += shortest_path(tuple(start), is_end, neighbours)[2]
         return total
+
 
 
 
@@ -45,5 +48,5 @@ class Day10(Day):
         return None
 
 
-Day10("test").run()
-# Day10().run()
+# Day10("test").run()
+Day10().run()
