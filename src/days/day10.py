@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import linprog
+from scipy.optimize import linprog, milp, LinearConstraint, Bounds
 
 from src.setup.day import Day
 from src.util.dijkstra import shortest_path
@@ -43,7 +43,7 @@ class Day10(Day):
             total += shortest_path(tuple(start), is_end, neighbours)[2]
         return total
 
-    @solution("")
+    @solution("14999")
     def part2(self) -> object:
         total = 0
         for line in self.input:
@@ -54,15 +54,16 @@ class Day10(Day):
             buttons = np.vstack(buttons).T
 
             joltage = np.array(joltage)
-            # print(joltage, buttons, cost)
 
-            result = linprog(c=cost, A_eq=buttons, b_eq=joltage, method='highs')
-            result = result.x
-            print(result)
-            total += np.sum(result)
+            result = milp(c=cost,
+                 constraints=[LinearConstraint(A=buttons, lb=joltage, ub=joltage)],
+                 bounds=Bounds(lb=0, ub=np.inf),
+                 integrality=1
+                )
+            total += np.sum(result.x)
 
-        return total, int(total)
+        return int(total)
 
 
-Day10("test").run()
-# Day10().run()
+# Day10("test").run()
+Day10().run()
