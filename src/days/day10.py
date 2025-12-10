@@ -1,3 +1,5 @@
+from typing import Iterable
+
 import numpy as np
 from scipy.optimize import milp, LinearConstraint, Bounds
 
@@ -14,6 +16,10 @@ def button_to_bitstring(button: str, size: int):
     return result
 
 
+def bitstring_to_int(bitstring: Iterable[int]) -> int:
+    return int("".join(map(str, bitstring)), 2)
+
+
 class Day10(Day):
     @property
     def day(self):
@@ -27,16 +33,18 @@ class Day10(Day):
             end = tuple([1 if c == "#" else 0 for c in end.strip("[]")])
             buttons = [button_to_bitstring(b, len(end)) for b in buttons]
 
-            start = [0] * len(end)
+            end = bitstring_to_int(end)
+            buttons = [bitstring_to_int(b) for b in buttons]
+            start = 0
 
             def is_end(cur):
                 return cur == end
 
             def neighbours(cur):
                 for b in buttons:
-                    yield tuple((np.array(cur) ^ np.array(b)).tolist())
+                    yield cur ^ b
 
-            total += shortest_path(tuple(start), is_end, neighbours)[2]
+            total += shortest_path(start, is_end, neighbours)[2]
         return total
 
     @solution("14999")
