@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import linprog, milp, LinearConstraint, Bounds
+from scipy.optimize import milp, LinearConstraint, Bounds
 
 from src.setup.day import Day
 from src.util.dijkstra import shortest_path
@@ -29,7 +29,6 @@ class Day10(Day):
             end, *buttons, _ = line.split(" ")
             end = tuple([1 if c == "#" else 0 for c in end.strip("[]")])
             buttons = [button_to_bitstring(b, len(end)) for b in buttons]
-            # print(end, buttons)
 
             start = [0] * len(end)
 
