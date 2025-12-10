@@ -5,9 +5,6 @@ from src.setup.day import Day
 from src.util.dijkstra import shortest_path
 from src.util.solution import solution
 
-ld = {".": 0, "#": 1}
-
-
 def button_to_bitstring(button: str, size: int):
     button = button.strip("()").split(",")
     button = [int(x) for x in button]
