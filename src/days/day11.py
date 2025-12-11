@@ -1,3 +1,6 @@
+from _pyrepl.commands import end
+from functools import cache
+
 from src.setup.day import Day
 from src.util.dijkstra import all_paths
 from src.util.solution import solution
@@ -14,11 +17,14 @@ class Day11(Day):
             device_name, outputs = line.split(": ")
             devices[device_name] = outputs.split(" ")
 
+        if "you" not in devices:
+            return None
+
         start = ("you",)
         end = "out"
 
         def is_end(cur):
-            *past, cur = cur
+            *_, cur = cur
             return cur == end
 
         def ns(cur):
@@ -28,9 +34,27 @@ class Day11(Day):
 
         return len(all_paths(start, is_end, ns))
 
-    @solution("")
+    @solution("303012373210128")
     def part2(self) -> object:
-        return None
+        devices = {}
+        for line in self.input:
+            device_name, outputs = line.split(": ")
+            devices[device_name] = outputs.split(" ")
+        if "svr" not in devices:
+            return None
 
-# Day11("test").run()
+        @cache
+        def count(cur, dac, fft):
+            match cur:
+                case 'out': return dac and fft
+                case 'fft': fft = True
+                case 'dac': dac = True
+
+            return sum(count(n, dac, fft) for n in devices[cur])
+
+        return count("svr", 0, 0)
+
+
+Day11("test").run()
+# Day11("test2").run()
 Day11().run()
