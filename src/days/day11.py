@@ -44,15 +44,13 @@ class Day11(Day):
             return None
 
         @cache
-        def count(cur, dac, fft):
-            match cur:
-                case 'out': return dac and fft
-                case 'fft': fft = True
-                case 'dac': dac = True
+        def count(cur, out):
+            if cur == out: return 1
+            if cur not in devices:
+                return 0
+            return sum(count(n, out) for n in devices[cur])
 
-            return sum(count(n, dac, fft) for n in devices[cur])
-
-        return count("svr", 0, 0)
+        return count("svr", "fft") * count("fft", "dac") * count("dac", "out")
 
 
 Day11("test").run()
