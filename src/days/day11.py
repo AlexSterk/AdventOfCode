@@ -5,6 +5,7 @@ from src.setup.day import Day
 from src.util.dijkstra import all_paths, count_paths
 from src.util.solution import solution
 
+
 class Day11(Day):
     @property
     def day(self):
@@ -30,7 +31,7 @@ class Day11(Day):
         def ns(cur):
             *past, cur = cur
             for n in devices[cur]:
-                yield *past,cur,n
+                yield *past, cur, n
 
         return len(all_paths(start, is_end, ns))
 
@@ -49,9 +50,10 @@ class Day11(Day):
             for n in devices[cur]:
                 yield n
 
-        return (count_paths("svr", lambda cur: cur == "fft", ns) *
-                count_paths("fft", lambda cur: cur == "dac", ns) *
-                count_paths("dac", lambda cur: cur == "out", ns))
+        def count(start, end):
+            return count_paths(start, lambda cur: cur == end, ns)
+
+        return count("svr", "fft") * count("fft", "dac") * count("dac", "out")
 
 
 Day11("test").run()
