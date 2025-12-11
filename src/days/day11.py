@@ -45,9 +45,7 @@ class Day11(Day):
             return None
 
         def ns(cur):
-            if cur not in devices:
-                return
-            for n in devices[cur]:
+            for n in devices.get(cur, []):
                 yield n
 
         def count(start, end):
