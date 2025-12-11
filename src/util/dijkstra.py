@@ -1,3 +1,4 @@
+from functools import cache
 from queue import PriorityQueue
 from typing import TypeVar, Iterable, Callable
 
@@ -55,6 +56,19 @@ def reconstruct_path(
     path.append(start)
     path.reverse()
     return dist, end, d, path
+
+
+def count_paths(
+        start: T,
+        end: Callable[[T], bool],
+        neighbours: Callable[[T], Iterable[T]],
+):
+    @cache
+    def count(cur):
+        if end(cur):
+            return 1
+        return sum(count(cur) for cur in neighbours(cur))
+    return count(start)
 
 
 class Dijkstra:

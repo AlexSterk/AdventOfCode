@@ -2,7 +2,7 @@ from _pyrepl.commands import end
 from functools import cache
 
 from src.setup.day import Day
-from src.util.dijkstra import all_paths
+from src.util.dijkstra import all_paths, count_paths
 from src.util.solution import solution
 
 class Day11(Day):
@@ -43,14 +43,15 @@ class Day11(Day):
         if "svr" not in devices:
             return None
 
-        @cache
-        def count(cur, out):
-            if cur == out: return 1
+        def ns(cur):
             if cur not in devices:
-                return 0
-            return sum(count(n, out) for n in devices[cur])
+                return
+            for n in devices[cur]:
+                yield n
 
-        return count("svr", "fft") * count("fft", "dac") * count("dac", "out")
+        return (count_paths("svr", lambda cur: cur == "fft", ns) *
+                count_paths("fft", lambda cur: cur == "dac", ns) *
+                count_paths("dac", lambda cur: cur == "out", ns))
 
 
 Day11("test").run()
