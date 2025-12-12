@@ -7,6 +7,46 @@ from src.util.np_cache import np_cache
 from src.util.solution import solution
 
 
+def to_np_array(shape):
+    arr = np.array([list(l) for l in shape.splitlines()])
+    arr = (arr == '#').astype(bool)
+    return arr
+
+
+@np_cache
+def overlaps(space, shape):
+    return (space & shape).sum() > 0
+
+
+def all_rotations_and_flips(arr: np.ndarray):
+    """
+    Generate all unique rotations and flips of a 2D ndarray.
+    Returns a list of arrays.
+    """
+    for flip in [False, True]:
+        temp = np.flipud(arr) if flip else arr
+        for k in range(4):
+            rotated = np.rot90(temp, k)
+            yield rotated
+
+
+def sliding_windows(grid: np.ndarray, width, height):
+    w, h = grid.shape
+    for y in range(h - height + 1):
+        for x in range(w - width + 1):
+            yield grid[x: x + width, y: y + height]
+
+def unique_arrays(arr_list):
+    seen = set()
+    unique = []
+    for arr in arr_list:
+        key = arr.tobytes()  # hashable representation
+        if key not in seen:
+            seen.add(key)
+            unique.append(arr)
+    return unique
+
+
 class Day12(Day):
     @property
     def day(self):
@@ -28,22 +68,36 @@ class Day12(Day):
             ints = [int(n) for n in m.group(3).split(" ")]
             _trees.append((width, height, ints))
         trees = _trees
-        print(shapes, trees)
+        # print(shapes, trees)
 
         TOTAL = 0
 
-        def to_np_array(shape):
-            arr = np.array([list(l) for l in shape.splitlines()])
-            arr = (arr == '#').astype(bool)
-            return arr
-
         shapes = [to_np_array(shape) for shape in shapes]
+        variants = {i: list(all_rotations_and_flips(shape)) for i, shape in enumerate(shapes)}
+        for i, l in variants.items():
+            variants[i] = unique_arrays(l)
 
-        @np_cache
-        def overlaps(space, shape):
-            space = unfreeze(space)
-            shape = unfreeze(shape)
-            return (space & shape).sum() == 0
+
+        def presents_fit(grid, presents) -> bool:
+            if all(p == 0 for p in presents):
+                return True
+
+            w, h = grid.shape
+            for i, c in enumerate(presents):
+                if c == 0:
+                    continue
+                presents_copy = presents.copy()
+                presents_copy[i] -= 1
+                vs = variants[i]
+                for variant in vs:
+                    for y in range(h - 3 + 1):
+                        for x in range(w - 3 + 1):
+                            subgrid = grid[x: x + 3, y: y + 3]
+                            if not overlaps(subgrid, variant):
+                                grid_copy = grid.copy()
+                                grid_copy[x: x + 3, y: y + 3] = variant
+                                if presents_fit(grid_copy, presents_copy):
+                                    return True
 
         sizes = [shape.sum() for shape in shapes]
         max_sizes = [shape.size for shape in shapes]
@@ -60,7 +114,8 @@ class Day12(Day):
 
             grid = np.zeros([width, height], dtype=bool)
 
-
+            if presents_fit(grid, presents):
+                TOTAL += 1
 
         return TOTAL
 
@@ -70,4 +125,4 @@ class Day12(Day):
 
 
 Day12("test").run()
-Day12().run()
+# Day12().run()
