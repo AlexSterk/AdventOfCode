@@ -1,7 +1,11 @@
 import re
 
+import numpy as np
+
 from src.setup.day import Day
+from src.util.np_cache import np_cache
 from src.util.solution import solution
+
 
 class Day12(Day):
     @property
@@ -26,15 +30,44 @@ class Day12(Day):
         trees = _trees
         print(shapes, trees)
 
+        TOTAL = 0
+
+        def to_np_array(shape):
+            arr = np.array([list(l) for l in shape.splitlines()])
+            arr = (arr == '#').astype(bool)
+            return arr
+
+        shapes = [to_np_array(shape) for shape in shapes]
+
+        @np_cache
+        def overlaps(space, shape):
+            space = unfreeze(space)
+            shape = unfreeze(shape)
+            return (space & shape).sum() == 0
+
+        sizes = [shape.sum() for shape in shapes]
+        max_sizes = [shape.size for shape in shapes]
+        for width, height, presents in trees:
+            available_space = width * height
+            total_size = sum(sizes[i] * count for i, count in enumerate(presents))
+            if available_space < total_size:
+                # presents will never fit, skip
+                continue
+            total_size = sum(max_sizes[i] * count for i, count in enumerate(presents))
+            if available_space >= total_size and width % 3 == 0 and height % 3 == 0:
+                TOTAL += 1
+                continue
+
+            grid = np.zeros([width, height], dtype=bool)
 
 
 
-
-        return None
+        return TOTAL
 
     @solution("")
     def part2(self) -> object:
         return None
 
+
 Day12("test").run()
-# Day12().run()
+Day12().run()
