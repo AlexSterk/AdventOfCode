@@ -1,5 +1,4 @@
 import re
-
 import numpy as np
 
 from src.setup.day import Day
@@ -8,20 +7,16 @@ from src.util.solution import solution
 
 
 def to_np_array(shape):
+    """Convert string shape to boolean ndarray."""
     arr = np.array([list(l) for l in shape.splitlines()])
     arr = (arr == '#').astype(bool)
     return arr
 
 
-@np_cache
-def overlaps(space, shape):
-    return (space & shape).sum() > 0
-
-
 def all_rotations_and_flips(arr: np.ndarray):
     """
-    Generate all unique rotations and flips of a 2D ndarray.
-    Returns a list of arrays.
+    Generate all rotations and vertical flips of a 2D ndarray.
+    Yields arrays.
     """
     for flip in [False, True]:
         temp = np.flipud(arr) if flip else arr
@@ -30,21 +25,36 @@ def all_rotations_and_flips(arr: np.ndarray):
             yield rotated
 
 
-def sliding_windows(grid: np.ndarray, width, height):
-    w, h = grid.shape
-    for y in range(h - height + 1):
-        for x in range(w - width + 1):
-            yield grid[x: x + width, y: y + height]
-
 def unique_arrays(arr_list):
+    """Remove duplicates from a list of ndarrays."""
     seen = set()
     unique = []
     for arr in arr_list:
-        key = arr.tobytes()  # hashable representation
+        key = arr.tobytes()
         if key not in seen:
             seen.add(key)
             unique.append(arr)
     return unique
+
+
+# 3x3 grids represented as 9-bit integers
+def to_int(grid):
+    return sum((1 << i) if val else 0 for i, val in enumerate(grid.flatten()))
+
+
+def overlaps_int(grid_int, variant_int):
+    return (grid_int & variant_int) != 0
+
+
+def variants_to_ints(variants):
+    return [to_int(v) for v in variants]
+
+
+def sliding_windows(grid, height, width):
+    H, W = grid.shape
+    for y in range(H - height + 1):
+        for x in range(W - width + 1):
+            yield x, y
 
 
 class Day12(Day):
@@ -54,67 +64,86 @@ class Day12(Day):
 
     @solution("")
     def part1(self) -> object:
-        shapes, trees = self.raw_input.rsplit("\n\n", 1)
-        shapes = shapes.split("\n\n")
+        shapes_str, trees_str = self.raw_input.rsplit("\n\n", 1)
+        shapes = shapes_str.split("\n\n")
         shapes = ["\n".join(l.splitlines()[1:]) for l in shapes]
-        trees = trees.split("\n")
-        p = re.compile(r"(\d+)x(\d+): (.+)")
 
-        _trees = []
-        for tree in trees:
+        p = re.compile(r"(\d+)x(\d+): (.+)")
+        trees = []
+        for tree in trees_str.split("\n"):
             m = p.search(tree)
             width = int(m.group(1))
             height = int(m.group(2))
             ints = [int(n) for n in m.group(3).split(" ")]
-            _trees.append((width, height, ints))
-        trees = _trees
-        # print(shapes, trees)
+            trees.append((width, height, ints))
 
         TOTAL = 0
 
-        shapes = [to_np_array(shape) for shape in shapes]
-        variants = {i: list(all_rotations_and_flips(shape)) for i, shape in enumerate(shapes)}
-        for i, l in variants.items():
-            variants[i] = unique_arrays(l)
+        # Convert shapes to boolean arrays
+        shapes_bool = [to_np_array(shape) for shape in shapes]
 
+        # Precompute unique rotated/flipped variants
+        variants_list = [
+            unique_arrays(list(all_rotations_and_flips(shape)))
+            for shape in shapes_bool
+        ]
 
-        def presents_fit(grid, presents) -> bool:
-            if all(p == 0 for p in presents):
+        # Convert variants to 3x3 integers
+        variant_ints_list = [variants_to_ints(vs) for vs in variants_list]
+
+        sizes = [shape.sum() for shape in shapes_bool]
+        max_sizes = [shape.size for shape in shapes_bool]
+
+        @np_cache
+        def presents_fit(grid, presents_tuple):
+            """
+            Recursive in-place backtracking to check if presents fit.
+            grid_bytes: flattened boolean grid as bytes
+            grid_shape: shape of grid
+            presents_tuple: tuple of remaining counts
+            """
+            if all(p == 0 for p in presents_tuple):
                 return True
 
-            w, h = grid.shape
-            for i, c in enumerate(presents):
-                if c == 0:
+            presents = list(presents_tuple)
+            grid = grid.copy()
+
+            for i, count in enumerate(presents):
+                if count == 0:
                     continue
+
                 presents_copy = presents.copy()
                 presents_copy[i] -= 1
-                vs = variants[i]
-                for variant in vs:
-                    for y in range(h - 3 + 1):
-                        for x in range(w - 3 + 1):
-                            subgrid = grid[x: x + 3, y: y + 3]
-                            if not overlaps(subgrid, variant):
-                                grid_copy = grid.copy()
-                                grid_copy[x: x + 3, y: y + 3] = variant
-                                if presents_fit(grid_copy, presents_copy):
-                                    return True
 
-        sizes = [shape.sum() for shape in shapes]
-        max_sizes = [shape.size for shape in shapes]
+                for variant_int in variant_ints_list[i]:
+                    for x, y in sliding_windows(grid, 3, 3):
+                        subgrid = grid[y:y + 3, x:x + 3]
+                        subgrid_int = to_int(subgrid)
+
+                        if not overlaps_int(subgrid_int, variant_int):
+                            # Place variant in-place
+                            variant = variants_list[i][variant_ints_list[i].index(variant_int)]
+                            subgrid[:,:] = variant
+
+                            if presents_fit(grid, tuple(presents_copy)):
+                                return True
+
+                            # Backtrack
+                            subgrid[:, :] = False
+            return False
+
         for width, height, presents in trees:
             available_space = width * height
             total_size = sum(sizes[i] * count for i, count in enumerate(presents))
             if available_space < total_size:
-                # presents will never fit, skip
                 continue
-            total_size = sum(max_sizes[i] * count for i, count in enumerate(presents))
-            if available_space >= total_size and width % 3 == 0 and height % 3 == 0:
+            total_size_max = sum(max_sizes[i] * count for i, count in enumerate(presents))
+            if available_space >= total_size_max and width % 3 == 0 and height % 3 == 0:
                 TOTAL += 1
                 continue
 
-            grid = np.zeros([width, height], dtype=bool)
-
-            if presents_fit(grid, presents):
+            grid = np.zeros([height, width], dtype=bool)
+            if presents_fit(grid, tuple(presents)):
                 TOTAL += 1
 
         return TOTAL
@@ -124,5 +153,5 @@ class Day12(Day):
         return None
 
 
-Day12("test").run()
-# Day12().run()
+# Day12("test").run()
+Day12().run()
